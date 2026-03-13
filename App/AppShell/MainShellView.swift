@@ -34,7 +34,13 @@ struct MainShellView: View {
 
                 case .qna:
                     NavigationStack(path: $qnaPath) {
-                        QandAPlaceholderView()
+                        QnARootView(
+                            path: $qnaPath,
+                            onBackToHome: {
+                                qnaPath.removeLast(qnaPath.count)
+                                tab = .home
+                            }
+                        )
                     }
 
                 case .mypage:
@@ -55,7 +61,7 @@ struct MainShellView: View {
                             tab = newTab
                         }
                     ),
-                    isHidden: isTabBarHidden,
+                    isHidden: isTabBarHidden || tab == .qna,
                     bottomInset: bottomInset
                 )
             }
@@ -73,18 +79,6 @@ struct MainShellView: View {
             qnaPath.removeLast(qnaPath.count)
         case .mypage:
             myPagePath.removeLast(myPagePath.count)
-        }
-    }
-}
-
-/// 아직 QnA 화면이 없을 수 있으니, 빌드 깨지지 않게 임시 뷰
-private struct QandAPlaceholderView: View {
-    var body: some View {
-        ScreenContainer(scroll: false) { _ in
-            VStack {
-                Text("QnA 탭을 준비중입니다. 조금만 기다려주세요.")
-                Spacer()
-            }
         }
     }
 }

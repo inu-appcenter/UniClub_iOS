@@ -24,6 +24,7 @@
 		CB4650EC2F3B93040087DE5A /* ProfileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4650EB2F3B93040087DE5A /* ProfileImageService.swift */; };
 		CB4650EE2F3B9B710087DE5A /* DeleteAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4650ED2F3B9B710087DE5A /* DeleteAccountViewModel.swift */; };
 		CB4650F12F3C66A60087DE5A /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4650F02F3C66A60087DE5A /* KeychainStore.swift */; };
+		CB8BE8CF2F6254E60047B379 /* QnAReportDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB8BE8CE2F6254E60047B379 /* QnAReportDialog.swift */; };
 		CBC3E77C2F311A3900EF7F12 /* AppMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3E77B2F311A3900EF7F12 /* AppMetrics.swift */; };
 		CBC3E77E2F311A5200EF7F12 /* AppTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3E77D2F311A5200EF7F12 /* AppTokens.swift */; };
 		CBC3E7802F311A6300EF7F12 /* ScreenContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3E77F2F311A6300EF7F12 /* ScreenContainer.swift */; };
@@ -91,6 +92,22 @@
 		CBC90CB72F39BA390022ECDC /* ClubListHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC90CB62F39BA390022ECDC /* ClubListHeader.swift */; };
 		CBC90CBA2F3B057D0022ECDC /* AppTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC90CB92F3B057D0022ECDC /* AppTab.swift */; };
 		CBC90CC02F3B13070022ECDC /* ScrollDirectionObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC90CBF2F3B13070022ECDC /* ScrollDirectionObserver.swift */; };
+		CBE06D9D2F601004003FB7B8 /* QnARoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06D9C2F601004003FB7B8 /* QnARoute.swift */; };
+		CBE06D9F2F60100B003FB7B8 /* QnAModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06D9E2F60100B003FB7B8 /* QnAModels.swift */; };
+		CBE06DA12F601010003FB7B8 /* QnAService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DA02F601010003FB7B8 /* QnAService.swift */; };
+		CBE06DA32F601011003FB7B8 /* QnAClubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DA22F601011003FB7B8 /* QnAClubService.swift */; };
+		CBE06DA52F601011003FB7B8 /* QnAViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DA42F601011003FB7B8 /* QnAViewModel.swift */; };
+		CBE06DA72F601012003FB7B8 /* QnADetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DA62F601012003FB7B8 /* QnADetailViewModel.swift */; };
+		CBE06DA92F601013003FB7B8 /* QnAComposerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DA82F601013003FB7B8 /* QnAComposerViewModel.swift */; };
+		CBE06DAB2F601013003FB7B8 /* QnASearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DAA2F601013003FB7B8 /* QnASearchBar.swift */; };
+		CBE06DAD2F60103C003FB7B8 /* QnAFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DAC2F60103C003FB7B8 /* QnAFilterBar.swift */; };
+		CBE06DAF2F60103D003FB7B8 /* QnAQuestionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DAE2F60103D003FB7B8 /* QnAQuestionCard.swift */; };
+		CBE06DB12F60103E003FB7B8 /* QnAAnswerRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DB02F60103E003FB7B8 /* QnAAnswerRow.swift */; };
+		CBE06DB32F60103F003FB7B8 /* QnAClubPickerSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DB22F60103F003FB7B8 /* QnAClubPickerSheetView.swift */; };
+		CBE06DB52F60FCD7003FB7B8 /* QnARootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DB42F60FCD7003FB7B8 /* QnARootView.swift */; };
+		CBE06DB72F60FCE6003FB7B8 /* QnAListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DB62F60FCE6003FB7B8 /* QnAListView.swift */; };
+		CBE06DB92F60FCF7003FB7B8 /* QnADetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DB82F60FCF7003FB7B8 /* QnADetailView.swift */; };
+		CBE06DBB2F60FD08003FB7B8 /* QnAComposerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE06DBA2F60FD08003FB7B8 /* QnAComposerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -111,6 +128,7 @@
 		CB4650EB2F3B93040087DE5A /* ProfileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageService.swift; sourceTree = "<group>"; };
 		CB4650ED2F3B9B710087DE5A /* DeleteAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountViewModel.swift; sourceTree = "<group>"; };
 		CB4650F02F3C66A60087DE5A /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		CB8BE8CE2F6254E60047B379 /* QnAReportDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAReportDialog.swift; sourceTree = "<group>"; };
 		CBC3E69F2F2F45C000EF7F12 /* UniClub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UniClub.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBC3E77B2F311A3900EF7F12 /* AppMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetrics.swift; sourceTree = "<group>"; };
 		CBC3E77D2F311A5200EF7F12 /* AppTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTokens.swift; sourceTree = "<group>"; };
@@ -179,6 +197,22 @@
 		CBC90CB62F39BA390022ECDC /* ClubListHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClubListHeader.swift; sourceTree = "<group>"; };
 		CBC90CB92F3B057D0022ECDC /* AppTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTab.swift; sourceTree = "<group>"; };
 		CBC90CBF2F3B13070022ECDC /* ScrollDirectionObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollDirectionObserver.swift; sourceTree = "<group>"; };
+		CBE06D9C2F601004003FB7B8 /* QnARoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnARoute.swift; sourceTree = "<group>"; };
+		CBE06D9E2F60100B003FB7B8 /* QnAModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAModels.swift; sourceTree = "<group>"; };
+		CBE06DA02F601010003FB7B8 /* QnAService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAService.swift; sourceTree = "<group>"; };
+		CBE06DA22F601011003FB7B8 /* QnAClubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAClubService.swift; sourceTree = "<group>"; };
+		CBE06DA42F601011003FB7B8 /* QnAViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAViewModel.swift; sourceTree = "<group>"; };
+		CBE06DA62F601012003FB7B8 /* QnADetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnADetailViewModel.swift; sourceTree = "<group>"; };
+		CBE06DA82F601013003FB7B8 /* QnAComposerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAComposerViewModel.swift; sourceTree = "<group>"; };
+		CBE06DAA2F601013003FB7B8 /* QnASearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnASearchBar.swift; sourceTree = "<group>"; };
+		CBE06DAC2F60103C003FB7B8 /* QnAFilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAFilterBar.swift; sourceTree = "<group>"; };
+		CBE06DAE2F60103D003FB7B8 /* QnAQuestionCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAQuestionCard.swift; sourceTree = "<group>"; };
+		CBE06DB02F60103E003FB7B8 /* QnAAnswerRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAAnswerRow.swift; sourceTree = "<group>"; };
+		CBE06DB22F60103F003FB7B8 /* QnAClubPickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAClubPickerSheetView.swift; sourceTree = "<group>"; };
+		CBE06DB42F60FCD7003FB7B8 /* QnARootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnARootView.swift; sourceTree = "<group>"; };
+		CBE06DB62F60FCE6003FB7B8 /* QnAListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAListView.swift; sourceTree = "<group>"; };
+		CBE06DB82F60FCF7003FB7B8 /* QnADetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnADetailView.swift; sourceTree = "<group>"; };
+		CBE06DBA2F60FD08003FB7B8 /* QnAComposerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAComposerView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -195,6 +229,19 @@
 		CB1DA1AE2F4C2CA0004FF6C6 /* QnA */ = {
 			isa = PBXGroup;
 			children = (
+				CBE06DBD2F612FF8003FB7B8 /* Sheets */,
+				CBE06DBC2F612FD3003FB7B8 /* Components */,
+				CBE06DA82F601013003FB7B8 /* QnAComposerViewModel.swift */,
+				CBE06DA62F601012003FB7B8 /* QnADetailViewModel.swift */,
+				CBE06DA42F601011003FB7B8 /* QnAViewModel.swift */,
+				CBE06DA22F601011003FB7B8 /* QnAClubService.swift */,
+				CBE06DA02F601010003FB7B8 /* QnAService.swift */,
+				CBE06D9E2F60100B003FB7B8 /* QnAModels.swift */,
+				CBE06D9C2F601004003FB7B8 /* QnARoute.swift */,
+				CBE06DB42F60FCD7003FB7B8 /* QnARootView.swift */,
+				CBE06DB62F60FCE6003FB7B8 /* QnAListView.swift */,
+				CBE06DB82F60FCF7003FB7B8 /* QnADetailView.swift */,
+				CBE06DBA2F60FD08003FB7B8 /* QnAComposerView.swift */,
 			);
 			path = QnA;
 			sourceTree = "<group>";
@@ -491,6 +538,26 @@
 			path = SupportingFiles;
 			sourceTree = "<group>";
 		};
+		CBE06DBC2F612FD3003FB7B8 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				CBE06DB02F60103E003FB7B8 /* QnAAnswerRow.swift */,
+				CBE06DAE2F60103D003FB7B8 /* QnAQuestionCard.swift */,
+				CBE06DAC2F60103C003FB7B8 /* QnAFilterBar.swift */,
+				CBE06DAA2F601013003FB7B8 /* QnASearchBar.swift */,
+				CB8BE8CE2F6254E60047B379 /* QnAReportDialog.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		CBE06DBD2F612FF8003FB7B8 /* Sheets */ = {
+			isa = PBXGroup;
+			children = (
+				CBE06DB22F60103F003FB7B8 /* QnAClubPickerSheetView.swift */,
+			);
+			path = Sheets;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -563,8 +630,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CBE06D9D2F601004003FB7B8 /* QnARoute.swift in Sources */,
+				CBE06DAF2F60103D003FB7B8 /* QnAQuestionCard.swift in Sources */,
 				CBC90C932F377CAC0022ECDC /* SignupFlowViewModel.swift in Sources */,
 				CBC3E7D52F32194800EF7F12 /* MyPageView.swift in Sources */,
+				CB8BE8CF2F6254E60047B379 /* QnAReportDialog.swift in Sources */,
 				CBC3E7D22F320E8800EF7F12 /* SignupStep3TermsView.swift in Sources */,
 				CB4650E22F3B7D2D0087DE5A /* MyPageAccountSection.swift in Sources */,
 				CBC3E7952F317AEC00EF7F12 /* IconButton.swift in Sources */,
@@ -572,6 +642,7 @@
 				CBC90CBA2F3B057D0022ECDC /* AppTab.swift in Sources */,
 				CBC3E7C52F31E09200EF7F12 /* MajorPickerStep.swift in Sources */,
 				CBC90CAB2F39A3E50022ECDC /* ClubsService.swift in Sources */,
+				CBE06DBB2F60FD08003FB7B8 /* QnAComposerView.swift in Sources */,
 				CB4650DC2F3B7CF40087DE5A /* MyPageDivider.swift in Sources */,
 				CB4650D52F3B6D6D0087DE5A /* MyPageViewModel.swift in Sources */,
 				CBC90CA42F3965A70022ECDC /* MajorEnum.swift in Sources */,
@@ -585,6 +656,7 @@
 				CBC3E7BA2F31CA0F00EF7F12 /* AuthRoute.swift in Sources */,
 				CBC3E7862F311AA700EF7F12 /* Chip.swift in Sources */,
 				CBC3E7802F311A6300EF7F12 /* ScreenContainer.swift in Sources */,
+				CBE06DB72F60FCE6003FB7B8 /* QnAListView.swift in Sources */,
 				CBC3E7932F3178B100EF7F12 /* HomeView.swift in Sources */,
 				CBC90C842F370D480022ECDC /* LoginService.swift in Sources */,
 				CBC90C992F38476F0022ECDC /* Color+Hex.swift in Sources */,
@@ -596,6 +668,7 @@
 				CB4650DE2F3B7D020087DE5A /* MyPageMenuRow.swift in Sources */,
 				CBC3E7BC2F31CA1F00EF7F12 /* AuthFlowRootView.swift in Sources */,
 				CBC3E7AF2F31BCE100EF7F12 /* SortSheet.swift in Sources */,
+				CBE06DB32F60103F003FB7B8 /* QnAClubPickerSheetView.swift in Sources */,
 				CBC3E79D2F317E6100EF7F12 /* HeroCarouselCard.swift in Sources */,
 				CBC3E7B12F31BD0600EF7F12 /* SearchView.swift in Sources */,
 				CBC3E77C2F311A3900EF7F12 /* AppMetrics.swift in Sources */,
@@ -604,6 +677,7 @@
 				CBC3E79B2F317B7D00EF7F12 /* AppTapBarView.swift in Sources */,
 				CBC3E7842F311A9700EF7F12 /* AppTextField.swift in Sources */,
 				CBC3E7B42F31BEF500EF7F12 /* MainShellView.swift in Sources */,
+				CBE06DA32F601011003FB7B8 /* QnAClubService.swift in Sources */,
 				CBC90BBE2F36FD1C0022ECDC /* TabBarControl.swift in Sources */,
 				CBC90CAD2F39A3F40022ECDC /* ClubListViewModel.swift in Sources */,
 				CBC90CB72F39BA390022ECDC /* ClubListHeader.swift in Sources */,
@@ -612,27 +686,34 @@
 				CBC3E7D92F32199900EF7F12 /* NotificationSettingsView.swift in Sources */,
 				CB4650D32F3B6D570087DE5A /* UserService.swift in Sources */,
 				CBC90C892F370D8A0022ECDC /* LoginViewModel.swift in Sources */,
+				CBE06DA72F601012003FB7B8 /* QnADetailViewModel.swift in Sources */,
 				CBC90CA62F397C5D0022ECDC /* MajorCodeMapper.swift in Sources */,
 				CBC3E77E2F311A5200EF7F12 /* AppTokens.swift in Sources */,
 				CBC3E7C82F31E0C700EF7F12 /* MajorPickerSheetView.swift in Sources */,
+				CBE06DA12F601010003FB7B8 /* QnAService.swift in Sources */,
 				CBC3E7902F311B6400EF7F12 /* LoginView.swift in Sources */,
 				CB4650EA2F3B92EB0087DE5A /* HTTPClient+PUT.swift in Sources */,
 				CBC90C952F377CC70022ECDC /* SignupService.swift in Sources */,
+				CBE06DB92F60FCF7003FB7B8 /* QnADetailView.swift in Sources */,
 				CB4650E42F3B7D3E0087DE5A /* MyPageGuideSection.swift in Sources */,
 				CBC3E7D02F320CAC00EF7F12 /* SignupStep2NicknameView.swift in Sources */,
 				CBC90C8D2F3710720022ECDC /* AppConfig.swift in Sources */,
 				CB4650EC2F3B93040087DE5A /* ProfileImageService.swift in Sources */,
+				CBE06D9F2F60100B003FB7B8 /* QnAModels.swift in Sources */,
 				CB4650F12F3C66A60087DE5A /* KeychainStore.swift in Sources */,
 				CBC3E7A12F317EF200EF7F12 /* ClubCard.swift in Sources */,
 				CBC3E7882F311AB600EF7F12 /* AppCard.swift in Sources */,
 				CBC3E7A92F31BC9B00EF7F12 /* HomeRoute.swift in Sources */,
+				CBE06DB12F60103E003FB7B8 /* QnAAnswerRow.swift in Sources */,
 				CBC3E7DD2F3219BF00EF7F12 /* ContactUsView.swift in Sources */,
 				CBC3E7DB2F3219AE00EF7F12 /* EditProfileView.swift in Sources */,
 				CBC90C912F3710BD0022ECDC /* HTTPClient+POST.swift in Sources */,
 				CB1DA1B02F4D8239004FF6C6 /* AppTabBarChrome.swift in Sources */,
+				CBE06DB52F60FCD7003FB7B8 /* QnARootView.swift in Sources */,
 				CB4650E62F3B7D4F0087DE5A /* MyPageEtcSection.swift in Sources */,
 				CBC3E7C12F31CA7B00EF7F12 /* SignupRootView.swift in Sources */,
 				CBC90C9E2F3874470022ECDC /* HomeBannerService.swift in Sources */,
+				CBE06DA92F601013003FB7B8 /* QnAComposerViewModel.swift in Sources */,
 				CBC3E7C32F31D06000EF7F12 /* SignupStep1View.swift in Sources */,
 				CB4650E82F3B83320087DE5A /* EditProfileViewModel.swift in Sources */,
 				CBC3E7AD2F31BCD100EF7F12 /* ClubListView.swift in Sources */,
@@ -641,11 +722,14 @@
 				CBC90C8B2F3710570022ECDC /* HTTPClient.swift in Sources */,
 				CBC90CA82F397C830022ECDC /* MajorItem.swift in Sources */,
 				CBC3E7E92F33B4C500EF7F12 /* PromotionDetailView.swift in Sources */,
+				CBE06DAB2F601013003FB7B8 /* QnASearchBar.swift in Sources */,
 				CBC3E7BF2F31CA6800EF7F12 /* SignupStep.swift in Sources */,
 				CBC3E7CE2F320A0000EF7F12 /* AuthRootView.swift in Sources */,
 				CBC90CB52F39B8710022ECDC /* UniClubApp.swift in Sources */,
 				CB4650D72F3B7CB40087DE5A /* MypageModels.swift in Sources */,
 				CBC3E7972F317B0100EF7F12 /* SectionHeader.swift in Sources */,
+				CBE06DA52F601011003FB7B8 /* QnAViewModel.swift in Sources */,
+				CBE06DAD2F60103C003FB7B8 /* QnAFilterBar.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
