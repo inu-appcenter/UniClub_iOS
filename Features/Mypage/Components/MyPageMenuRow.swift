@@ -17,16 +17,14 @@ struct MyPageMenuRow: View {
         Button(action: action) {
             HStack {
                 Text(title)
-                    .font(AppTypography.body())
+                    .font(.system(size: 14, weight: .regular))
                     .foregroundStyle(AppColors.textPrimary)
 
                 Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(AppColors.textSecondary)
             }
             .padding(.vertical, m.space10)
             .frame(minHeight: m.controlHeight44)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

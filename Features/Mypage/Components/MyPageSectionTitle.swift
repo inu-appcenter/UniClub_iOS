@@ -8,13 +8,11 @@
 import SwiftUI
 
 struct MyPageSectionTitle: View {
-    @Environment(\.appMetrics) private var m
     let title: String
 
     var body: some View {
         Text(title)
-            .font(AppTypography.bodyStrong())
+            .font(.system(size: 17, weight: .bold))
             .foregroundStyle(AppColors.textPrimary)
-            .padding(.bottom, m.space14)
     }
 }

@@ -3,11 +3,17 @@ import PhotosUI
 import UniformTypeIdentifiers
 
 struct EditProfileView: View {
-    
-    
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
-    @State private var selectedPhotoData: Data? = nil   // 미리보기/업로드에 사용
-    
+    @State private var showMajorSheet: Bool = false
+    @State private var showProfileImageActionSheet: Bool = false
+
+    @FocusState private var focusedField: Field?
+
+    enum Field {
+        case name
+        case nickname
+    }
+
     let onSaved: (() -> Void)?
 
     init(onSaved: (() -> Void)? = nil) {
@@ -17,26 +23,15 @@ struct EditProfileView: View {
     @Environment(\.appMetrics) private var m
     @Environment(\.dismiss) private var dismiss
 
-    // JSON 1(사진 있음) / JSON 2(nopicture) 상태
-    enum ProfileImageState {
-        case hasImage
-        case noImage
-    }
-
-    // MARK: - ViewModel
     @StateObject private var vm = EditProfileViewModel()
 
-    // SignupStep1View에서 쓰던 학과 선택 시트 방식 그대로
-    @State private var showMajorSheet: Bool = false
-
-    private var imageState: ProfileImageState {
-        vm.profileImageURL == nil ? .noImage : .hasImage
-    }
-
     var body: some View {
-        ScreenContainer(scroll: false) { _ in
+        ScreenContainer(
+            scroll: false,
+            topPadding: .none,
+            bottomPadding: .default
+        ) { _ in
             VStack(spacing: 0) {
-
                 header
                     .padding(.top, m.space8)
 
@@ -44,13 +39,14 @@ struct EditProfileView: View {
                     .padding(.top, m.space24)
 
                 fieldsBlock
-                    .padding(.top, m.space32)
+                    .padding(.top, 54 * m.scale)
 
                 Spacer(minLength: 0)
             }
         }
+        .navigationBarBackButtonHidden(true)
+        .toolbar(.hidden, for: .navigationBar)
         .overlay {
-            // ✅ Collectmajor 1/2 Sheet (SignupStep1View와 동일)
             MajorPickerSheetView(
                 isPresented: $showMajorSheet,
                 onSelectMajor: { item in
@@ -59,8 +55,32 @@ struct EditProfileView: View {
                 }
             )
         }
+        .overlay {
+            if showProfileImageActionSheet {
+                ProfileImageActionSheet(
+                    selection: $selectedPhotoItem,
+                    onDismiss: {
+                        showProfileImageActionSheet = false
+                    },
+                    onDelete: {
+                        vm.removeSelectedProfileImage()
+                        showProfileImageActionSheet = false
+                    }
+                )
+            }
+        }
         .task {
             await vm.load()
+        }
+        .onChange(of: selectedPhotoItem) { _, newItem in
+            guard let newItem else { return }
+            Task {
+                if let data = try? await newItem.loadTransferable(type: Data.self) {
+                    let contentType = guessImageContentType(from: data)
+                    vm.setSelectedImage(data: data, contentType: contentType)
+                }
+                showProfileImageActionSheet = false
+            }
         }
         .overlay {
             if vm.isLoading {
@@ -90,13 +110,13 @@ struct EditProfileView: View {
         }
     }
 
-    // MARK: - Header (뒤로 / 타이틀 / 저장)
     private var header: some View {
         HStack(spacing: 0) {
             Button {
                 dismiss()
             } label: {
                 Image(systemName: "chevron.left")
+                    .font(.system(size: 18, weight: .medium))
                     .foregroundStyle(AppColors.textPrimary)
                     .frame(width: 44, height: 44)
             }
@@ -105,7 +125,7 @@ struct EditProfileView: View {
             Spacer(minLength: 0)
 
             Text("프로필 수정")
-                .font(AppTypography.bodyStrong())
+                .font(.system(size: 15, weight: .medium))
                 .foregroundStyle(AppColors.textPrimary)
 
             Spacer(minLength: 0)
@@ -120,7 +140,7 @@ struct EditProfileView: View {
                 }
             } label: {
                 Text("저장")
-                    .font(AppTypography.bodyStrong())
+                    .font(.system(size: 12, weight: .medium))
                     .foregroundStyle(vm.canSave ? AppColors.textPrimary : AppColors.textSecondary)
                     .frame(width: 44, height: 44)
             }
@@ -131,64 +151,69 @@ struct EditProfileView: View {
         .frame(height: 44)
     }
 
-    // MARK: - Profile Image (JSON 1 vs JSON 2)
     private var profileImageBlock: some View {
-        PhotosPicker(selection: $selectedPhotoItem, matching: .images, photoLibrary: .shared()) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 23)
-                    .fill(imageState == .hasImage ? AppColors.fieldFill : .white)
-                    .frame(width: 70, height: 69)
-                    .shadow(color: .black.opacity(0.16), radius: 14, x: 0, y: 3)
+        ZStack(alignment: .bottomTrailing) {
+            profileImageContainer
 
-                // ✅ 1순위: 새로 선택한 이미지 미리보기
-                if let data = vm.selectedImageData, let ui = UIImage(data: data) {
+            Button {
+                showProfileImageActionSheet = true
+            } label: {
+                Image("icon_editview_mypage")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 22, height: 22)
+            }
+            .buttonStyle(.plain)
+            .offset(x: 4, y: 4)
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
+    }
+
+    @ViewBuilder
+    private var profileImageContainer: some View {
+        if let data = vm.selectedImageData, let ui = UIImage(data: data) {
+            RoundedRectangle(cornerRadius: 23)
+                .fill(Color.white)
+                .frame(width: 70, height: 69)
+                .shadow(color: .black.opacity(0.25), radius: 3.6, x: 0, y: 4)
+                .overlay {
                     Image(uiImage: ui)
                         .resizable()
                         .scaledToFill()
                         .frame(width: 70, height: 69)
                         .clipShape(RoundedRectangle(cornerRadius: 23))
-
-                // ✅ 2순위: 서버에 저장된 기존 이미지
-                } else if let url = vm.profileImageURL {
+                }
+        } else if let url = vm.profileImageURL, !vm.isProfileImageRemoved {
+            RoundedRectangle(cornerRadius: 23)
+                .fill(Color.white)
+                .frame(width: 70, height: 69)
+                .shadow(color: .black.opacity(0.25), radius: 3.6, x: 0, y: 4)
+                .overlay {
                     AsyncImage(url: url) { phase in
                         switch phase {
-                        case .success(let img):
-                            img.resizable().scaledToFill()
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .scaledToFill()
                         default:
-                            Image(systemName: "person.fill")
-                                .foregroundStyle(AppColors.textSecondary)
+                            Image("image_default_mypage")
+                                .resizable()
+                                .scaledToFill()
                         }
                     }
-                    .id(url.absoluteString) // ✅ URL 바뀌면 새로 로드 강제
+                    .id(url.absoluteString)
                     .frame(width: 70, height: 69)
                     .clipShape(RoundedRectangle(cornerRadius: 23))
-
-                // ✅ 3순위: 기본 아이콘
-                } else {
-                    Image(systemName: "camera.fill")
-                        .font(.system(size: 24, weight: .semibold))
-                        .foregroundStyle(.orange)
                 }
-            }
+        } else {
+            Image("image_default_mypage")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 70, height: 69)
         }
-        .buttonStyle(.plain)
-        .onChange(of: selectedPhotoItem) { _, newItem in
-            guard let newItem else { return }
-            Task {
-                // ✅ 이미지 Data 로드
-                if let data = try? await newItem.loadTransferable(type: Data.self) {
-                    // contentType 추정 (가능하면 png/jpg 구분)
-                    let ct = guessImageContentType(from: data) // 아래 helper
-                    vm.setSelectedImage(data: data, contentType: ct)
-                }
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .center)
     }
 
-    // ✅ 간단 contentType 추정 (png 시그니처 검사)
     private func guessImageContentType(from data: Data) -> String {
-        // PNG signature: 89 50 4E 47 0D 0A 1A 0A
         let pngSig: [UInt8] = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]
         if data.count >= 8 {
             let head = [UInt8](data.prefix(8))
@@ -197,70 +222,84 @@ struct EditProfileView: View {
         return "image/jpeg"
     }
 
-    // MARK: - Fields (닉네임 / 이름 / 학과)
     private var fieldsBlock: some View {
-        VStack(spacing: 22) {
-            labeledInputRow(title: "닉네임", text: $vm.nickname)
-            labeledInputRow(title: "이름", text: $vm.name)
+        VStack(spacing: 15 * m.scale) {
             majorRow
+            labeledInputRow(title: "이름", text: $vm.name, field: .name)
+            labeledInputRow(title: "닉네임", text: $vm.nickname, field: .nickname)
         }
-        .padding(.horizontal, 24) // JSON 느낌(좌우 여백)
+        .padding(.horizontal, 30 * m.scale)
     }
 
-    /// JSON처럼 "좌측 라벨 + 우측 입력 박스(회색)" 구조
-    private func labeledInputRow(title: String, text: Binding<String>) -> some View {
-        HStack(alignment: .center, spacing: m.space16) {
+    private func labeledInputRow(
+        title: String,
+        text: Binding<String>,
+        field: Field
+    ) -> some View {
+        HStack(alignment: .center, spacing: 14 * m.scale) {
             Text(title)
-                .font(AppTypography.body())
+                .font(.system(size: 12, weight: .regular))
                 .foregroundStyle(AppColors.textPrimary)
-                .frame(width: 58, alignment: .leading)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(width: 50 * m.scale, alignment: .leading)
 
             ZStack {
                 RoundedRectangle(cornerRadius: 13)
-                    .fill(AppColors.fieldFill)
+                    .fill(Color(red: 0.9567, green: 0.9567, blue: 0.9567))
                     .frame(height: 31)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 13)
-                            .stroke(AppColors.border, lineWidth: m.hairline)
-                    )
 
                 TextField("", text: text)
-                    .font(AppTypography.body())
+                    .focused($focusedField, equals: field)
+                    .font(.system(size: 12, weight: .regular))
                     .foregroundStyle(AppColors.textPrimary)
-                    .padding(.horizontal, m.space12)
+                    .padding(.horizontal, 14 * m.scale)
                     .frame(height: 31)
             }
-            .frame(maxWidth: .infinity)
+            .frame(width: 196 * m.scale, alignment: .leading)
+            .overlay(
+                RoundedRectangle(cornerRadius: 13)
+                    .stroke(
+                        focusedField == field ? Color.orange : .clear,
+                        lineWidth: focusedField == field ? 0.5 : 0
+                    )
+            )
         }
     }
 
-    /// 학과 선택 (SignupStep1View와 동일 UX)
     private var majorRow: some View {
-        HStack(alignment: .center, spacing: m.space16) {
+        HStack(alignment: .center, spacing: 14 * m.scale) {
             Text("학과")
-                .font(AppTypography.body())
+                .font(.system(size: 12, weight: .regular))
                 .foregroundStyle(AppColors.textPrimary)
-                .frame(width: 58, alignment: .leading)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(width: 50 * m.scale, alignment: .leading)
 
             Button {
                 showMajorSheet = true
             } label: {
                 HStack(spacing: m.space8) {
-                    Text(!vm.majorDisplay.isEmpty ? vm.majorDisplay : "학과 선택")
+                    Text(vm.majorDisplay.isEmpty ? "학과 선택" : vm.majorDisplay)
+                        .font(.system(size: 12, weight: .regular))
                         .foregroundStyle(vm.majorDisplay.isEmpty ? AppColors.textSecondary : AppColors.textPrimary)
 
                     Spacer(minLength: 0)
 
                     Image(systemName: "chevron.down")
-                        .foregroundStyle(AppColors.textSecondary)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(showMajorSheet ? Color.orange : Color(red: 0.462, green: 0.462, blue: 0.462))
                 }
-                .padding(.horizontal, m.space12)
-                .frame(height: 31)
-                .background(AppColors.fieldFill)
+                .padding(.horizontal, 14 * m.scale)
+                .frame(width: 196 * m.scale, height: 31)
+                .background(Color(red: 0.9567, green: 0.9567, blue: 0.9567))
                 .clipShape(RoundedRectangle(cornerRadius: 13))
                 .overlay(
                     RoundedRectangle(cornerRadius: 13)
-                        .stroke(AppColors.border, lineWidth: m.hairline)
+                        .stroke(
+                            showMajorSheet ? Color.orange : .clear,
+                            lineWidth: showMajorSheet ? 0.5 : 0
+                        )
                 )
             }
             .buttonStyle(.plain)

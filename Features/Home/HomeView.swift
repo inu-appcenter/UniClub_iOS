@@ -22,11 +22,12 @@ struct HomeView: View {
     // MARK: Constants (Coordinate Spaces)
     private let mainClubsScrollSpace = "home.mainClubs.scroll"
 
-    // (삭제) BannerCarouselView가 자체 로딩/에러 처리
-
     // MARK: State - Main Clubs (추천 동아리)
     @State private var mainClubs: [MainClubItem] = []
     @State private var mainClubsError: String?
+
+    /// 즐겨찾기 토글 중인 clubId 집합
+    @State private var favoriteLoadingClubIDs: Set<Int> = []
 
     /// “끝에서 더 당겼을 때만” 새로고침을 위한 트리거 진행도(0~1)
     @State private var refreshTriggerProgress: CGFloat = 0
@@ -48,11 +49,9 @@ struct HomeView: View {
                     header
                         .padding(.top, m.space14)
 
-                    // ✅ 배너
                     bannerCarousel
                         .padding(.top, m.space12)
 
-                    // ✅ “이런 동아리는 어떠세요?” (랜덤 5개 + 끝에서 추가 pull 시 새로고침)
                     recommendedSection
                         .padding(.top, m.space24 - m.space2)
 
@@ -62,7 +61,6 @@ struct HomeView: View {
                     categoryRow
                         .padding(.top, m.space24 - m.space2)
 
-                    // ✅ 탭바(높이 89) 영역만큼 스크롤 하단 여유
                     Spacer(minLength: m.controlHeight52 + m.space32 + m.space4)
                 }
             }
@@ -74,7 +72,7 @@ struct HomeView: View {
     // MARK: - Header
 
     private var header: some View {
-        let iconGap = m.space18 + m.space4 // (=22)
+        let iconGap = m.space18 + m.space4
 
         return HStack(alignment: .center, spacing: 0) {
             Image("logo_uniclub")
@@ -137,7 +135,11 @@ struct HomeView: View {
                             MainClubCardView(
                                 club: club,
                                 cardWidth: recommendedCardWidth(),
-                                cardHeight: recommendedCardHeight()
+                                cardHeight: recommendedCardHeight(),
+                                isFavoriteLoading: favoriteLoadingClubIDs.contains(club.id),
+                                onFavoriteTap: {
+                                    Task { await handleFavoriteTap(clubId: club.id) }
+                                }
                             )
                             .id(club.id)
                         }
@@ -277,7 +279,7 @@ struct HomeView: View {
         ]
     }
 
-    // MARK: - Sizing Helpers (Home_2.json 기준)
+    // MARK: - Sizing Helpers
 
     private func recommendedCardWidth() -> CGFloat {
         let maxW = min(m.screenSize.width, m.contentMaxWidth)
@@ -348,6 +350,26 @@ struct HomeView: View {
         }
     }
 
+    @MainActor
+    private func handleFavoriteTap(clubId: Int) async {
+        guard !favoriteLoadingClubIDs.contains(clubId) else { return }
+
+        favoriteLoadingClubIDs.insert(clubId)
+        defer { favoriteLoadingClubIDs.remove(clubId) }
+
+        do {
+            _ = try await MainClubsService.toggleFavorite(clubId: clubId)
+
+            if let index = mainClubs.firstIndex(where: { $0.clubId == clubId }) {
+                mainClubs[index] = mainClubs[index].toggledFavorite()
+            }
+
+            mainClubsError = nil
+        } catch {
+            mainClubsError = "관심 동아리 처리에 실패했습니다."
+        }
+    }
+
     private func pickRandomFive(from items: [MainClubItem]) -> [MainClubItem] {
         if items.count <= 5 { return items }
         return Array(items.shuffled().prefix(5))
@@ -362,6 +384,8 @@ private struct MainClubCardView: View {
     let club: MainClubItem
     let cardWidth: CGFloat
     let cardHeight: CGFloat
+    let isFavoriteLoading: Bool
+    let onFavoriteTap: () -> Void
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -389,9 +413,22 @@ private struct MainClubCardView: View {
 
                 Spacer(minLength: 0)
 
-                Image(systemName: club.favorite ? "heart.fill" : "heart")
-                    .font(.system(size: m.space16, weight: .semibold))
-                    .foregroundStyle(club.favorite ? Color.red : Color.white)
+                Button(action: onFavoriteTap) {
+                    Group {
+                        if isFavoriteLoading {
+                            ProgressView()
+                                .controlSize(.small)
+                                .tint(.white)
+                        } else {
+                            Image(systemName: club.favorite ? "heart.fill" : "heart")
+                                .font(.system(size: m.space16, weight: .semibold))
+                                .foregroundStyle(club.favorite ? Color.red : Color.white)
+                        }
+                    }
+                    .frame(width: m.space24, height: m.space24)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, m.space10)
             .padding(.top, m.space10)

@@ -24,6 +24,8 @@
 		CB4650EC2F3B93040087DE5A /* ProfileImageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4650EB2F3B93040087DE5A /* ProfileImageService.swift */; };
 		CB4650EE2F3B9B710087DE5A /* DeleteAccountViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4650ED2F3B9B710087DE5A /* DeleteAccountViewModel.swift */; };
 		CB4650F12F3C66A60087DE5A /* KeychainStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4650F02F3C66A60087DE5A /* KeychainStore.swift */; };
+		CB727E242F701D7B00D52743 /* QnABlockConfirmDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB727E232F701D7B00D52743 /* QnABlockConfirmDialog.swift */; };
+		CB727E262F77D41900D52743 /* ProfileImageActionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB727E252F77D41900D52743 /* ProfileImageActionSheet.swift */; };
 		CB8BE8CF2F6254E60047B379 /* QnAReportDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB8BE8CE2F6254E60047B379 /* QnAReportDialog.swift */; };
 		CBC3E77C2F311A3900EF7F12 /* AppMetrics.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3E77B2F311A3900EF7F12 /* AppMetrics.swift */; };
 		CBC3E77E2F311A5200EF7F12 /* AppTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC3E77D2F311A5200EF7F12 /* AppTokens.swift */; };
@@ -128,6 +130,8 @@
 		CB4650EB2F3B93040087DE5A /* ProfileImageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageService.swift; sourceTree = "<group>"; };
 		CB4650ED2F3B9B710087DE5A /* DeleteAccountViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteAccountViewModel.swift; sourceTree = "<group>"; };
 		CB4650F02F3C66A60087DE5A /* KeychainStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainStore.swift; sourceTree = "<group>"; };
+		CB727E232F701D7B00D52743 /* QnABlockConfirmDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnABlockConfirmDialog.swift; sourceTree = "<group>"; };
+		CB727E252F77D41900D52743 /* ProfileImageActionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileImageActionSheet.swift; sourceTree = "<group>"; };
 		CB8BE8CE2F6254E60047B379 /* QnAReportDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAReportDialog.swift; sourceTree = "<group>"; };
 		CBC3E69F2F2F45C000EF7F12 /* UniClub.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = UniClub.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CBC3E77B2F311A3900EF7F12 /* AppMetrics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMetrics.swift; sourceTree = "<group>"; };
@@ -256,6 +260,7 @@
 				CB4650E12F3B7D2D0087DE5A /* MyPageAccountSection.swift */,
 				CB4650E32F3B7D3E0087DE5A /* MyPageGuideSection.swift */,
 				CB4650E52F3B7D4F0087DE5A /* MyPageEtcSection.swift */,
+				CB727E252F77D41900D52743 /* ProfileImageActionSheet.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -546,6 +551,7 @@
 				CBE06DAC2F60103C003FB7B8 /* QnAFilterBar.swift */,
 				CBE06DAA2F601013003FB7B8 /* QnASearchBar.swift */,
 				CB8BE8CE2F6254E60047B379 /* QnAReportDialog.swift */,
+				CB727E232F701D7B00D52743 /* QnABlockConfirmDialog.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -655,6 +661,7 @@
 				CB4650DA2F3B7CE70087DE5A /* MyPageSectionTitle.swift in Sources */,
 				CBC3E7BA2F31CA0F00EF7F12 /* AuthRoute.swift in Sources */,
 				CBC3E7862F311AA700EF7F12 /* Chip.swift in Sources */,
+				CB727E262F77D41900D52743 /* ProfileImageActionSheet.swift in Sources */,
 				CBC3E7802F311A6300EF7F12 /* ScreenContainer.swift in Sources */,
 				CBE06DB72F60FCE6003FB7B8 /* QnAListView.swift in Sources */,
 				CBC3E7932F3178B100EF7F12 /* HomeView.swift in Sources */,
@@ -678,6 +685,7 @@
 				CBC3E7842F311A9700EF7F12 /* AppTextField.swift in Sources */,
 				CBC3E7B42F31BEF500EF7F12 /* MainShellView.swift in Sources */,
 				CBE06DA32F601011003FB7B8 /* QnAClubService.swift in Sources */,
+				CB727E242F701D7B00D52743 /* QnABlockConfirmDialog.swift in Sources */,
 				CBC90BBE2F36FD1C0022ECDC /* TabBarControl.swift in Sources */,
 				CBC90CAD2F39A3F40022ECDC /* ClubListViewModel.swift in Sources */,
 				CBC90CB72F39BA390022ECDC /* ClubListHeader.swift in Sources */,

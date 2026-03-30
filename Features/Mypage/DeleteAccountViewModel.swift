@@ -26,8 +26,7 @@ final class DeleteAccountViewModel: ObservableObject {
         do {
             try await UserService.deleteAccount(password: pw)
 
-            // ✅ 성공: 토큰 삭제 + 루트 전환 트리거
-            MyAuthStore.shared.signOut() // 너 MyPageViewModel에서 쓰던 signOut이랑 동일한 방식으로 맞춰
+            MyAuthStore.shared.signOut()
             isLoading = false
             return true
 

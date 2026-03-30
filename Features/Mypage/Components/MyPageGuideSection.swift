@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MyPageGuideSection: View {
+    @Environment(\.appMetrics) private var m
     @Environment(\.openURL) private var openURL
 
     let onInquiry: () -> Void
@@ -17,6 +18,8 @@ struct MyPageGuideSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             MyPageSectionTitle(title: "이용안내")
+                .padding(.bottom, m.space14)
+
             MyPageMenuRow(title: "문의하기", action: onInquiry)
             MyPageMenuRow(title: "이용약관", action: {
                 openURL(termsURL)
