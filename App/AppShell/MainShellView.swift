@@ -20,6 +20,19 @@ struct MainShellView: View {
 
     @State private var isTabBarHidden: Bool = false
 
+    private var shouldHideTabBar: Bool {
+        switch tab {
+        case .qna:
+            return true
+
+        case .home:
+            return false
+
+        case .mypage:
+            return isTabBarHidden || !myPagePath.isEmpty
+        }
+    }
+
     var body: some View {
         GeometryReader { geo in
             let m = AppMetrics.make(for: geo.size, baseWidth: 360)
@@ -45,7 +58,10 @@ struct MainShellView: View {
 
                 case .mypage:
                     NavigationStack(path: $myPagePath) {
-                        MyPageView(isTabBarHidden: $isTabBarHidden)
+                        MyPageView(
+                            path: $myPagePath,
+                            isTabBarHidden: $isTabBarHidden
+                        )
                     }
                 }
             }
@@ -61,7 +77,7 @@ struct MainShellView: View {
                             tab = newTab
                         }
                     ),
-                    isHidden: isTabBarHidden || tab == .qna,
+                    isHidden: shouldHideTabBar,
                     bottomInset: bottomInset
                 )
             }

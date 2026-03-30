@@ -1,3 +1,4 @@
+//
 //  MainClubsService.swift
 //  UniClub
 //
@@ -6,7 +7,6 @@
 
 import Foundation
 
-// GET /api/v1/main/clubs 응답 스키마에 맞춘 모델
 struct MainClubItem: Identifiable, Decodable {
     let clubId: Int
     let name: String
@@ -45,11 +45,23 @@ struct MainClubItem: Identifiable, Decodable {
             self.imageUrl = nil
         }
     }
+
+    func toggledFavorite() -> MainClubItem {
+        MainClubItem(
+            clubId: clubId,
+            name: name,
+            imageUrl: imageUrl,
+            favorite: !favorite
+        )
+    }
+}
+
+struct ToggleFavoriteResponse: Decodable {
+    let message: String
 }
 
 enum MainClubsService {
     /// GET /api/v1/main/clubs
-    /// - Note: favorite가 사용자별이라 Authorization이 필요할 가능성이 높음
     static func fetchMainClubs() async throws -> [MainClubItem] {
         let url = AppConfig.baseURL.appendingPathComponent(
             AppConfig.API.Main.clubs.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
@@ -72,5 +84,35 @@ enum MainClubsService {
 
         let dec = JSONDecoder()
         return try dec.decode([MainClubItem].self, from: data)
+    }
+
+    /// POST /api/v1/clubs/{clubId}/favorite
+    ///
+    /// 주의:
+    /// - 현재 제공된 Swagger 조각에는 HTTP Method가 보이지 않아 POST로 가정함
+    /// - 실제 Swagger가 PUT/PATCH라면 req.httpMethod만 변경하면 됨
+    static func toggleFavorite(clubId: Int) async throws -> ToggleFavoriteResponse {
+        let path = "/api/v1/clubs/\(clubId)/favorite"
+        let url = AppConfig.baseURL.appendingPathComponent(
+            path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        )
+
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        let (data, resp) = try await HTTPClient.shared.sendRaw(req, requiresAuth: true)
+
+        guard let http = resp as? HTTPURLResponse else {
+            throw APIError.badResponse(-1, "Invalid HTTPURLResponse")
+        }
+
+        guard (200...299).contains(http.statusCode) else {
+            let body = String(data: data, encoding: .utf8) ?? ""
+            throw APIError.badResponse(http.statusCode, body)
+        }
+
+        let dec = JSONDecoder()
+        return try dec.decode(ToggleFavoriteResponse.self, from: data)
     }
 }

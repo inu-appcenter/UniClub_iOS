@@ -19,8 +19,10 @@ struct QnAListView: View {
     @State private var selectedActionQuestion: QnAQuestionSummary?
     @State private var isShowingDeleteConfirmation: Bool = false
     @State private var isShowingReportDialog: Bool = false
+    @State private var isShowingBlockDialog: Bool = false
     @State private var reportReason: String = ""
     @State private var isSubmittingReport: Bool = false
+    @State private var isSubmittingBlock: Bool = false
 
     var body: some View {
         ZStack {
@@ -73,7 +75,7 @@ struct QnAListView: View {
                 Color.black.opacity(0.32)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        if !isShowingDeleteConfirmation && !isShowingReportDialog {
+                        if !isShowingDeleteConfirmation && !isShowingReportDialog && !isShowingBlockDialog {
                             selectedActionQuestion = nil
                         }
                     }
@@ -112,6 +114,23 @@ struct QnAListView: View {
                 )
                 .transition(.opacity)
             }
+
+            if isShowingBlockDialog {
+                Color.black.opacity(0.32)
+                    .ignoresSafeArea()
+
+                QnABlockConfirmDialog(
+                    title: "이 질문 작성자를 차단하시겠습니까?",
+                    isSubmitting: isSubmittingBlock,
+                    onCancel: {
+                        isShowingBlockDialog = false
+                    },
+                    onConfirm: {
+                        Task { await submitQuestionBlock() }
+                    }
+                )
+                .transition(.opacity)
+            }
         }
         .task {
             await viewModel.initialLoadIfNeeded()
@@ -127,6 +146,7 @@ struct QnAListView: View {
         .animation(.easeInOut(duration: 0.2), value: selectedActionQuestion != nil)
         .animation(.easeInOut(duration: 0.2), value: isShowingDeleteConfirmation)
         .animation(.easeInOut(duration: 0.2), value: isShowingReportDialog)
+        .animation(.easeInOut(duration: 0.2), value: isShowingBlockDialog)
     }
 
     private var header: some View {
@@ -251,6 +271,16 @@ struct QnAListView: View {
                     )
                 }
                 .buttonStyle(.plain)
+
+                Button {
+                    isShowingBlockDialog = true
+                } label: {
+                    actionRow(
+                        systemIconName: "nosign",
+                        title: "차단하기"
+                    )
+                }
+                .buttonStyle(.plain)
             }
         }
         .frame(width: 307)
@@ -354,6 +384,24 @@ struct QnAListView: View {
             isShowingReportDialog = false
             selectedActionQuestion = nil
             reportReason = ""
+        }
+    }
+
+    @MainActor
+    private func submitQuestionBlock() async {
+        guard let question = selectedActionQuestion, !isSubmittingBlock else { return }
+
+        isSubmittingBlock = true
+        defer { isSubmittingBlock = false }
+
+        do {
+            try await QnAService.blockQuestionAuthor(questionId: question.questionId)
+            isShowingBlockDialog = false
+            selectedActionQuestion = nil
+            await viewModel.loadQuestions()
+        } catch {
+            isShowingBlockDialog = false
+            selectedActionQuestion = nil
         }
     }
 }

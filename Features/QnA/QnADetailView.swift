@@ -55,11 +55,11 @@ struct QnADetailView: View {
                 }
             }
 
-            if activeMoreAnswer != nil || pendingDeleteAnswer != nil || viewModel.showReportDialog {
+            if activeMoreAnswer != nil || pendingDeleteAnswer != nil || viewModel.showReportDialog || viewModel.showBlockDialog {
                 Color.black.opacity(0.32)
                     .ignoresSafeArea()
                     .onTapGesture {
-                        if pendingDeleteAnswer == nil && !viewModel.showReportDialog {
+                        if pendingDeleteAnswer == nil && !viewModel.showReportDialog && !viewModel.showBlockDialog {
                             activeMoreAnswer = nil
                         }
                     }
@@ -92,6 +92,23 @@ struct QnADetailView: View {
                 )
                 .transition(.opacity)
             }
+
+            if viewModel.showBlockDialog {
+                QnABlockConfirmDialog(
+                    title: viewModel.blockDialogTitle,
+                    isSubmitting: viewModel.isSubmittingBlock,
+                    onCancel: {
+                        viewModel.dismissBlockDialog()
+                    },
+                    onConfirm: {
+                        Task {
+                            _ = await viewModel.submitBlock()
+                            activeMoreAnswer = nil
+                        }
+                    }
+                )
+                .transition(.opacity)
+            }
         }
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
@@ -112,6 +129,7 @@ struct QnADetailView: View {
         .animation(.easeInOut(duration: 0.2), value: activeMoreAnswer != nil)
         .animation(.easeInOut(duration: 0.2), value: pendingDeleteAnswer != nil)
         .animation(.easeInOut(duration: 0.2), value: viewModel.showReportDialog)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.showBlockDialog)
     }
 
     private var header: some View {
@@ -365,6 +383,14 @@ struct QnADetailView: View {
                     viewModel.presentReportDialog(target: .answer(id: answer.answerId))
                 } label: {
                     sheetRow(title: "신고하기", iconSystemName: "exclamationmark.triangle")
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    activeMoreAnswer = nil
+                    viewModel.presentBlockDialog(target: .answer(id: answer.answerId))
+                } label: {
+                    sheetRow(title: "차단하기", iconSystemName: "nosign")
                 }
                 .buttonStyle(.plain)
             }

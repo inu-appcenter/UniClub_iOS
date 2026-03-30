@@ -9,6 +9,9 @@ import Foundation
 
 enum QnAService {
     private static let basePath = "/api/v1/qna"
+    private static let blockBasePath = "/api/v1/block"
+
+    private struct EmptyRequestBody: Encodable {}
 
     static func searchQuestions(
         keyword: String,
@@ -112,6 +115,20 @@ enum QnAService {
                 targetId: target.targetId,
                 reason: trimmedReason
             )
+        )
+    }
+
+    static func blockQuestionAuthor(questionId: Int) async throws {
+        _ = try await HTTPClient.shared.postJSONRaw(
+            "\(blockBasePath)/questions/\(questionId)",
+            body: EmptyRequestBody()
+        )
+    }
+
+    static func blockAnswerAuthor(answerId: Int) async throws {
+        _ = try await HTTPClient.shared.postJSONRaw(
+            "\(blockBasePath)/answers/\(answerId)",
+            body: EmptyRequestBody()
         )
     }
 }

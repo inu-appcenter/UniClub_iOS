@@ -8,6 +8,20 @@
 import Foundation
 import Combine
 
+enum QnABlockTarget: Equatable {
+    case question(id: Int)
+    case answer(id: Int)
+
+    var dialogTitle: String {
+        switch self {
+        case .question:
+            return "이 질문 작성자를 차단하시겠습니까?"
+        case .answer:
+            return "이 답변 작성자를 차단하시겠습니까?"
+        }
+    }
+}
+
 @MainActor
 final class QnADetailViewModel: ObservableObject {
     let questionId: Int
@@ -16,6 +30,7 @@ final class QnADetailViewModel: ObservableObject {
     @Published private(set) var isLoading: Bool = false
     @Published private(set) var isSubmittingAnswer: Bool = false
     @Published private(set) var isSubmittingReport: Bool = false
+    @Published private(set) var isSubmittingBlock: Bool = false
     @Published var errorMessage: String?
 
     @Published var answerText: String = ""
@@ -23,6 +38,9 @@ final class QnADetailViewModel: ObservableObject {
     @Published var showReportDialog: Bool = false
     @Published var reportReason: String = ""
     @Published private(set) var selectedReportTarget: QnAReportTarget?
+
+    @Published var showBlockDialog: Bool = false
+    @Published private(set) var selectedBlockTarget: QnABlockTarget?
 
     init(questionId: Int) {
         self.questionId = questionId
@@ -130,8 +148,45 @@ final class QnADetailViewModel: ObservableObject {
         }
     }
 
+    func presentBlockDialog(target: QnABlockTarget) {
+        selectedBlockTarget = target
+        showBlockDialog = true
+    }
+
+    func dismissBlockDialog() {
+        showBlockDialog = false
+        selectedBlockTarget = nil
+    }
+
+    func submitBlock() async -> Bool {
+        guard let selectedBlockTarget, !isSubmittingBlock else { return false }
+
+        isSubmittingBlock = true
+        defer { isSubmittingBlock = false }
+
+        do {
+            switch selectedBlockTarget {
+            case .question(let questionId):
+                try await QnAService.blockQuestionAuthor(questionId: questionId)
+            case .answer(let answerId):
+                try await QnAService.blockAnswerAuthor(answerId: answerId)
+            }
+
+            dismissBlockDialog()
+            await loadDetail()
+            return true
+        } catch {
+            errorMessage = "차단을 완료하지 못했습니다."
+            return false
+        }
+    }
+
     var reportDialogTitle: String {
         selectedReportTarget?.dialogTitle ?? "신고하시겠습니까?"
+    }
+
+    var blockDialogTitle: String {
+        selectedBlockTarget?.dialogTitle ?? "이 사용자를 차단하시겠습니까?"
     }
 
     var topLevelAnswers: [QnAAnswerItem] {
