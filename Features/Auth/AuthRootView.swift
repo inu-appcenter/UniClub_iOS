@@ -21,8 +21,11 @@ struct AuthRootView: View {
             LoginRootView(onNavigateSignup: { route = .signupStep1 })
 
         case .signupStep1:
-            SignupStep1View(onVerified: { route = .signupNickname })
-                .environmentObject(signupVM)   // ✅ 주입
+            SignupStep1View(
+                onBack: { route = .login },
+                onVerified: { route = .signupNickname }
+            )
+            .environmentObject(signupVM)   // ✅ 주입
 
         case .signupNickname:
             SignupStep2NicknameView(

@@ -1,196 +1,269 @@
 import SwiftUI
 
 struct SignupStep1View: View {
-    let onVerified: () -> Void   // ✅ “다음” 버튼에서만 호출되게 바꿈
+    let onBack: () -> Void
+    let onVerified: () -> Void
 
-    @EnvironmentObject private var vm: SignupFlowViewModel
     @Environment(\.appMetrics) private var m
-
-    @State private var showAlert: Bool = false
+    @EnvironmentObject private var model: SignupFlowViewModel
     @State private var showMajorPicker: Bool = false
 
-    // ✅ EnvironmentObject 접근 꼬임 방지
-    private var model: SignupFlowViewModel { _vm.wrappedValue }
-
-    // MARK: - UI Rules
     private var canTapVerify: Bool {
-        let sid = model.studentId.trimmingCharacters(in: .whitespacesAndNewlines)
-        return !model.isPortalVerified
+        !model.isPortalVerified
         && !model.isLoading
-        && !sid.isEmpty
+        && !model.studentId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         && !model.password.isEmpty
     }
 
     private var canTapNext: Bool {
-        let name = model.name.trimmingCharacters(in: .whitespacesAndNewlines)
-        let majorCode = model.majorCode.trimmingCharacters(in: .whitespacesAndNewlines)
-
-        return model.isPortalVerified
+        model.isPortalVerified
         && !model.isLoading
-        && !name.isEmpty
-        && !majorCode.isEmpty
+        && !model.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        && !model.majorCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+
+    private var safeAreaTop: CGFloat {
+        (UIApplication.shared.connectedScenes.first as? UIWindowScene)?
+            .windows.first?.safeAreaInsets.top ?? 0
     }
 
     var body: some View {
-        ScreenContainer(scroll: true) { _ in
-            ZStack {
-                VStack(alignment: .leading, spacing: 16) {
+        ZStack {
+            AppColors.background.ignoresSafeArea()
 
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 0) {
+
+                    // 뒤로가기 버튼 (Figma y=42 = 상태바 아래 18pt)
+                    IconButton.back { onBack() }
+                        .padding(.top, safeAreaTop + 18 * m.scale)
+
+                    // 회원가입 헤더 (뒤로가기 하단 ~ 헤더: 43pt)
                     Text("회원가입")
-                        .font(AppTypography.title())
+                        .font(AppTypography.notoSans(32 * m.scale, weight: .bold))
                         .foregroundStyle(AppColors.textPrimary)
-                        .padding(.top, 12)
+                        .padding(.top, 43 * m.scale)
 
-                    // ✅ 학번/비번: 인증 전까지 입력 가능, 인증 후 비활성(잠금)
-                    field(title: "학번", text: Binding(
-                        get: { model.studentId },
-                        set: { model.studentId = $0 }
-                    ), isSecure: false, keyboard: .numberPad)
+                    // 포털 안내 배지 (Figma y=165 → 헤더 하단 y=158 기준 7pt)
+                    portalBadge(scale: m.scale)
+                        .padding(.top, 7 * m.scale)
+
+                    Color.clear.frame(height: 42 * m.scale)
+
+                    signupField(
+                        label: "학번을 입력해주세요.",
+                        text: Binding(get: { model.studentId }, set: { model.studentId = $0 }),
+                        isSecure: false,
+                        isActive: !model.isPortalVerified,
+                        scale: m.scale
+                    )
                     .disabled(model.isPortalVerified)
-                    .opacity(model.isPortalVerified ? 0.6 : 1)
 
-                    field(title: "비밀번호", text: Binding(
-                        get: { model.password },
-                        set: { model.password = $0 }
-                    ), isSecure: true, keyboard: .default)
+                    Color.clear.frame(height: 20 * m.scale)
+
+                    signupField(
+                        label: "비밀번호를 입력해주세요.",
+                        text: Binding(get: { model.password }, set: { model.password = $0 }),
+                        isSecure: true,
+                        isActive: !model.isPortalVerified,
+                        scale: m.scale
+                    )
                     .disabled(model.isPortalVerified)
-                    .opacity(model.isPortalVerified ? 0.6 : 1)
 
-                    // ✅ 이름/학과: 인증 전에는 비활성
-                    field(title: "이름", text: Binding(
-                        get: { model.name },
-                        set: { model.name = $0 }
-                    ), isSecure: false, keyboard: .default)
-                    .disabled(!model.isPortalVerified)
-                    .opacity(model.isPortalVerified ? 1 : 0.4)
-
-                    majorPickerRow
-                        .disabled(!model.isPortalVerified)
-                        .opacity(model.isPortalVerified ? 1 : 0.4)
-
-                    // ✅ 인증 완료 라벨
                     if model.isPortalVerified {
-                        Text("✅ 재학생 확인 완료")
-                            .font(AppTypography.caption())
+                        Text("재학생 확인이 완료되었습니다.")
+                            .font(AppTypography.notoSans(11 * m.scale, weight: .medium))
                             .foregroundStyle(AppColors.brand)
-                            .padding(.top, 2)
-                    }
-
-                    if !model.isPortalVerified {
-                        Button {
-                            Task {
-                                let ok = await model.verifyStudent()
-                                if !ok { showAlert = true }
-                            }
-                        } label: {
-                            Text(model.isLoading ? "확인 중..." : "재학생 확인")
-                                .font(AppTypography.bodyStrong())
-                                .foregroundStyle(AppColors.onBrand)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .background(AppColors.brand)
-                                .clipShape(RoundedRectangle(cornerRadius: m.radius18))
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(!canTapVerify)
-                        .opacity(canTapVerify ? 1 : 0.35)
+                            .padding(.top, 16 * m.scale)
+                        Color.clear.frame(height: 48 * m.scale)
+                    } else if model.errorMessage != nil {
+                        errorTooltip(scale: m.scale)
+                            .padding(.top, 26 * m.scale)
+                        Color.clear.frame(height: 29 * m.scale)
                     } else {
-                        Button {
-                            onVerified()
-                        } label: {
-                            Text("다음")
-                                .font(AppTypography.bodyStrong())
-                                .foregroundStyle(AppColors.onBrand)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .background(AppColors.brand)
-                                .clipShape(RoundedRectangle(cornerRadius: m.radius18))
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(!canTapNext)
-                        .opacity(canTapNext ? 1 : 0.35)
+                        Color.clear.frame(height: 81 * m.scale)
                     }
 
-                    Spacer(minLength: 24)
+                    signupField(
+                        label: "이름을 입력해주세요.",
+                        text: Binding(get: { model.name }, set: { model.name = $0 }),
+                        isSecure: false,
+                        isActive: model.isPortalVerified,
+                        scale: m.scale
+                    )
+                    .disabled(!model.isPortalVerified)
+
+                    Color.clear.frame(height: 20 * m.scale)
+
+                    majorPickerRow(scale: m.scale)
+                        .disabled(!model.isPortalVerified)
+
+                    Color.clear.frame(height: 117 * m.scale)
+
+                    actionButton(scale: m.scale)
+                        .frame(maxWidth: .infinity, alignment: .center)
+
+                    Color.clear.frame(height: 40 * m.scale)
                 }
-                .padding(.horizontal, 20)
-
-                // ✅ MajorPicker 연결
-                MajorPickerSheetView(
-                    isPresented: $showMajorPicker,
-                    onSelectMajor: { item in
-                        model.majorDisplay = item.display
-                        model.majorCode = item.code
-                    }
-                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.leading, 31 * m.scale)
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    UIApplication.shared.sendAction(
+                        #selector(UIResponder.resignFirstResponder),
+                        to: nil, from: nil, for: nil
+                    )
+                }
             }
-        }
-        .onChange(of: model.errorMessage) { _, newValue in
-            showAlert = (newValue != nil)
-        }
-        .alert("회원가입", isPresented: $showAlert) {
-            Button("확인") { model.errorMessage = nil }
-        } message: {
-            Text(model.errorMessage ?? "")
+            .ignoresSafeArea(.container, edges: .top)
+
+            MajorPickerSheetView(
+                isPresented: $showMajorPicker,
+                onSelectMajor: { item in
+                    model.majorDisplay = item.display
+                    model.majorCode = item.code
+                }
+            )
         }
     }
 
-    // MARK: - Major Picker Row
-    private var majorPickerRow: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("학과")
-                .font(AppTypography.bodyStrong())
-                .foregroundStyle(AppColors.textPrimary)
+    // MARK: - Portal Badge
+    // Figma: #FF5900 bg, r=13, 184x26, icon 16x16 at x=7, text at x=31
+    private func portalBadge(scale: CGFloat) -> some View {
+        HStack(spacing: 8 * scale) {
+            Image(systemName: "exclamationmark.circle")
+                .font(.system(size: 12 * scale))
+                .frame(width: 16 * scale, height: 16 * scale)
+            Text("학교 포털 계정을 입력해주세요.")
+                .font(AppTypography.notoSans(11 * scale))
+        }
+        .foregroundStyle(AppColors.background)
+        .padding(.leading, 7 * scale)
+        .frame(width: 184 * scale, height: 26 * scale, alignment: .leading)
+        .background(AppColors.brand)
+        .clipShape(RoundedRectangle(cornerRadius: 13 * scale))
+    }
 
+    // MARK: - Signup Field (underline style)
+    // Figma: label 14pt Regular, input below, underline width 184pt
+    private func signupField(
+        label: String,
+        text: Binding<String>,
+        isSecure: Bool,
+        isActive: Bool,
+        scale: CGFloat
+    ) -> some View {
+        let labelColor: Color = isActive ? AppColors.textPrimary : AppColors.grey300
+        let lineColor: Color = isActive ? AppColors.grey800 : AppColors.grey300
+
+        return VStack(alignment: .leading, spacing: 0) {
+            Text(label)
+                .font(AppTypography.notoSans(14 * scale))
+                .foregroundStyle(labelColor)
+
+            Color.clear.frame(height: 8 * scale)
+
+            Group {
+                if isSecure {
+                    SecureField("", text: text)
+                } else {
+                    TextField("", text: text)
+                }
+            }
+            .font(AppTypography.notoSans(14 * scale))
+            .foregroundStyle(AppColors.textPrimary)
+            .frame(height: 24 * scale)
+
+            Color.clear.frame(height: 1 * scale)
+
+            Rectangle()
+                .fill(lineColor)
+                .frame(width: 184 * scale, height: 1 * scale)
+        }
+        .frame(width: 184 * scale, alignment: .leading)
+    }
+
+    // MARK: - Error Tooltip
+    // Figma Frame 178: #000000 bg, r=13, 193x26, 11pt white text
+    private func errorTooltip(scale: CGFloat) -> some View {
+        Text("학번과 비밀번호를 확인해주세요.")
+            .font(AppTypography.notoSans(11 * scale))
+            .foregroundStyle(AppColors.background)
+            .padding(.horizontal, 8 * scale)
+            .frame(width: 193 * scale, height: 26 * scale, alignment: .leading)
+            .background(AppColors.grey800)
+            .clipShape(RoundedRectangle(cornerRadius: 13 * scale))
+    }
+
+    // MARK: - Major Picker Row
+    // Figma: 14pt Regular text, chevron 12x6 at right, no underline
+    private func majorPickerRow(scale: CGFloat) -> some View {
+        let isActive = model.isPortalVerified
+        let labelColor: Color = isActive ? AppColors.textPrimary : AppColors.grey300
+
+        return VStack(alignment: .leading, spacing: 0) {
             Button {
-                showMajorPicker = true
+                if isActive { showMajorPicker = true }
             } label: {
-                HStack {
-                    // ✅ 표시용은 majorDisplay만 사용
-                    Text(!model.majorDisplay.isEmpty ? model.majorDisplay : "학과 선택")
-                        .font(AppTypography.body())
-                        .foregroundStyle(!model.majorDisplay.isEmpty ? AppColors.textPrimary : AppColors.textSecondary)
+                HStack(spacing: 0) {
+                    Text(model.majorDisplay.isEmpty ? "학과를 선택해주세요." : model.majorDisplay)
+                        .font(AppTypography.notoSans(14 * scale))
+                        .foregroundStyle(labelColor)
 
                     Spacer(minLength: 0)
 
                     Image(systemName: "chevron.down")
-                        .foregroundStyle(AppColors.textSecondary)
+                        .font(.system(size: 9 * scale, weight: .regular))
+                        .foregroundStyle(labelColor)
+                        .frame(width: 12 * scale, height: 6 * scale)
                 }
-                .padding(.vertical, 12)
-                .padding(.horizontal, 12)
-                .background(AppColors.fieldFill)
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .frame(width: 184 * scale)
             }
             .buttonStyle(.plain)
+
+            Color.clear.frame(height: 8 * scale)
+
+            Rectangle()
+                .fill(isActive ? AppColors.grey800 : AppColors.grey300)
+                .frame(width: 184 * scale, height: 1 * scale)
         }
+        .frame(width: 184 * scale, alignment: .leading)
     }
 
-    // MARK: - Field
-    private func field(title: String, text: Binding<String>, isSecure: Bool, keyboard: UIKeyboardType) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(AppTypography.bodyStrong())
-                .foregroundStyle(AppColors.textPrimary)
-
-            if isSecure {
-                SecureField("", text: text)
-                    .keyboardType(keyboard)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled(true)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 12)
-                    .background(AppColors.fieldFill)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            } else {
-                TextField("", text: text)
-                    .keyboardType(keyboard)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled(true)
-                    .padding(.vertical, 12)
-                    .padding(.horizontal, 12)
-                    .background(AppColors.fieldFill)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+    // MARK: - Action Button
+    // 재학생 확인: 173x51, r=45 / 다음: 132x51, r=45
+    // active=#000000, disabled=#D2D2D2(grey300)
+    @ViewBuilder
+    private func actionButton(scale: CGFloat) -> some View {
+        if model.isPortalVerified {
+            Button {
+                guard canTapNext else { return }
+                onVerified()
+            } label: {
+                Text("다음")
+                    .font(AppTypography.notoSans(14 * scale))
+                    .foregroundStyle(AppColors.background)
+                    .frame(width: 132 * scale, height: 51 * scale)
+                    .background(canTapNext ? AppColors.grey800 : AppColors.grey300)
+                    .clipShape(RoundedRectangle(cornerRadius: 45 * scale))
             }
+            .buttonStyle(.plain)
+            .disabled(!canTapNext)
+        } else {
+            Button {
+                Task {
+                    _ = await model.verifyStudent()
+                }
+            } label: {
+                Text(model.isLoading ? "확인 중..." : "재학생 확인")
+                    .font(AppTypography.notoSans(14 * scale))
+                    .foregroundStyle(AppColors.background)
+                    .frame(width: 173 * scale, height: 51 * scale)
+                    .background(canTapVerify ? AppColors.grey800 : AppColors.grey300)
+                    .clipShape(RoundedRectangle(cornerRadius: 45 * scale))
+            }
+            .buttonStyle(.plain)
+            .disabled(!canTapVerify)
         }
     }
 }

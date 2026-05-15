@@ -30,7 +30,7 @@ public struct AppTabBar: View {
 
         let labelSize: CGFloat = (tab == .qna) ? 11 : 10
         let kerning: CGFloat = (tab == .qna) ? -0.121 : -0.11
-        let labelColor: Color = isSelected ? .white : Color(hex: 0xBFBFBF, alpha: 1)
+        let labelColor: Color = isSelected ? .white : AppColors.grey400
 
         return Button {
             selection = tab
@@ -42,7 +42,7 @@ public struct AppTabBar: View {
                     .frame(width: 24 * m.scale, height: 24 * m.scale)
 
                 Text(tab.title)
-                    .font(.custom("NotoSansKR-Medium", size: labelSize * m.scale))
+                    .font(AppTypography.notoSans(labelSize * m.scale, weight: .medium))
                     .kerning(kerning * m.scale)
                     .foregroundStyle(labelColor)
             }

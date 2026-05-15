@@ -17,7 +17,7 @@ struct ProfileImageActionSheet: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            Color.black.opacity(0.5)
+            AppColors.grey800.opacity(0.5)
                 .ignoresSafeArea()
                 .onTapGesture {
                     onDismiss()
@@ -69,8 +69,8 @@ struct ProfileImageActionSheet: View {
                 .frame(width: 24, height: 24)
 
             Text(title)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(Color.white)
+                .font(AppTypography.notoSans(13, weight: .medium))
+                .foregroundStyle(AppColors.background)
 
             Spacer(minLength: 0)
         }

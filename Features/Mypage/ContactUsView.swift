@@ -17,7 +17,7 @@ struct ContactUsView: View {
     private let instagramUrlString = "https://instagram.com/inuappcenter"
     private let emailAddress = "inuappcenter@gamil.com"
 
-    private var contentHorizontalInset: CGFloat { 36 * m.scale }
+    private var contentHorizontalInset: CGFloat { m.space18 }
 
     var body: some View {
         ScreenContainer(
@@ -26,15 +26,18 @@ struct ContactUsView: View {
             bottomPadding: .default
         ) { _ in
             VStack(spacing: 0) {
-                header
-                    .padding(.top, 8 * m.scale)
+                AppPageHeader(onBack: { dismiss() }) {
+                    Text("문의하기")
+                        .font(AppTypography.notoSans(15, weight: .medium))
+                        .foregroundStyle(AppColors.textPrimary)
+                }
 
                 guideText
-                    .padding(.top, 40 * m.scale)
+                    .padding(.top, m.scale * 22)
                     .padding(.horizontal, contentHorizontalInset)
 
                 contactList
-                    .padding(.top, 48 * m.scale)
+                    .padding(.top, m.space28)
                     .padding(.horizontal, contentHorizontalInset)
 
                 Spacer(minLength: 0)
@@ -44,38 +47,10 @@ struct ContactUsView: View {
         .toolbar(.hidden, for: .navigationBar)
     }
 
-    // MARK: - Header
-    private var header: some View {
-        HStack(spacing: 0) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 18 * m.scale, weight: .medium))
-                    .foregroundStyle(AppColors.textPrimary)
-                    .frame(width: 44 * m.scale, height: 44 * m.scale)
-            }
-            .buttonStyle(.plain)
-
-            Spacer(minLength: 0)
-
-            Text("문의하기")
-                .font(.system(size: 15 * m.scale, weight: .medium))
-                .foregroundStyle(AppColors.textPrimary)
-
-            Spacer(minLength: 0)
-
-            Color.clear
-                .frame(width: 44 * m.scale, height: 44 * m.scale)
-        }
-        .padding(.horizontal, 8 * m.scale)
-        .frame(height: 44 * m.scale)
-    }
-
     // MARK: - Guide
     private var guideText: some View {
         Text("UniClub 이용 중에 생긴 불편한 점이나 문의사항을 \n보내주세요 :-)")
-            .font(.system(size: 11 * m.scale, weight: .regular))
+            .font(AppTypography.notoSans(11 * m.scale))
             .foregroundStyle(AppColors.textSecondary)
             .multilineTextAlignment(.leading)
             .lineSpacing(4 * m.scale)
@@ -84,7 +59,7 @@ struct ContactUsView: View {
 
     // MARK: - Contact List
     private var contactList: some View {
-        VStack(alignment: .leading, spacing: 32 * m.scale) {
+        VStack(alignment: .leading, spacing: m.scale * 26) {
             contactItemWithButton(
                 title: "Kakao Talk 채널",
                 value: "pf.kakao.com/_xgxaSLd",
@@ -121,11 +96,11 @@ struct ContactUsView: View {
         HStack(alignment: .center, spacing: 12 * m.scale) {
             VStack(alignment: .leading, spacing: 4 * m.scale) {
                 Text(title)
-                    .font(.system(size: 14 * m.scale, weight: .medium))
+                    .font(AppTypography.notoSans(14 * m.scale, weight: .medium))
                     .foregroundStyle(AppColors.textPrimary)
 
                 Text(value)
-                    .font(.system(size: 10 * m.scale, weight: .regular))
+                    .font(AppTypography.notoSans(10 * m.scale))
                     .foregroundStyle(AppColors.textSecondary)
             }
 
@@ -137,7 +112,7 @@ struct ContactUsView: View {
                         .fill(Color(red: 1.0, green: 0.35, blue: 0.0))
 
                     Image(systemName: "chevron.right")
-                        .font(.system(size: 14 * m.scale, weight: .bold))
+                        .font(AppTypography.notoSans(14 * m.scale, weight: .bold))
                         .foregroundStyle(.white)
                 }
                 .frame(width: 34 * m.scale, height: 34 * m.scale)
@@ -153,11 +128,11 @@ struct ContactUsView: View {
     ) -> some View {
         VStack(alignment: .leading, spacing: 4 * m.scale) {
             Text(title)
-                .font(.system(size: 14 * m.scale, weight: .medium))
+                .font(AppTypography.notoSans(14 * m.scale, weight: .medium))
                 .foregroundStyle(AppColors.textPrimary)
 
             Text(value)
-                .font(.system(size: 10 * m.scale, weight: .regular))
+                .font(AppTypography.notoSans(10 * m.scale))
                 .foregroundStyle(AppColors.textSecondary)
                 .onTapGesture {
                     #if canImport(UIKit)

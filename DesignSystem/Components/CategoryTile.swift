@@ -25,7 +25,7 @@ public struct CategoryTile: View {
             HStack(spacing: m.space10) {
                 if let systemIcon {
                     Image(systemName: systemIcon)
-                        .font(.system(size: 18, weight: .semibold))
+                        .font(AppTypography.notoSans(18, weight: .semibold))
                         .foregroundStyle(AppColors.brand)
                 }
 

@@ -30,11 +30,10 @@ extension HTTPClient {
         req.setValue("application/json", forHTTPHeaderField: "Accept")
         req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
-        injectAuthorizationIfNeeded(into: &req)
         headers.forEach { req.setValue($0.value, forHTTPHeaderField: $0.key) }
         req.httpBody = try JSONEncoder().encode(body)
 
-        return try await performRaw(req)
+        return try await sendValidatedRaw(req)
     }
 
     /// ✅ DELETE(JSON) + Raw(Data, HTTPURLResponse)
@@ -56,11 +55,10 @@ extension HTTPClient {
         req.setValue("application/json", forHTTPHeaderField: "Accept")
         req.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
-        injectAuthorizationIfNeeded(into: &req)
         headers.forEach { req.setValue($0.value, forHTTPHeaderField: $0.key) }
         req.httpBody = try JSONEncoder().encode(body)
 
-        return try await performRaw(req)
+        return try await sendValidatedRaw(req)
     }
 
     /// ✅ PATCH(body 없음) + Raw(Data, HTTPURLResponse)
@@ -80,10 +78,9 @@ extension HTTPClient {
         req.httpMethod = "PATCH"
         req.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        injectAuthorizationIfNeeded(into: &req)
         headers.forEach { req.setValue($0.value, forHTTPHeaderField: $0.key) }
 
-        return try await performRaw(req)
+        return try await sendValidatedRaw(req)
     }
 
     /// ✅ DELETE(body 없음) + Raw(Data, HTTPURLResponse)
@@ -103,30 +100,8 @@ extension HTTPClient {
         req.httpMethod = "DELETE"
         req.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        injectAuthorizationIfNeeded(into: &req)
         headers.forEach { req.setValue($0.value, forHTTPHeaderField: $0.key) }
 
-        return try await performRaw(req)
-    }
-
-    private func performRaw(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {
-        do {
-            let (data, resp) = try await sendRaw(request, requiresAuth: true)
-
-            guard let http = resp as? HTTPURLResponse else {
-                throw APIError.badResponse(-1, "Invalid HTTPURLResponse")
-            }
-
-            guard (200...299).contains(http.statusCode) else {
-                let bodyStr = String(data: data, encoding: .utf8) ?? ""
-                throw APIError.badResponse(http.statusCode, bodyStr)
-            }
-
-            return (data, http)
-        } catch let e as URLError {
-            throw APIError.transport(e)
-        } catch {
-            throw APIError.unknown(error)
-        }
+        return try await sendValidatedRaw(req)
     }
 }

@@ -11,7 +11,7 @@ struct LogoutConfirmOverlay: View {
 
     var body: some View {
         ZStack {
-            Color.black.opacity(0.5)
+            AppColors.grey800.opacity(0.5)
                 .ignoresSafeArea()
                 .onTapGesture {
                     onCancel()
@@ -19,7 +19,7 @@ struct LogoutConfirmOverlay: View {
 
             VStack(spacing: 0) {
                 Text("로그아웃하시겠습니까?")
-                    .font(.system(size: 13 * m.scale, weight: .medium))
+                    .font(AppTypography.notoSans(13 * m.scale, weight: .medium))
                     .foregroundStyle(AppColors.textPrimary)
                     .padding(.top, 13 * m.scale)
 
@@ -42,7 +42,7 @@ struct LogoutConfirmOverlay: View {
                 .padding(.bottom, 13 * m.scale)
             }
             .frame(width: dialogWidth, height: dialogHeight)
-            .background(Color.white)
+            .background(AppColors.background)
             .clipShape(RoundedRectangle(cornerRadius: 18 * m.scale))
         }
     }
@@ -53,7 +53,7 @@ struct LogoutConfirmOverlay: View {
     ) -> some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 13 * m.scale, weight: .regular))
+                .font(AppTypography.notoSans(13 * m.scale))
                 .foregroundStyle(AppColors.textPrimary)
                 .frame(minWidth: 24 * m.scale)
                 .contentShape(Rectangle())

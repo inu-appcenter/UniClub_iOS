@@ -18,6 +18,8 @@ struct HomeView: View {
     let onTapAll: () -> Void
     let onTapCategory: (String) -> Void
     let onTapSearch: () -> Void
+    let onTapClub: (Int) -> Void
+    let onTapNotification: () -> Void
 
     // MARK: Constants (Coordinate Spaces)
     private let mainClubsScrollSpace = "home.mainClubs.scroll"
@@ -42,7 +44,7 @@ struct HomeView: View {
     // MARK: Body
 
     var body: some View {
-        ScreenContainer(scroll: false) { _ in
+        ScreenContainer(scroll: false, bottomPadding: .none) { _ in
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
 
@@ -61,8 +63,8 @@ struct HomeView: View {
                     categoryRow
                         .padding(.top, m.space24 - m.space2)
 
-                    Spacer(minLength: m.controlHeight52 + m.space32 + m.space4)
                 }
+                .padding(.bottom, 89 * m.scale)
             }
             .background(AppColors.background)
         }
@@ -93,10 +95,7 @@ struct HomeView: View {
 
             Spacer().frame(width: iconGap)
 
-            Button(action: {
-                // NOTE(기능 연동 전):
-                // - 알림 화면(Notifications) 라우팅/디자인 확정 후 연결한다.
-            }) {
+            Button(action: onTapNotification) {
                 Image("icon_alarm")
                     .resizable()
                     .renderingMode(.original)
@@ -137,6 +136,7 @@ struct HomeView: View {
                                 cardWidth: recommendedCardWidth(),
                                 cardHeight: recommendedCardHeight(),
                                 isFavoriteLoading: favoriteLoadingClubIDs.contains(club.id),
+                                onTap: { onTapClub(club.id) },
                                 onFavoriteTap: {
                                     Task { await handleFavoriteTap(clubId: club.id) }
                                 }
@@ -201,7 +201,7 @@ struct HomeView: View {
                     ProgressView()
                 } else {
                     Image(systemName: "arrow.clockwise")
-                        .font(.system(size: m.space18, weight: .semibold))
+                        .font(AppTypography.notoSans(m.space18, weight: .semibold))
                         .foregroundStyle(AppColors.textSecondary)
                 }
             }
@@ -378,94 +378,6 @@ struct HomeView: View {
 
 // MARK: - MainClubCardView (추천 카드)
 
-private struct MainClubCardView: View {
-    @Environment(\.appMetrics) private var m
-
-    let club: MainClubItem
-    let cardWidth: CGFloat
-    let cardHeight: CGFloat
-    let isFavoriteLoading: Bool
-    let onFavoriteTap: () -> Void
-
-    var body: some View {
-        ZStack(alignment: .top) {
-            cardImage
-                .frame(width: cardWidth, height: cardHeight)
-                .clipped()
-
-            LinearGradient(
-                colors: [
-                    Color.black.opacity(0.55),
-                    Color.black.opacity(0.15),
-                    Color.clear
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: m.space32 + m.space24)
-            .frame(maxWidth: .infinity, alignment: .top)
-
-            HStack(alignment: .center) {
-                Text(club.name)
-                    .font(AppTypography.captionStrong())
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
-
-                Spacer(minLength: 0)
-
-                Button(action: onFavoriteTap) {
-                    Group {
-                        if isFavoriteLoading {
-                            ProgressView()
-                                .controlSize(.small)
-                                .tint(.white)
-                        } else {
-                            Image(systemName: club.favorite ? "heart.fill" : "heart")
-                                .font(.system(size: m.space16, weight: .semibold))
-                                .foregroundStyle(club.favorite ? Color.red : Color.white)
-                        }
-                    }
-                    .frame(width: m.space24, height: m.space24)
-                    .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, m.space10)
-            .padding(.top, m.space10)
-        }
-        .frame(width: cardWidth, height: cardHeight)
-        .clipShape(RoundedRectangle(cornerRadius: m.radius18, style: .continuous))
-    }
-
-    @ViewBuilder
-    private var cardImage: some View {
-        if let url = club.imageUrl {
-            AsyncImage(url: url) { phase in
-                switch phase {
-                case .success(let img):
-                    img.resizable().scaledToFill()
-                case .empty:
-                    defaultClubImage
-                case .failure:
-                    defaultClubImage
-                @unknown default:
-                    defaultClubImage
-                }
-            }
-        } else {
-            defaultClubImage
-        }
-    }
-
-    private var defaultClubImage: some View {
-        Image("image_default_clubs")
-            .resizable()
-            .scaledToFill()
-            .frame(width: cardWidth, height: cardHeight)
-            .background(AppColors.fieldFill)
-    }
-}
-
 // MARK: - Refresh Trigger PreferenceKey
 
 private struct RefreshTriggerProgressKey: PreferenceKey {
@@ -481,6 +393,8 @@ private struct RefreshTriggerProgressKey: PreferenceKey {
     HomeView(
         onTapAll: {},
         onTapCategory: { _ in },
-        onTapSearch: {}
+        onTapSearch: {},
+        onTapClub: { _ in },
+        onTapNotification: {}
     )
 }

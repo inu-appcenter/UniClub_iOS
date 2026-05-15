@@ -17,7 +17,7 @@ struct MyPageMenuRow: View {
         Button(action: action) {
             HStack {
                 Text(title)
-                    .font(.system(size: 14, weight: .regular))
+                    .font(AppTypography.notoSans(14))
                     .foregroundStyle(AppColors.textPrimary)
 
                 Spacer(minLength: 0)

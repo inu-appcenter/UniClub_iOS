@@ -18,9 +18,7 @@ struct ClubListHeader: View {
     
     var body: some View {
         HStack(spacing: m.space8) {
-            IconButton(systemName: "chevron.left", variant: .plain) {
-                onTapBack()
-            }
+            IconButton.back { onTapBack() }
             
             Text(title)
                 .font(AppTypography.bodyStrong())

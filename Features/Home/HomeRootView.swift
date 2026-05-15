@@ -12,7 +12,9 @@ struct HomeRootView: View {
         HomeView(
             onTapAll: { path.append(HomeRoute.clubListAll) },
             onTapCategory: { name in path.append(HomeRoute.clubListCategory(name)) },
-            onTapSearch: { path.append(HomeRoute.search) }
+            onTapSearch: { path.append(HomeRoute.search) },
+            onTapClub: { clubId in path.append(HomeRoute.promotionDetail(clubId)) },
+            onTapNotification: { path.append(HomeRoute.notification) }
         )
         .navigationDestination(for: HomeRoute.self) { route in
             switch route {
@@ -26,6 +28,13 @@ struct HomeRootView: View {
 
             case .search:
                 SearchView()
+                    .tabBarPresent(false)
+
+            case .promotionDetail(let clubId):
+                PromotionDetailView(clubId: clubId)
+
+            case .notification:
+                NotificationView(onBack: { path.removeLast() })
                     .tabBarPresent(false)
             }
         }

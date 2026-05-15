@@ -31,9 +31,6 @@ final class SignupFlowViewModel: ObservableObject {
     @Published var agreePrivacy: Bool = false
     @Published var agreeMarketing: Bool = false
 
-    // ✅ Step1 재학생 확인 결과를 끝까지 들고갈 값
-    @Published var studentVerification: Bool = false
-
     // 공용 UI 상태
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
@@ -56,12 +53,10 @@ final class SignupFlowViewModel: ObservableObject {
             let res = try await SignupService.verifyStudent(studentId: sid, password: password)
 
             isPortalVerified = res.verified ?? false
-            studentVerification = isPortalVerified   // ✅ 여기서 저장
 
             return isPortalVerified
         } catch {
             isPortalVerified = false
-            studentVerification = false
             errorMessage = error.localizedDescription
             return false
         }
@@ -112,8 +107,7 @@ final class SignupFlowViewModel: ObservableObject {
                 major: majorCode,          // ✅ 여기만 바꾸면 끝
                 nickname: nn,
                 agreePrivacy: agreePrivacy,
-                agreeMarketing: agreeMarketing,
-                studentVerification: studentVerification
+                agreeMarketing: agreeMarketing
             )
 
             let res = try await SignupService.register(req)

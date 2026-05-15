@@ -1,14 +1,19 @@
-//
-//  MajorItem.swift
-//  UniClub
-//
-//  Created by 제욱 on 2/9/26.
-//
-
 import Foundation
 
 struct MajorItem: Identifiable, Hashable {
     var id: String { code }
-    let code: String     // 서버 전송값: "COMPUTER_ENGINEERING"
-    let display: String  // 표시값: "컴퓨터공학부"
+    let code: String
+    let display: String
+}
+
+struct MajorSection: Identifiable {
+    let id: String
+    let title: String
+    let items: [MajorItem]
+}
+
+struct MajorColumnPair: Identifiable {
+    let id: String
+    let left: MajorSection
+    let right: MajorSection
 }

@@ -27,6 +27,8 @@ public enum ScreenEdgePadding {
 }
 
 public struct ScreenContainer<Content: View>: View {
+    @Environment(\.appMetrics) private var metrics
+
     private let scroll: Bool
     private let showsIndicators: Bool
     private let background: Color
@@ -51,34 +53,29 @@ public struct ScreenContainer<Content: View>: View {
     }
 
     public var body: some View {
-        GeometryReader { geo in
-            let metrics = AppMetrics.make(for: geo.size, baseWidth: 360)
+        ZStack {
+            background.ignoresSafeArea()
 
-            ZStack {
-                background.ignoresSafeArea()
-
-                Group {
-                    if scroll {
-                        ScrollView(showsIndicators: showsIndicators) {
-                            inner(metrics)
-                        }
-                    } else {
+            Group {
+                if scroll {
+                    ScrollView(showsIndicators: showsIndicators) {
                         inner(metrics)
                     }
+                } else {
+                    inner(metrics)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
-            .environment(\.appMetrics, metrics)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
+        .ignoresSafeArea(edges: .bottom)
     }
 
     private func inner(_ m: AppMetrics) -> some View {
-        VStack(alignment: .leading, spacing: m.space16) {
-            content(m)
-        }
-        .frame(maxWidth: m.contentMaxWidth, alignment: .topLeading)
-        .padding(.horizontal, m.horizontalPadding)
-        .padding(.top, topPadding.value(using: m))
-        .padding(.bottom, bottomPadding.value(using: m))
+        content(m)
+            .frame(maxWidth: m.contentMaxWidth, alignment: .topLeading)
+            .padding(.horizontal, m.horizontalPadding)
+            .padding(.top, topPadding.value(using: m))
+            .padding(.bottom, bottomPadding.value(using: m))
+            .keyboardAvoiding()
     }
 }

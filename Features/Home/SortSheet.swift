@@ -41,7 +41,7 @@ struct SortSheet: View {
 
                                 if selected == option {
                                     Image(systemName: "checkmark")
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(AppTypography.notoSans(14, weight: .bold))
                                         .foregroundStyle(AppColors.brand)
                                 }
                             }

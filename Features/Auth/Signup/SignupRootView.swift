@@ -17,7 +17,7 @@ struct SignupRootView: View {
 
                 // 상단 헤더 (회원가입 / 뒤로)
                 HStack(spacing: m.space10) {
-                    IconButton(systemName: "chevron.left") { dismiss() }
+                    IconButton.back { dismiss() }
                     Text("회원가입")
                         .font(AppTypography.title())
                         .foregroundStyle(AppColors.textPrimary)
@@ -30,15 +30,15 @@ struct SignupRootView: View {
                 Group {
                     switch step {
                     case .step1:
-                        SignupStep1View(onVerified: {
-                            // 일단 뼈대 단계: 재학생 확인 성공하면 다음 단계로 이동
-                            goNext()
-                        })
+                        SignupStep1View(
+                            onBack: { goPrev() },
+                            onVerified: { goNext() }
+                        )
                     case .step2:
                         SignupStepPlaceholder(title: "Signup_2")
                     case .step3:
                         SignupStepPlaceholder(title: "Signup_3")
-                    case .step3_1:
+                    case .step3Sub:
                         SignupStepPlaceholder(title: "Signup_3_1")
                     case .step4:
                         SignupStepPlaceholder(title: "Signup_4")
@@ -99,19 +99,20 @@ struct SignupRootView: View {
 
     // 단계 이동: 지금은 순서대로만 (나중에 JSON 흐름 정확해지면 수정)
     private func goPrev() {
-        let all: [SignupStep] = [.step1,.step2,.step3,.step3_1,.step4,.step5,.step6,.collectMajor1,.collectMajor2,.terms7,.terms8]
+        let all: [SignupStep] = [.step1,.step2,.step3,.step3Sub,.step4,.step5,.step6,.collectMajor1,.collectMajor2,.terms7,.terms8]
         guard let idx = all.firstIndex(of: step), idx > 0 else { return }
         step = all[idx - 1]
     }
 
     private func goNext() {
-        let all: [SignupStep] = [.step1,.step2,.step3,.step3_1,.step4,.step5,.step6,.collectMajor1,.collectMajor2,.terms7,.terms8]
+        let all: [SignupStep] = [.step1,.step2,.step3,.step3Sub,.step4,.step5,.step6,.collectMajor1,.collectMajor2,.terms7,.terms8]
         guard let idx = all.firstIndex(of: step), idx < all.count - 1 else { return }
         step = all[idx + 1]
     }
 }
 
 private struct SignupStepPlaceholder: View {
+    @Environment(\.appMetrics) private var m
     let title: String
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -121,10 +122,10 @@ private struct SignupStepPlaceholder: View {
                 .font(AppTypography.body())
                 .foregroundStyle(AppColors.textSecondary)
         }
-        .padding(16)
+        .padding(m.space16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColors.cardFill)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .clipShape(RoundedRectangle(cornerRadius: m.radius18))
     }
 }
 

@@ -22,7 +22,7 @@ public struct Chip: View {
     public var body: some View {
         let view = Text(text)
             .font(AppTypography.caption())
-            .foregroundStyle(isSelected ? Color.white : AppColors.brand)
+            .foregroundStyle(isSelected ? AppColors.background : AppColors.brand)
             .padding(.horizontal, m.space12)
             .padding(.vertical, m.space8)
             .background(isSelected ? AppColors.brand : AppColors.brand.opacity(0.12))

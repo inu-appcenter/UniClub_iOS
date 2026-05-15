@@ -17,7 +17,7 @@ struct QnASearchBar: View {
     var body: some View {
         HStack(spacing: m.space8) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: m.space16, weight: .medium))
+                .font(AppTypography.notoSans(m.space16, weight: .medium))
                 .foregroundStyle(AppColors.textSecondary)
 
             TextField(placeholder, text: $text)
@@ -36,7 +36,7 @@ struct QnASearchBar: View {
                     onSubmit?()
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: m.space14, weight: .semibold))
+                        .font(AppTypography.notoSans(m.space14, weight: .semibold))
                         .foregroundStyle(AppColors.textSecondary)
                 }
                 .buttonStyle(.plain)

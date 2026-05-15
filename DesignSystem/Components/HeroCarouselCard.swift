@@ -32,7 +32,7 @@ public struct HeroCarouselCard: View {
             cover
 
             LinearGradient(
-                colors: [Color.black.opacity(0.0), Color.black.opacity(0.35)],
+                colors: [AppColors.grey800.opacity(0.0), AppColors.grey800.opacity(0.35)],
                 startPoint: .top,
                 endPoint: .bottom
             )
@@ -40,13 +40,13 @@ public struct HeroCarouselCard: View {
             VStack(alignment: .leading, spacing: m.space8) {
                 Text(title)
                     .font(AppTypography.title())
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(AppColors.background)
                     .lineLimit(2)
 
                 if let subtitle, !subtitle.isEmpty {
                     Text(subtitle)
                         .font(AppTypography.caption())
-                        .foregroundStyle(Color.white.opacity(0.9))
+                        .foregroundStyle(AppColors.background.opacity(0.9))
                         .lineLimit(2)
                 }
             }
@@ -93,7 +93,7 @@ public struct HeroCarouselCard: View {
             .fill(AppColors.cardFill)
             .overlay(
                 Image(systemName: "sparkles")
-                    .font(.system(size: 22, weight: .semibold))
+                    .font(AppTypography.notoSans(22, weight: .semibold))
                     .foregroundStyle(AppColors.textSecondary)
             )
             .clipped()

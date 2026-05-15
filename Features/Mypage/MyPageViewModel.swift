@@ -41,6 +41,6 @@ final class MyPageViewModel: ObservableObject {
     }
 
     func signOut() {
-        MyAuthStore.shared.signOut()
+        Task { await MyAuthStore.shared.signOut() }
     }
 }

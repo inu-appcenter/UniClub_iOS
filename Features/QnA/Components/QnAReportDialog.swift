@@ -30,12 +30,12 @@ struct QnAReportDialog: View {
 
             ZStack(alignment: .topLeading) {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(hex: 0xF5F5F5))
+                    .fill(AppColors.fieldFill)
 
                 if reason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     Text("이유를 입력해주세요.")
                         .font(AppTypography.body())
-                        .foregroundStyle(Color(hex: 0x9A9A9A))
+                        .foregroundStyle(AppColors.grey500)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 14)
                 }
@@ -66,7 +66,7 @@ struct QnAReportDialog: View {
                 .font(AppTypography.body())
                 .foregroundStyle(
                     reason.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmitting
-                    ? Color(hex: 0xBFBFBF)
+                    ? AppColors.grey400
                     : AppColors.textPrimary
                 )
                 .frame(maxWidth: .infinity)
@@ -76,7 +76,7 @@ struct QnAReportDialog: View {
             .padding(.top, m.space18)
         }
         .frame(width: 300)
-        .background(Color.white)
+        .background(AppColors.background)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 }

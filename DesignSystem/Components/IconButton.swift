@@ -20,6 +20,7 @@ public struct IconButton: View {
     private let systemName: String
     private let size: CGFloat?
     private let hitSize: CGFloat?
+    private let weight: Font.Weight
     private let tint: Color
     private let variant: IconButtonVariant
     private let action: () -> Void
@@ -29,6 +30,7 @@ public struct IconButton: View {
         systemName: String,
         size: CGFloat? = nil,
         hitSize: CGFloat? = nil,
+        weight: Font.Weight = .semibold,
         tint: Color = AppColors.textPrimary,
         background: Color? = nil,
         cornerRadius: CGFloat? = nil,
@@ -37,6 +39,7 @@ public struct IconButton: View {
         self.systemName = systemName
         self.size = size
         self.hitSize = hitSize
+        self.weight = weight
         self.tint = tint
         if let bg = background {
             self.variant = .filled(background: bg, cornerRadius: cornerRadius ?? 999)
@@ -52,6 +55,7 @@ public struct IconButton: View {
         variant: IconButtonVariant,
         size: CGFloat? = nil,
         hitSize: CGFloat? = nil,
+        weight: Font.Weight = .semibold,
         tint: Color = AppColors.textPrimary,
         action: @escaping () -> Void
     ) {
@@ -59,6 +63,7 @@ public struct IconButton: View {
         self.variant = variant
         self.size = size
         self.hitSize = hitSize
+        self.weight = weight
         self.tint = tint
         self.action = action
     }
@@ -66,11 +71,12 @@ public struct IconButton: View {
     public var body: some View {
         Button(action: action) {
             Image(systemName: systemName)
-                .font(.system(size: resolvedSize, weight: .semibold))
+                .font(.system(size: resolvedSize, weight: weight))
                 .foregroundStyle(tint)
                 .frame(width: resolvedHitSize, height: resolvedHitSize)
                 .background(backgroundView)
                 .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(systemName)
@@ -95,5 +101,24 @@ public struct IconButton: View {
         case .filled(_, let r):
             return r
         }
+    }
+}
+
+// MARK: - Back Button Factory
+
+extension IconButton {
+    /// Figma 스펙: chevron.left, size=18, weight=.medium (strokeWeight 2.0 근사)
+    /// tint 기본값: textPrimary(#000000) / 밝은 배경용 .white 전달
+    public static func back(
+        tint: Color = AppColors.textPrimary,
+        action: @escaping () -> Void
+    ) -> IconButton {
+        IconButton(
+            systemName: "chevron.left",
+            variant: .plain,
+            weight: .medium,
+            tint: tint,
+            action: action
+        )
     }
 }

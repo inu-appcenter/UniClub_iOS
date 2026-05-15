@@ -21,11 +21,7 @@ struct SignupStep3TermsView: View {
             VStack(alignment: .leading, spacing: 16) {
 
                 HStack {
-                    Button(action: onBack) {
-                        Image(systemName: "chevron.left")
-                            .foregroundStyle(AppColors.textPrimary)
-                    }
-                    .buttonStyle(.plain)
+                    IconButton.back { onBack() }
 
                     Spacer()
 

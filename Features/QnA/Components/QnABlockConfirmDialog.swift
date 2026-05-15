@@ -44,7 +44,7 @@ struct QnABlockConfirmDialog: View {
                     onConfirm()
                 }
                 .font(AppTypography.body())
-                .foregroundStyle(isSubmitting ? Color(hex: 0xBFBFBF) : AppColors.textPrimary)
+                .foregroundStyle(isSubmitting ? AppColors.grey400 : AppColors.textPrimary)
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
                 .disabled(isSubmitting)
@@ -52,7 +52,7 @@ struct QnABlockConfirmDialog: View {
             .padding(.top, m.space18)
         }
         .frame(width: 300)
-        .background(Color.white)
+        .background(AppColors.background)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 }

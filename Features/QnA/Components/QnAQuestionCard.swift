@@ -42,7 +42,7 @@ struct QnAQuestionCard: View {
                         Button(action: onMore) {
                             Image(systemName: "ellipsis")
                                 .rotationEffect(Angle(degrees: 90))
-                                .font(.system(size: m.space18, weight: .semibold))
+                                .font(AppTypography.notoSans(m.space18, weight: .semibold))
                                 .foregroundStyle(AppColors.textPrimary)
                                 .frame(width: m.controlHeight44, height: m.controlHeight44)
                         }
@@ -52,7 +52,7 @@ struct QnAQuestionCard: View {
 
                 Text("@\(clubName)")
                     .font(AppTypography.captionStrong())
-                    .foregroundStyle(Color(hex: 0xFF5900))
+                    .foregroundStyle(AppColors.brand)
                     .lineLimit(1)
 
                 Text(content)
@@ -69,7 +69,7 @@ struct QnAQuestionCard: View {
 
                     Text("\(answerCount)")
                         .font(AppTypography.captionStrong())
-                        .foregroundStyle(Color.orange)
+                        .foregroundStyle(AppColors.brand)
                 }
             }
             .padding(m.space16)

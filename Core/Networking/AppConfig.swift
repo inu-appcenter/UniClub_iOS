@@ -21,9 +21,10 @@ enum AppConfig {
         // MARK: - Clubs
         enum Clubs {
             static let list = "/api/v1/clubs"
-            static func detail(_ id: Int) -> String {
-                "/api/v1/clubs/\(id)"
-            }
+            static func detail(_ id: Int) -> String { "/api/v1/clubs/\(id)" }
+            static func favorite(_ id: Int) -> String { "/api/v1/clubs/\(id)/favorite" }
+            static func upload(_ id: Int) -> String { "/api/v1/clubs/\(id)/upload" }
+            static func s3Presigned(_ id: Int) -> String { "/api/v1/club/\(id)/s3-presigned" }
         }
 
         // MARK: - Main
@@ -46,12 +47,27 @@ enum AppConfig {
             static let questions = "/api/v1/qna/{questionId}"
         }
 
+        // MARK: - FCM
+        enum FCM {
+            static let register   = "/api/v1/fcm/register"
+            static let unregister = "/api/v1/fcm"
+        }
+
+        // MARK: - Notifications
+        enum Notifications {
+            static let list    = "/api/v1/notifications"
+            static let readAll = "/api/v1/notifications/read-all"
+            static func read(_ id: Int)   -> String { "/api/v1/notifications/\(id)/read" }
+            static func delete(_ id: Int) -> String { "/api/v1/notifications/\(id)" }
+        }
+
         // MARK: - mypage
         enum User {
             static let me = "/api/v1/users/me"
             static let edit = "/api/v1/users/me"
             static let delete = "/api/v1/users"
             static let profilePresigned = "/api/v1/user/profile/s3-presigned"
+            static let notificationSetting = "/api/v1/users/notification"
         }
     }
 }

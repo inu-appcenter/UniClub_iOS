@@ -29,7 +29,7 @@ struct QnAAnswerRow: View {
 
                         if answer.president {
                             Circle()
-                                .fill(Color(hex: 0xFF5900))
+                                .fill(AppColors.brand)
                                 .frame(width: m.space6, height: m.space6)
                         }
                     }
@@ -45,7 +45,7 @@ struct QnAAnswerRow: View {
                     Button(action: onTapMore) {
                         Image(systemName: "ellipsis")
                             .rotationEffect(Angle(degrees: 90))
-                            .font(.system(size: m.space18, weight: .semibold))
+                            .font(AppTypography.notoSans(m.space18, weight: .semibold))
                             .foregroundStyle(AppColors.textPrimary)
                     }
                     .buttonStyle(.plain)
@@ -55,7 +55,7 @@ struct QnAAnswerRow: View {
             HStack(alignment: .bottom, spacing: m.space10) {
                 Text(answer.deleted ? "삭제된 댓글입니다." : answer.content)
                     .font(AppTypography.body())
-                    .foregroundStyle(answer.deleted ? Color(hex: 0xBFBFBF) : AppColors.textPrimary)
+                    .foregroundStyle(answer.deleted ? AppColors.grey400 : AppColors.textPrimary)
                     .padding(.leading, m.space28 + m.space10 + m.space4)
 
                 Spacer(minLength: 0)
@@ -65,17 +65,17 @@ struct QnAAnswerRow: View {
                         onTapReply()
                     }
                     .font(AppTypography.caption())
-                    .foregroundStyle(Color(hex: 0xBFBFBF))
+                    .foregroundStyle(AppColors.grey400)
                     .buttonStyle(.plain)
                 }
             }
         }
         .padding(m.space14)
-        .background(isReplyTarget ? Color(hex: 0xE3E3E3) : Color.white)
+        .background(isReplyTarget ? AppColors.separator : AppColors.background)
         .overlay(
             RoundedRectangle(cornerRadius: m.radius16, style: .continuous)
                 .stroke(
-                    isReplyTarget ? Color(hex: 0xCACACA) : Color.clear,
+                    isReplyTarget ? AppColors.grey400 : Color.clear,
                     lineWidth: 0.5
                 )
         )

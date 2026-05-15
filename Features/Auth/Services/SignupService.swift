@@ -25,13 +25,13 @@ enum SignupService {
         }
     }
     static func verifyStudent(studentId: String, password: String) async throws -> VerifyResponse {
-        let (data, http) = try await HTTPClient.shared.postJSONRaw(
+        let (data, _) = try await HTTPClient.shared.postJSONRaw(
             AppConfig.API.Auth.verifyStudent,
             body: VerifyRequest(studentId: studentId, password: password),
             requiresAuth: false
         )
 
-        return try JSONDecoder().decode(VerifyResponse.self, from: data)
+        return try HTTPClient.shared.decode(VerifyResponse.self, from: data)
     }
 
     // MARK: - 2) 회원가입
@@ -45,7 +45,6 @@ enum SignupService {
         // ✅ 서버 스키마에 맞는 값들만 유지
         let agreePrivacy: Bool          // -> personalInfoCollectionAgreement
         let agreeMarketing: Bool        // -> marketingAdvertisement
-        let studentVerification: Bool   // -> studentVerification
 
         enum CodingKeys: String, CodingKey {
             case studentId
@@ -55,7 +54,6 @@ enum SignupService {
             case nickname
             case agreePrivacy = "personalInfoCollectionAgreement"
             case agreeMarketing = "marketingAdvertisement"
-            case studentVerification
         }
     }
 
@@ -71,7 +69,7 @@ enum SignupService {
             return RegisterResponse() // accessToken nil
         }
 
-        return try JSONDecoder().decode(RegisterResponse.self, from: data)
+        return try HTTPClient.shared.decode(RegisterResponse.self, from: data)
     }
 
     struct RegisterResponse: Decodable {
@@ -93,4 +91,3 @@ enum SignupService {
         }
     }
 }
-

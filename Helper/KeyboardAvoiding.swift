@@ -8,6 +8,9 @@
 import SwiftUI
 import Combine
 
+#if canImport(UIKit)
+import UIKit
+
 private final class KeyboardObserver: ObservableObject {
     @Published var height: CGFloat = 0
 
@@ -47,3 +50,10 @@ extension View {
         modifier(KeyboardAvoidingModifier())
     }
 }
+#else
+extension View {
+    func keyboardAvoiding() -> some View {
+        self
+    }
+}
+#endif

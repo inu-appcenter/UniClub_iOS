@@ -33,7 +33,7 @@ struct ClubListCard: View {
         HStack(spacing: m.space8) {
             // 이름: 14pt (JSON 기반)
             Text(item.name)
-                .font(.system(size: 14, weight: .medium))
+                .font(AppTypography.notoSans(14, weight: .medium))
                 .foregroundStyle(.white)
                 .lineLimit(1)
 
@@ -42,25 +42,25 @@ struct ClubListCard: View {
             Spacer(minLength: 0)
 
             Image(systemName: item.favorite ? "heart.fill" : "heart")
-                .font(.system(size: 16, weight: .semibold))
+                .font(AppTypography.notoSans(16, weight: .semibold))
                 .foregroundStyle(item.favorite ? .pink : .white.opacity(0.95))
         }
     }
 
     private var categoryPill: some View {
         Text(CategoryType(rawValue: item.category)?.displayText ?? "")
-            .font(.system(size: 10, weight: .medium))
+            .font(AppTypography.notoSans(10, weight: .medium))
             .foregroundStyle(.white.opacity(0.95))
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
-            .background(Color.black.opacity(0.28))
+            .background(AppColors.grey800.opacity(0.28))
             .clipShape(Capsule())
     }
 
     private var descriptionText: some View {
         // 소개: 9pt (JSON 기반)
         Text(item.info ?? "")
-            .font(.system(size: 9, weight: .medium))
+            .font(AppTypography.notoSans(9, weight: .medium))
             .foregroundStyle(.white.opacity(0.95))
             .lineLimit(2)
             .fixedSize(horizontal: false, vertical: true)
@@ -78,7 +78,7 @@ struct ClubListCard: View {
 
             // 상태: 10pt (JSON 기반)
             Text(ClubStatus(rawValue: item.status ?? "")?.displayText ?? "")
-                .font(.system(size: 10, weight: .medium))
+                .font(AppTypography.notoSans(10, weight: .medium))
                 .foregroundStyle(.white.opacity(0.95))
         }
     }
@@ -102,14 +102,14 @@ struct ClubListCard: View {
                     case .success(let img):
                         img.resizable().scaledToFill()
                     default:
-                        Color.black.opacity(0.06)
+                        AppColors.grey800.opacity(0.06)
                     }
                 }
                 .frame(width: 54, height: 54)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
             } else {
                 Image(systemName: "person.fill")
-                    .foregroundStyle(Color.black.opacity(0.25))
+                    .foregroundStyle(AppColors.grey800.opacity(0.25))
             }
         }
     }
@@ -133,7 +133,7 @@ struct ClubListSortButton: View {
                     .foregroundStyle(AppColors.textSecondary)
 
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(AppTypography.notoSans(12, weight: .semibold))
                     .foregroundStyle(AppColors.textSecondary)
 
                 Spacer(minLength: 0)

@@ -25,7 +25,7 @@ struct QnAClubPickerSheetView: View {
     var body: some View {
         ScreenContainer(
             scroll: false,
-            background: Color(hex: 0xF8F8F8),
+            background: AppColors.backgroundSecondary,
             topPadding: .none,
             bottomPadding: .custom(m.space16)
         ) { _ in
@@ -70,7 +70,7 @@ struct QnAClubPickerSheetView: View {
                                                 .font(AppTypography.bodyStrong())
                                                 .foregroundStyle(
                                                     selectedClub?.clubId == club.clubId
-                                                    ? Color(hex: 0xFF5900)
+                                                    ? AppColors.brand
                                                     : AppColors.textPrimary
                                                 )
 
@@ -78,7 +78,7 @@ struct QnAClubPickerSheetView: View {
                                                 .font(AppTypography.caption())
                                                 .foregroundStyle(
                                                     selectedClub?.clubId == club.clubId
-                                                    ? Color(hex: 0xFF5900)
+                                                    ? AppColors.brand
                                                     : AppColors.textSecondary
                                                 )
                                         }
@@ -102,7 +102,7 @@ struct QnAClubPickerSheetView: View {
                         .foregroundStyle(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: m.controlHeight48)
-                        .background(Color(hex: 0xFF5900).opacity(selectedClub == nil ? 0.35 : 1))
+                        .background(AppColors.brand.opacity(selectedClub == nil ? 0.35 : 1))
                         .clipShape(RoundedRectangle(cornerRadius: m.radiusPill))
                 }
                 .disabled(selectedClub == nil)

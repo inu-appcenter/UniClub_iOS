@@ -28,7 +28,7 @@ struct QnAListView: View {
         ZStack {
             ScreenContainer(
                 scroll: false,
-                background: Color(hex: 0xF8F8F8),
+                background: AppColors.backgroundSecondary,
                 topPadding: .none,
                 bottomPadding: .none
             ) { _ in
@@ -72,7 +72,7 @@ struct QnAListView: View {
             }
 
             if selectedActionQuestion != nil {
-                Color.black.opacity(0.32)
+                AppColors.grey800.opacity(0.32)
                     .ignoresSafeArea()
                     .onTapGesture {
                         if !isShowingDeleteConfirmation && !isShowingReportDialog && !isShowingBlockDialog {
@@ -89,7 +89,7 @@ struct QnAListView: View {
             }
 
             if isShowingDeleteConfirmation {
-                Color.black.opacity(0.32)
+                AppColors.grey800.opacity(0.32)
                     .ignoresSafeArea()
 
                 deleteConfirmDialog
@@ -97,7 +97,7 @@ struct QnAListView: View {
             }
 
             if isShowingReportDialog {
-                Color.black.opacity(0.32)
+                AppColors.grey800.opacity(0.32)
                     .ignoresSafeArea()
 
                 QnAReportDialog(
@@ -116,7 +116,7 @@ struct QnAListView: View {
             }
 
             if isShowingBlockDialog {
-                Color.black.opacity(0.32)
+                AppColors.grey800.opacity(0.32)
                     .ignoresSafeArea()
 
                 QnABlockConfirmDialog(
@@ -151,9 +151,7 @@ struct QnAListView: View {
 
     private var header: some View {
         HStack {
-            IconButton(systemName: "chevron.left") {
-                onBackToHome()
-            }
+            IconButton.back { onBackToHome() }
 
             Spacer(minLength: 0)
 
@@ -188,7 +186,7 @@ struct QnAListView: View {
                     Task { await viewModel.loadQuestions() }
                 }
                 .font(AppTypography.captionStrong())
-                .foregroundStyle(Color(hex: 0xFF5900))
+                .foregroundStyle(AppColors.brand)
 
                 Spacer()
             }
@@ -199,7 +197,7 @@ struct QnAListView: View {
                 if let selectedClub = viewModel.selectedClub {
                     Text("@\(selectedClub.clubName)")
                         .font(AppTypography.captionStrong())
-                        .foregroundStyle(Color(hex: 0xFF5900))
+                        .foregroundStyle(AppColors.brand)
 
                     Text("동아리 부원들에게 궁금한 점을 물어보세요.")
                         .font(AppTypography.body())
@@ -238,85 +236,20 @@ struct QnAListView: View {
         }
     }
 
+    @ViewBuilder
     private var questionActionSheet: some View {
-        VStack(spacing: 0) {
-            if let question = selectedActionQuestion, question.owner {
-                Button {
+        if let question = selectedActionQuestion {
+            QnAQuestionActionSheet(
+                question: question,
+                onEdit: {
                     selectedActionQuestion = nil
                     onOpenDetail(question.questionId)
-                } label: {
-                    actionRow(
-                        iconName: "icon_fix_pencil",
-                        title: "수정하기"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    isShowingDeleteConfirmation = true
-                } label: {
-                    actionRow(
-                        iconName: "icon_delete_trashcan",
-                        title: "삭제하기"
-                    )
-                }
-                .buttonStyle(.plain)
-            } else {
-                Button {
-                    isShowingReportDialog = true
-                } label: {
-                    actionRow(
-                        systemIconName: "exclamationmark.triangle",
-                        title: "신고하기"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    isShowingBlockDialog = true
-                } label: {
-                    actionRow(
-                        systemIconName: "nosign",
-                        title: "차단하기"
-                    )
-                }
-                .buttonStyle(.plain)
-            }
+                },
+                onDelete: { isShowingDeleteConfirmation = true },
+                onReport: { isShowingReportDialog = true },
+                onBlock: { isShowingBlockDialog = true }
+            )
         }
-        .frame(width: 307)
-        .background(Color(hex: 0x2B2B2B))
-        .clipShape(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-        )
-        .padding(.bottom, m.space16)
-    }
-
-    private func actionRow(
-        iconName: String? = nil,
-        systemIconName: String? = nil,
-        title: String
-    ) -> some View {
-        HStack(spacing: m.space16) {
-            if let iconName {
-                Image(iconName)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 24, height: 24)
-            } else if let systemIconName {
-                Image(systemName: systemIconName)
-                    .font(.system(size: 22, weight: .medium))
-                    .foregroundStyle(.white)
-                    .frame(width: 24, height: 24)
-            }
-
-            Text(title)
-                .font(AppTypography.bodyStrong())
-                .foregroundStyle(.white)
-
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, m.space20)
-        .frame(height: 48)
     }
 
     private var deleteConfirmDialog: some View {
@@ -358,7 +291,7 @@ struct QnAListView: View {
             }
         }
         .frame(maxWidth: 260)
-        .background(Color.white)
+        .background(AppColors.background)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
     }
 

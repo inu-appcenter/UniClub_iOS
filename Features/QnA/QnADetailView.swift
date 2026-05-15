@@ -40,7 +40,7 @@ struct QnADetailView: View {
         ZStack {
             ScreenContainer(
                 scroll: false,
-                background: Color(hex: 0xF8F8F8),
+                background: AppColors.backgroundSecondary,
                 topPadding: .none,
                 bottomPadding: .none
             ) { _ in
@@ -56,7 +56,7 @@ struct QnADetailView: View {
             }
 
             if activeMoreAnswer != nil || pendingDeleteAnswer != nil || viewModel.showReportDialog || viewModel.showBlockDialog {
-                Color.black.opacity(0.32)
+                AppColors.grey800.opacity(0.32)
                     .ignoresSafeArea()
                     .onTapGesture {
                         if pendingDeleteAnswer == nil && !viewModel.showReportDialog && !viewModel.showBlockDialog {
@@ -134,9 +134,7 @@ struct QnADetailView: View {
 
     private var header: some View {
         HStack {
-            IconButton(systemName: "chevron.left") {
-                onBack()
-            }
+            IconButton.back { onBack() }
 
             Spacer(minLength: 0)
 
@@ -165,7 +163,7 @@ struct QnADetailView: View {
                     questionHeader(detail)
 
                     Rectangle()
-                        .fill(Color(hex: 0xEBEBEB))
+                        .fill(AppColors.separator)
                         .frame(height: max(1, m.hairline))
 
                     ForEach(viewModel.topLevelAnswers) { answer in
@@ -222,123 +220,16 @@ struct QnADetailView: View {
     }
 
     private func questionHeader(_ detail: QnAQuestionDetail) -> some View {
-        HStack(alignment: .top, spacing: m.space12) {
-            mainQuestionAvatar(size: 35)
-
-            VStack(alignment: .leading, spacing: m.space4) {
-                HStack(spacing: m.space4) {
-                    Text(detail.nickname)
-                        .font(AppTypography.bodyStrong())
-                        .foregroundStyle(AppColors.textPrimary)
-
-                    if detail.president {
-                        Circle()
-                            .fill(Color(hex: 0xFF5900))
-                            .frame(width: m.space6, height: m.space6)
-                    }
-                }
-
-                Text(QnADateFormatter.display(detail.updatedAt))
-                    .font(AppTypography.caption())
-                    .foregroundStyle(AppColors.textSecondary)
-
-                Text("@\(detail.clubName)")
-                    .font(AppTypography.captionStrong())
-                    .foregroundStyle(Color(hex: 0xFF5900))
-                    .padding(.top, m.space8)
-
-                Text(detail.content)
-                    .font(AppTypography.body())
-                    .foregroundStyle(AppColors.textPrimary)
-                    .padding(.top, m.space2)
-            }
-
-            Spacer(minLength: 0)
-        }
-    }
-
-    @ViewBuilder
-    private func mainQuestionAvatar(size: CGFloat) -> some View {
-        if let profileURL = viewModel.detail?.profileURL {
-            AsyncImage(url: profileURL) { phase in
-                switch phase {
-                case .success(let image):
-                    image.resizable().scaledToFill()
-                default:
-                    defaultMainQuestionAvatar(size: size)
-                }
-            }
-            .frame(width: size, height: size)
-            .clipShape(Circle())
-        } else {
-            defaultMainQuestionAvatar(size: size)
-        }
-    }
-
-    private func defaultMainQuestionAvatar(size: CGFloat) -> some View {
-        Image("image_default_user")
-            .resizable()
-            .scaledToFill()
-            .frame(width: size, height: size)
-            .clipShape(Circle())
+        QnAQuestionHeader(detail: detail, profileURL: viewModel.detail?.profileURL)
     }
 
     private var answerInputBar: some View {
-        HStack(spacing: m.space10) {
-            Button {
-                isAnonymousReply.toggle()
-            } label: {
-                Text("익명")
-                    .font(AppTypography.captionStrong())
-                    .foregroundStyle(isAnonymousReply ? .white : Color(hex: 0xBFBFBF))
-                    .frame(width: 68, height: 48)
-                    .background(isAnonymousReply ? Color(hex: 0xFF5900) : Color(hex: 0x2B2B2B))
-                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-            }
-            .buttonStyle(.plain)
-
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .fill(Color(hex: 0x2B2B2B))
-
-                if viewModel.answerText.isEmpty {
-                    Text("댓글을 입력하세요.")
-                        .font(AppTypography.body())
-                        .foregroundStyle(Color(hex: 0xBFBFBF))
-                        .padding(.leading, m.space18)
-                }
-
-                HStack(spacing: m.space10) {
-                    TextField("", text: $viewModel.answerText)
-                        .font(AppTypography.body())
-                        .foregroundStyle(.white)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .padding(.leading, m.space18)
-
-                    Button {
-                        Task { await submitCurrentReply() }
-                    } label: {
-                        Image("icon_submit_uparrow")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 24, height: 24)
-                            .opacity(
-                                viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                                ? 0.5
-                                : 1
-                            )
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(
-                        viewModel.answerText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                        || isSubmittingReply
-                    )
-                    .padding(.trailing, m.space14)
-                }
-            }
-            .frame(height: 48)
-        }
+        QnAAnswerInputBar(
+            viewModel: viewModel,
+            isAnonymousReply: $isAnonymousReply,
+            isSubmittingReply: isSubmittingReply,
+            onSubmit: { Task { await submitCurrentReply() } }
+        )
     }
 
     @MainActor
@@ -366,58 +257,22 @@ struct QnADetailView: View {
         }
     }
 
-    @ViewBuilder
     private func answerActionSheet(for answer: QnAAnswerItem) -> some View {
-        VStack(spacing: 0) {
-            if answer.owner {
-                Button {
-                    activeMoreAnswer = nil
-                    pendingDeleteAnswer = answer
-                } label: {
-                    sheetRow(title: "삭제하기")
-                }
-                .buttonStyle(.plain)
-            } else {
-                Button {
-                    activeMoreAnswer = nil
-                    viewModel.presentReportDialog(target: .answer(id: answer.answerId))
-                } label: {
-                    sheetRow(title: "신고하기", iconSystemName: "exclamationmark.triangle")
-                }
-                .buttonStyle(.plain)
-
-                Button {
-                    activeMoreAnswer = nil
-                    viewModel.presentBlockDialog(target: .answer(id: answer.answerId))
-                } label: {
-                    sheetRow(title: "차단하기", iconSystemName: "nosign")
-                }
-                .buttonStyle(.plain)
+        QnAAnswerActionSheet(
+            answer: answer,
+            onDelete: {
+                activeMoreAnswer = nil
+                pendingDeleteAnswer = answer
+            },
+            onReport: {
+                activeMoreAnswer = nil
+                viewModel.presentReportDialog(target: .answer(id: answer.answerId))
+            },
+            onBlock: {
+                activeMoreAnswer = nil
+                viewModel.presentBlockDialog(target: .answer(id: answer.answerId))
             }
-        }
-        .frame(width: 307)
-        .background(Color(hex: 0x2B2B2B))
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-        .padding(.bottom, m.space16)
-    }
-
-    private func sheetRow(title: String, iconSystemName: String? = nil) -> some View {
-        HStack(spacing: m.space12) {
-            if let iconSystemName {
-                Image(systemName: iconSystemName)
-                    .font(.system(size: 22, weight: .medium))
-                    .foregroundStyle(.white)
-                    .frame(width: 24, height: 24)
-            }
-
-            Text(title)
-                .font(AppTypography.bodyStrong())
-                .foregroundStyle(.white)
-
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, m.space20)
-        .frame(height: 48)
+        )
     }
 
     private var deleteAnswerConfirmDialog: some View {
@@ -452,7 +307,7 @@ struct QnADetailView: View {
             }
         }
         .frame(maxWidth: 300)
-        .background(Color.white)
+        .background(AppColors.background)
         .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
     }
 }

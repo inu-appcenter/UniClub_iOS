@@ -21,6 +21,7 @@ struct QnARootView: View {
                 path.append(QnARoute.compose(selectedClub: selectedClub))
             }
         )
+        .tabBarPresent(false)
         .navigationDestination(for: QnARoute.self) { route in
             switch route {
             case .detail(let questionId):
@@ -34,6 +35,7 @@ struct QnARootView: View {
                         path.append(QnARoute.edit(questionId: questionId, club: club, initialContent: content))
                     }
                 )
+                .tabBarPresent(false)
 
             case .compose(let selectedClub):
                 QnAComposerView(
@@ -42,6 +44,7 @@ struct QnARootView: View {
                         if !path.isEmpty { path.removeLast() }
                     }
                 )
+                .tabBarPresent(false)
 
             case .edit(let questionId, let club, let initialContent):
                 QnAComposerView(
@@ -52,6 +55,7 @@ struct QnARootView: View {
                         if !path.isEmpty { path.removeLast() }
                     }
                 )
+                .tabBarPresent(false)
             }
         }
     }

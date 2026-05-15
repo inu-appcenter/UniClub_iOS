@@ -12,7 +12,7 @@ struct MyPageSectionTitle: View {
 
     var body: some View {
         Text(title)
-            .font(.system(size: 17, weight: .bold))
+            .font(AppTypography.notoSans(17, weight: .bold))
             .foregroundStyle(AppColors.textPrimary)
     }
 }

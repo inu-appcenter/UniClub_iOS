@@ -11,7 +11,7 @@ enum SignupStep: Hashable {
     case step1   // Signup_1
     case step2   // Signup_2
     case step3   // Signup_3
-    case step3_1 // Signup_3_1
+    case step3Sub // Signup_3_1
     case step4
     case step5
     case step6

@@ -71,9 +71,7 @@ struct QnAComposerView: View {
 
     private var header: some View {
         HStack {
-            IconButton(systemName: "chevron.left") {
-                onDismiss()
-            }
+            IconButton.back { onDismiss() }
 
             Spacer(minLength: 0)
 
@@ -101,7 +99,7 @@ struct QnAComposerView: View {
                 Spacer(minLength: 0)
 
                 Image(systemName: "magnifyingglass")
-                    .font(.system(size: m.space16, weight: .medium))
+                    .font(AppTypography.notoSans(m.space16, weight: .medium))
                     .foregroundStyle(AppColors.textSecondary)
             }
             .padding(.horizontal, m.space12)
@@ -116,7 +114,7 @@ struct QnAComposerView: View {
 
     private var divider: some View {
         Rectangle()
-            .fill(Color(hex: 0xEBEBEB))
+            .fill(AppColors.separator)
             .frame(height: max(1, m.hairline))
     }
 
@@ -125,7 +123,7 @@ struct QnAComposerView: View {
             if let selectedClub = viewModel.selectedClub {
                 Text("@\(selectedClub.clubName)")
                     .font(AppTypography.captionStrong())
-                    .foregroundStyle(Color(hex: 0xFF5900))
+                    .foregroundStyle(AppColors.brand)
             }
 
             Text("동아리 부원들에게 궁금한 것을 물어보세요.")
@@ -159,8 +157,8 @@ struct QnAComposerView: View {
                     .frame(width: 68, height: 48)
                     .background(
                         viewModel.isAnonymous
-                        ? Color(hex: 0xFF5900)
-                        : Color(hex: 0xD3D3D3)
+                        ? AppColors.brand
+                        : AppColors.grey300
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             }
@@ -180,7 +178,7 @@ struct QnAComposerView: View {
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)
                     .background(
-                        Color(hex: 0x2B2B2B)
+                        AppColors.grey700
                             .opacity(viewModel.isSubmitEnabled ? 1 : 0.35)
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))

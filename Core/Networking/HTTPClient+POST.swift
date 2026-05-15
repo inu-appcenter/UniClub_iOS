@@ -5,13 +5,6 @@
 //  Created by 제욱 on 2/7/26.
 //
 
-//
-//  HTTPClient+POST.swift
-//  UniClub
-//
-//  Created by 제욱 on 2/7/26.
-//
- 
 import Foundation
 
 extension HTTPClient {
@@ -35,11 +28,7 @@ extension HTTPClient {
             requiresAuth: requiresAuth
         )
 
-        do {
-            return try JSONDecoder().decode(Res.self, from: data)
-        } catch {
-            throw APIError.decoding(error)
-        }
+        return try decode(Res.self, from: data)
     }
 
     /// ✅ POST(JSON) + Raw(Data, HTTPURLResponse)
@@ -72,26 +61,14 @@ extension HTTPClient {
             req.setValue(nil, forHTTPHeaderField: "Authorization")
         }
 
-        let data: Data
-        let resp: URLResponse
-
         if requiresAuth {
-            (data, resp) = try await sendRaw(req)
-        } else {
-            // ✅ 공개 API도 같은 session 사용 + Authorization 완전 제거
-            (data, resp) = try await sendWithoutAuth(req)
-            log(req, data: data, resp: resp)
+            return try await sendValidatedRaw(req, requiresAuth: true)
         }
 
-        guard let http = resp as? HTTPURLResponse else {
-            throw APIError.badResponse(-1, "Invalid HTTPURLResponse")
-        }
-
-        guard (200...299).contains(http.statusCode) else {
-            let bodyText = String(data: data, encoding: .utf8) ?? ""
-            throw APIError.badResponse(http.statusCode, bodyText)
-        }
-
+        // ✅ 공개 API도 같은 session 사용 + Authorization 완전 제거
+        let (data, resp) = try await sendWithoutAuth(req)
+        log(req, data: data, resp: resp)
+        let http = try validate(data: data, response: resp)
         return (data, http)
     }
 }

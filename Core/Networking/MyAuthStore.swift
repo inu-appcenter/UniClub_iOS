@@ -31,7 +31,8 @@ final class MyAuthStore: ObservableObject {
         }
     }
 
-    func signOut() {
+    func signOut() async {
+        await FCMService.shared.unregisterTokenFromServer()
         setAccessToken(nil)
     }
 

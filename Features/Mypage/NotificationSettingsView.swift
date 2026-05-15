@@ -6,66 +6,61 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 struct NotificationSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appMetrics) private var m
+    @StateObject private var fcm = FCMService.shared
 
-    // ✅ JSON _1(off) / _2(on) 차이는 이 상태값 하나
-    @State private var isPushOn: Bool = false
+    @State private var serverEnabled: Bool = false
+    @State private var isTogglingServer: Bool = false
+
+    private var isPushOn: Bool {
+        let systemGranted = fcm.authorizationStatus == .authorized || fcm.authorizationStatus == .provisional
+        return systemGranted && serverEnabled
+    }
 
     var body: some View {
-        ScreenContainer(scroll: false) { _ in
+        ScreenContainer(scroll: false, topPadding: .none) { _ in
             ZStack(alignment: .top) {
                 AppColors.background.ignoresSafeArea()
 
                 VStack(spacing: 0) {
-                    header
-                        .padding(.top, 39)      // 상태바 아래 여백 느낌(피그마 상단 구성에 맞춤)
-                        .padding(.bottom, 52)   // 타이틀~콘텐츠 간격 느낌
+                    AppPageHeader(onBack: { dismiss() }) {
+                        Text("알림 설정")
+                            .font(AppTypography.notoSans(15, weight: .medium))
+                            .foregroundStyle(AppColors.textPrimary)
+                    }
+                    .padding(.bottom, m.scale * 22)
 
                     content
-                        .padding(.horizontal, 36) // 텍스트/토글이 가운데 쪽에 모이는 느낌
+                        .padding(.horizontal, m.space18)
                     Spacer()
                 }
             }
         }
         .navigationBarHidden(true)
-    }
-
-    private var header: some View {
-        ZStack {
-            // 중앙 타이틀
-            Text("알림 설정")
-                .font(AppTypography.bodyStrong())
-                .foregroundStyle(AppColors.textPrimary)
-
-            // 왼쪽 뒤로가기(피그마 Vector)
-            HStack {
-                Button { dismiss() } label: {
-                    Image(systemName: "chevron.left")
-                        .foregroundStyle(AppColors.textPrimary)
-                        .frame(width: 44, height: 44)
-                }
-                .buttonStyle(.plain)
-
-                Spacer()
-            }
-            .padding(.horizontal, 16)
+        .task {
+            await fcm.refreshAuthorizationStatus()
+            await loadServerSetting()
         }
-        .frame(height: 44)
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            Task {
+                await fcm.refreshAuthorizationStatus()
+                await loadServerSetting()
+            }
+        }
     }
 
     private var content: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // 설명문(피그마에 있는 긴 회색 안내문)
-            Text("질의응답, 관심 동아리, 총동아리연합회 소식 등 동아리의 다양한 소식을 알려드릴게요.")
-                .font(AppTypography.caption())
+            Text("질의응답, 관심 동아리, 총동아리연합회 소식 등 동아리의\n다양한 소식을 알려드릴게요.")
+                .font(AppTypography.notoSans(11))
                 .foregroundStyle(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.bottom, 61)
+                .padding(.bottom, m.scale * 31)
 
-            // “앱 푸시 알림” + 토글
             HStack(alignment: .center) {
                 Text("앱 푸시 알림")
                     .font(AppTypography.body())
@@ -73,7 +68,39 @@ struct NotificationSettingsView: View {
 
                 Spacer(minLength: 0)
 
-                UniToggle(isOn: $isPushOn)
+                UniToggle(isOn: isPushOn, onToggle: handleToggle)
+                    .disabled(isTogglingServer)
+            }
+        }
+    }
+
+    private func loadServerSetting() async {
+        do {
+            serverEnabled = try await NotificationService.fetchSetting()
+        } catch {
+            // 실패 시 기본값 유지
+        }
+    }
+
+    private func handleToggle() {
+        switch fcm.authorizationStatus {
+        case .notDetermined:
+            Task { await fcm.requestPermission() }
+        case .denied:
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        default:
+            // 시스템 권한 있으면 서버 설정 토글
+            isTogglingServer = true
+            Task {
+                do {
+                    try await NotificationService.toggleSetting()
+                    serverEnabled.toggle()
+                } catch {
+                    // 실패 시 상태 유지
+                }
+                isTogglingServer = false
             }
         }
     }
@@ -83,7 +110,8 @@ struct NotificationSettingsView: View {
 // MARK: - Custom Toggle (49×30, knob 22×22)
 private struct UniToggle: View {
     @Environment(\.appMetrics) private var m
-    @Binding var isOn: Bool
+    let isOn: Bool
+    let onToggle: () -> Void
 
     private let w: CGFloat = 49
     private let h: CGFloat = 30
@@ -93,7 +121,7 @@ private struct UniToggle: View {
     var body: some View {
         Button {
             withAnimation(.easeOut(duration: 0.18)) {
-                isOn.toggle()
+                onToggle()
             }
         } label: {
             ZStack {
@@ -101,7 +129,7 @@ private struct UniToggle: View {
                     .fill(trackColor)
 
                 Circle()
-                    .fill(Color.white)
+                    .fill(AppColors.background)
                     .frame(width: knob, height: knob)
                     .offset(x: isOn ? (w/2 - knob/2 - pad) : -(w/2 - knob/2 - pad))
             }
@@ -113,10 +141,8 @@ private struct UniToggle: View {
     }
 
     private var trackColor: Color {
-        // JSON 기준: OFF 회색 / ON 주황
-        // ✅ AppColors.brand가 주황이면 그대로 사용됨
         if isOn { return AppColors.brand }
-        return Color(white: 0.678) // 피그마의 회색(대략)과 유사
+        return Color(white: 0.678)
     }
 }
 

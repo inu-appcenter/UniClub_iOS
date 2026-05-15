@@ -24,14 +24,14 @@ struct QnAFilterBar: View {
             Button(action: onTapSelectClub) {
                 HStack(spacing: m.space8) {
                     Image(systemName: "magnifyingglass")
-                        .font(.system(size: m.space14, weight: .semibold))
+                        .font(AppTypography.notoSans(m.space14, weight: .semibold))
                     Text(selectedClubName ?? "동아리 선택")
                         .font(AppTypography.captionStrong())
                 }
                 .foregroundStyle(.white)
                 .padding(.horizontal, m.space12)
                 .frame(height: m.controlHeight44 - m.space8)
-                .background(Color(hex: 0xFF5900))
+                .background(AppColors.brand)
                 .clipShape(Capsule())
             }
 
@@ -60,16 +60,16 @@ struct QnAFilterBar: View {
             HStack(spacing: m.space6) {
                 Text(title)
                     .font(AppTypography.caption())
-                    .foregroundStyle(isOn ? Color(hex: 0xFF5900) : AppColors.textSecondary)
+                    .foregroundStyle(isOn ? AppColors.brand : AppColors.textSecondary)
 
                 ZStack {
                     RoundedRectangle(cornerRadius: 6)
-                        .fill(isOn ? Color(hex: 0xFF5900) : Color.gray.opacity(0.35))
+                        .fill(isOn ? AppColors.brand : Color.gray.opacity(0.35))
                         .frame(width: m.space18 + m.space2, height: m.space18 + m.space2)
 
                     if isOn {
                         Image(systemName: "checkmark")
-                            .font(.system(size: m.space10, weight: .bold))
+                            .font(AppTypography.notoSans(m.space10, weight: .bold))
                             .foregroundStyle(.white)
                     }
                 }

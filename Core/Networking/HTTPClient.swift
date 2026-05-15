@@ -39,7 +39,9 @@ final class HTTPClient {
         return URLSession(configuration: config)
     }()
     
-    var authTokenProvider: () -> String? = { MyAuthStore.shared.accessToken }
+    var authTokenProvider: () async -> String? = {
+        await MainActor.run { MyAuthStore.shared.accessToken }
+    }
     
     // ✅ 공개 API용 (Authorization 절대 주입 X)
     func sendWithoutAuth(_ request: URLRequest) async throws -> (Data, URLResponse) {
@@ -59,8 +61,7 @@ final class HTTPClient {
         as: T.Type = T.self
     ) async throws -> T {
         let data = try await getRaw(path, query: query, headers: headers)
-        do { return try JSONDecoder().decode(T.self, from: data) }
-        catch { throw APIError.decoding(error) }
+        return try decode(T.self, from: data)
     }
     
     func getFlexibleArray<T: Decodable>(
@@ -70,10 +71,14 @@ final class HTTPClient {
         as: T.Type = T.self
     ) async throws -> [T] {
         let data = try await getRaw(path, query: query, headers: headers)
-        let dec = JSONDecoder()
-        if let arr = try? dec.decode([T].self, from: data) { return arr }
-        let one = try dec.decode(T.self, from: data)
-        return [one]
+        do {
+            let decoder = JSONDecoder()
+            if let arr = try? decoder.decode([T].self, from: data) { return arr }
+            let one = try decoder.decode(T.self, from: data)
+            return [one]
+        } catch {
+            throw APIError.decoding(error)
+        }
     }
     
     /// 4-3에서 쓸 수 있는 기반이지만, 4-1 단계에서는 유지해도 됨
@@ -105,39 +110,11 @@ final class HTTPClient {
         req.httpMethod = "GET"
         req.setValue("application/json", forHTTPHeaderField: "Accept")
         
-        // ✅ (4-1) Authorization 주입은 HTTPClient에서만 수행
-        // ✅ 단, 이미 외부에서 Authorization을 붙였으면 덮어쓰지 않음
-        injectAuthorizationIfNeeded(into: &req)
-        
         // 외부에서 넘긴 헤더 적용 (이 시점에 Authorization을 넘겨주면 그대로 유지됨)
         headers.forEach { req.setValue($0.value, forHTTPHeaderField: $0.key) }
-        
-        do {
-            let (data, resp) = try await session.data(for: req)
-            log(req, data: data, resp: resp)
-            
-            guard let http = resp as? HTTPURLResponse else {
-                throw APIError.badResponse(-1, "Invalid HTTPURLResponse")
-            }
-            guard (200...299).contains(http.statusCode) else {
-                let body = String(data: data, encoding: .utf8) ?? ""
-                
-                // ✅ (4-3 A안) 401이면 즉시 로그아웃 처리(토큰 삭제)
-                if http.statusCode == 401 {
-                    await MainActor.run {
-                        MyAuthStore.shared.signOut()
-                    }
-                }
-                
-                
-                throw APIError.badResponse(http.statusCode, body)
-            }
-            return data
-        } catch let urlErr as URLError {
-            throw APIError.transport(urlErr)
-        } catch {
-            throw APIError.unknown(error)
-        }
+
+        let (data, _) = try await sendValidatedRaw(req, requiresAuth: true)
+        return data
     }
     
     /// ✅ (4-1) 이미 만들어진 URLRequest를 받아서
@@ -149,26 +126,51 @@ final class HTTPClient {
         // ✅ (핵심) requiresAuth가 true일 때만 Authorization 자동 주입
         if requiresAuth,
            req.value(forHTTPHeaderField: "Authorization") == nil,
-           let token = authTokenProvider(), !token.isEmpty {
+           let token = await authTokenProvider(), !token.isEmpty {
             req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
         do {
             let (data, resp) = try await session.data(for: req)
             log(req, data: data, resp: resp)
-            
-            // ✅ 401 signOut은 "인증 요청"에만 적용하는 게 자연스러움
-            if requiresAuth,
-               let http = resp as? HTTPURLResponse,
-               http.statusCode == 401 {
-                await MainActor.run { MyAuthStore.shared.signOut() }
-            }
-            
             return (data, resp)
+        } catch let apiError as APIError {
+            throw apiError
         } catch let urlErr as URLError {
             throw APIError.transport(urlErr)
         } catch {
             throw APIError.unknown(error)
+        }
+    }
+
+    func sendValidatedRaw(
+        _ request: URLRequest,
+        requiresAuth: Bool = true
+    ) async throws -> (Data, HTTPURLResponse) {
+        let (data, response) = try await sendRaw(request, requiresAuth: requiresAuth)
+        let http = try validate(data: data, response: response)
+        return (data, http)
+    }
+
+    func validate(data: Data, response: URLResponse) throws -> HTTPURLResponse {
+        guard let http = response as? HTTPURLResponse else {
+            throw APIError.badResponse(-1, "Invalid HTTPURLResponse")
+        }
+
+        guard (200...299).contains(http.statusCode) else {
+            let body = String(data: data, encoding: .utf8) ?? ""
+            throw APIError.badResponse(http.statusCode, body)
+        }
+
+        return http
+    }
+
+    func decode<T: Decodable>(_ type: T.Type = T.self, from data: Data) throws -> T {
+        let jsonData = data.isEmpty ? Data("{}".utf8) : data
+        do {
+            return try JSONDecoder().decode(T.self, from: jsonData)
+        } catch {
+            throw APIError.decoding(error)
         }
     }
     
@@ -179,14 +181,14 @@ final class HTTPClient {
     
     /// Authorization 헤더가 없다면, authTokenProvider로부터 토큰을 받아 Bearer 토큰을 주입한다.
     /// - 중요: 이미 Authorization이 있으면 "절대 덮어쓰지 않는다"
-    func injectAuthorizationIfNeeded(into request: inout URLRequest) {
+    func injectAuthorizationIfNeeded(into request: inout URLRequest) async {
         // 이미 Authorization이 세팅되어 있으면 건드리지 않는다 (Feature/테스트 코드 호환)
         if request.value(forHTTPHeaderField: "Authorization") != nil {
             return
         }
         
         // 토큰이 있으면 주입
-        if let token = authTokenProvider(), !token.isEmpty {
+        if let token = await authTokenProvider(), !token.isEmpty {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
     }

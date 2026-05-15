@@ -102,7 +102,7 @@ public struct ClubCard: View {
             .fill(AppColors.cardFill)
             .overlay(
                 Image(systemName: "photo")
-                    .font(.system(size: 18, weight: .regular))
+                    .font(AppTypography.notoSans(18))
                     .foregroundStyle(AppColors.textSecondary)
             )
             .clipped()

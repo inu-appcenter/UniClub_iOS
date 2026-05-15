@@ -5,6 +5,8 @@ enum HomeRoute: Hashable {
     case clubListAll
     case clubListCategory(String)
     case search
+    case promotionDetail(Int)
+    case notification
 }
 
 enum ClubListMode: Hashable {

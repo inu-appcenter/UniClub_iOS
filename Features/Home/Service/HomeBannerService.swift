@@ -17,31 +17,9 @@ struct HomeBannerItem: Identifiable, Decodable {
 enum HomeBannerService {
     /// GET /api/v1/main/banner (✅ 인증 필요)
     static func fetchBanners() async throws -> [HomeBannerItem] {
-        let url = AppConfig.baseURL.appendingPathComponent(
-            AppConfig.API.Main.banner.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        try await HTTPClient.shared.get(
+            AppConfig.API.Main.banner,
+            as: [HomeBannerItem].self
         )
-
-        var req = URLRequest(url: url)
-        req.httpMethod = "GET"
-        req.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        // ✅ 배너는 인증 필요하므로 처음부터 true
-        let (data, resp) = try await HTTPClient.shared.sendRaw(req, requiresAuth: true)
-
-        guard let http = resp as? HTTPURLResponse else {
-            throw APIError.badResponse(-1, "Invalid HTTPURLResponse")
-        }
-
-        guard (200...299).contains(http.statusCode) else {
-            let body = String(data: data, encoding: .utf8) ?? ""
-            throw APIError.badResponse(http.statusCode, body)
-        }
-
-        return try decodeBanners(data)
-    }
-
-    private static func decodeBanners(_ data: Data) throws -> [HomeBannerItem] {
-        let dec = JSONDecoder()
-        return try dec.decode([HomeBannerItem].self, from: data)
     }
 }

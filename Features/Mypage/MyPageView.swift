@@ -10,12 +10,11 @@ struct MyPageView: View {
     }
 
     @Binding var path: NavigationPath
-    @Binding var isTabBarHidden: Bool
 
     @State private var showLogoutSheet: Bool = false
     @StateObject private var vm = MyPageViewModel()
 
-    private let scrollSpace = "mypage.scroll"
+    @Environment(\.appMetrics) private var m
 
     var body: some View {
         ScreenContainer(
@@ -28,17 +27,17 @@ struct MyPageView: View {
             VStack(alignment: .leading, spacing: 0) {
 
                 Text("마이페이지")
-                    .font(AppTypography.title())
+                    .font(AppTypography.notoSans(15, weight: .medium))
                     .foregroundStyle(AppColors.textPrimary)
                     .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, m.space32 + m.space8)
-                    .padding(.bottom, m.space32 + m.space8)
+                    .padding(.top, m.space16)
+                    .padding(.bottom, m.scale * 30)
 
                 MyPageProfileHeader(profile: vm.profileUI)
-                    .padding(.bottom, m.space24 + m.space4)
+                    .padding(.bottom, m.space28)
 
                 MyPageDivider()
-                    .padding(.bottom, m.space16)
+                    .padding(.bottom, m.space28)
 
                 MyPageAccountSection(
                     onNotification: { path.append(Route.notification) },
@@ -47,14 +46,16 @@ struct MyPageView: View {
                 )
 
                 MyPageDivider()
-                    .padding(.vertical, m.space16)
+                    .padding(.top, m.space16)
+                    .padding(.bottom, m.space28)
 
                 MyPageGuideSection(
                     onInquiry: { path.append(Route.inquiry) }
                 )
 
                 MyPageDivider()
-                    .padding(.vertical, m.space16)
+                    .padding(.top, m.space16)
+                    .padding(.bottom, m.space28)
 
                 MyPageEtcSection(
                     onDeleteAccount: { path.append(Route.deleteAccount) }
@@ -62,35 +63,33 @@ struct MyPageView: View {
 
                 Spacer(minLength: m.space24)
             }
-            .observeScrollDirection(
-                in: scrollSpace,
-                threshold: 6,
-                onScrollDown: { isTabBarHidden = true },
-                onScrollUp: { isTabBarHidden = false }
-            )
-            .coordinateSpace(name: scrollSpace)
+            .padding(.horizontal, m.space8 + m.space2)
         }
         .navigationDestination(for: Route.self) { r in
             switch r {
             case .notification:
                 NotificationSettingsView()
+                    .tabBarPresent(false)
 
             case .profileEdit:
                 EditProfileView(onSaved: {
                     Task { await vm.refresh() }
                 })
+                .tabBarPresent(false)
 
             case .inquiry:
                 ContactUsView()
+                    .tabBarPresent(false)
 
             case .deleteAccount:
                 DeleteAccountView()
+                    .tabBarPresent(false)
             }
         }
         .overlay {
             if vm.isLoading {
                 ZStack {
-                    Color.black.opacity(0.08).ignoresSafeArea()
+                    AppColors.grey800.opacity(0.08).ignoresSafeArea()
                     ProgressView()
                 }
             }
@@ -107,10 +106,10 @@ struct MyPageView: View {
                     }
                     .buttonStyle(.bordered)
                 }
-                .padding(16)
+                .padding(m.space16)
                 .background(AppColors.surface)
-                .clipShape(RoundedRectangle(cornerRadius: 14))
-                .padding(.horizontal, 16)
+                .clipShape(RoundedRectangle(cornerRadius: m.radius12))
+                .padding(.horizontal, m.space16)
             }
 
             if showLogoutSheet {
@@ -125,7 +124,6 @@ struct MyPageView: View {
             }
         }
         .task {
-            isTabBarHidden = false
             await vm.load(force: false)
         }
     }
@@ -133,9 +131,6 @@ struct MyPageView: View {
 
 #Preview("MyPageView") {
     NavigationStack {
-        MyPageView(
-            path: .constant(NavigationPath()),
-            isTabBarHidden: .constant(false)
-        )
+        MyPageView(path: .constant(NavigationPath()))
     }
 }

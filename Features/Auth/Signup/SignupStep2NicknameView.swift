@@ -28,14 +28,7 @@ struct SignupStep2NicknameView: View {
                 // 상단 헤더 (뒤로/타이틀)
                 HStack(spacing: m.space10) {
                     if let onBack {
-                        Button {
-                            onBack()
-                        } label: {
-                            Image(systemName: "chevron.left")
-                                .foregroundStyle(AppColors.textSecondary)
-                                .frame(width: 44, height: 44)
-                        }
-                        .buttonStyle(.plain)
+                        IconButton.back { onBack() }
                     } else {
                         Spacer().frame(width: 44, height: 44)
                     }
@@ -58,10 +51,10 @@ struct SignupStep2NicknameView: View {
                     .padding(.bottom, m.space18)
 
                 // 닉네임 입력
-                UnderlineInput(
+                AppTextField(
                     title: "닉네임",
                     text: $vm.nickname,
-                    keyboard: .default
+                    style: .underline
                 )
                 .padding(.bottom, m.space24)
 
@@ -94,28 +87,3 @@ struct SignupStep2NicknameView: View {
 }
 
 
-// MARK: - Underline Input (SignupStep1View와 동일 스타일)
-private struct UnderlineInput: View {
-    @Environment(\.appMetrics) private var m
-
-    let title: String
-    @Binding var text: String
-    let keyboard: UIKeyboardType
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: m.space8) {
-            Text(title)
-                .font(AppTypography.bodyStrong())
-                .foregroundStyle(AppColors.textPrimary)
-
-            TextField("", text: $text)
-                .keyboardType(keyboard)
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled(true)
-
-            Rectangle()
-                .fill(AppColors.border)
-                .frame(height: m.hairline)
-        }
-    }
-}

@@ -26,7 +26,6 @@ final class DeleteAccountViewModel: ObservableObject {
         do {
             try await UserService.deleteAccount(password: pw)
 
-            MyAuthStore.shared.signOut()
             isLoading = false
             return true
 

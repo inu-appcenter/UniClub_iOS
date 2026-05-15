@@ -63,27 +63,10 @@ struct ToggleFavoriteResponse: Decodable {
 enum MainClubsService {
     /// GET /api/v1/main/clubs
     static func fetchMainClubs() async throws -> [MainClubItem] {
-        let url = AppConfig.baseURL.appendingPathComponent(
-            AppConfig.API.Main.clubs.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
+        try await HTTPClient.shared.get(
+            AppConfig.API.Main.clubs,
+            as: [MainClubItem].self
         )
-
-        var req = URLRequest(url: url)
-        req.httpMethod = "GET"
-        req.setValue("application/json", forHTTPHeaderField: "Accept")
-
-        let (data, resp) = try await HTTPClient.shared.sendRaw(req, requiresAuth: true)
-
-        guard let http = resp as? HTTPURLResponse else {
-            throw APIError.badResponse(-1, "Invalid HTTPURLResponse")
-        }
-
-        guard (200...299).contains(http.statusCode) else {
-            let body = String(data: data, encoding: .utf8) ?? ""
-            throw APIError.badResponse(http.statusCode, body)
-        }
-
-        let dec = JSONDecoder()
-        return try dec.decode([MainClubItem].self, from: data)
     }
 
     /// POST /api/v1/clubs/{clubId}/favorite
@@ -93,26 +76,13 @@ enum MainClubsService {
     /// - 실제 Swagger가 PUT/PATCH라면 req.httpMethod만 변경하면 됨
     static func toggleFavorite(clubId: Int) async throws -> ToggleFavoriteResponse {
         let path = "/api/v1/clubs/\(clubId)/favorite"
-        let url = AppConfig.baseURL.appendingPathComponent(
-            path.trimmingCharacters(in: CharacterSet(charactersIn: "/"))
-        )
+        let url = try HTTPClient.shared.makeURL(path, query: nil)
 
         var req = URLRequest(url: url)
         req.httpMethod = "POST"
         req.setValue("application/json", forHTTPHeaderField: "Accept")
 
-        let (data, resp) = try await HTTPClient.shared.sendRaw(req, requiresAuth: true)
-
-        guard let http = resp as? HTTPURLResponse else {
-            throw APIError.badResponse(-1, "Invalid HTTPURLResponse")
-        }
-
-        guard (200...299).contains(http.statusCode) else {
-            let body = String(data: data, encoding: .utf8) ?? ""
-            throw APIError.badResponse(http.statusCode, body)
-        }
-
-        let dec = JSONDecoder()
-        return try dec.decode(ToggleFavoriteResponse.self, from: data)
+        let (data, _) = try await HTTPClient.shared.sendValidatedRaw(req)
+        return try HTTPClient.shared.decode(ToggleFavoriteResponse.self, from: data)
     }
 }

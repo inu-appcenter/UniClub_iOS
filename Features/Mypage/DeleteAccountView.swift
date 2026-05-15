@@ -13,6 +13,7 @@ struct DeleteAccountView: View {
 
     @StateObject private var vm = DeleteAccountViewModel()
     @State private var password: String = ""
+    @State private var showDeleteSuccess: Bool = false
 
     private var isDeleteEnabled: Bool {
         !password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -29,14 +30,19 @@ struct DeleteAccountView: View {
             bottomPadding: .default
         ) { _ in
             VStack(spacing: 0) {
-                header
-                    .padding(.top, m.space8)
+                AppPageHeader(onBack: { dismiss() }) {
+                    Text("계정 삭제")
+                        .font(AppTypography.notoSans(15, weight: .medium))
+                        .foregroundStyle(AppColors.textPrimary)
+                }
 
                 content
-                    .padding(.top, 52 * m.scale)
+                    .padding(.top, m.scale * 33)
+                    .padding(.leading, m.space24)
 
                 deleteButton
-                    .padding(.top, 50 * m.scale)
+                    .padding(.top, m.scale * 50)
+                    .padding(.leading, m.space24)
 
                 Spacer(minLength: 0)
             }
@@ -46,9 +52,14 @@ struct DeleteAccountView: View {
         .overlay {
             if vm.isLoading {
                 ZStack {
-                    Color.black.opacity(0.08).ignoresSafeArea()
+                    AppColors.grey800.opacity(0.08).ignoresSafeArea()
                     ProgressView()
                 }
+            }
+        }
+        .alert("계정이 삭제되었습니다", isPresented: $showDeleteSuccess) {
+            Button("확인") {
+                Task { await MyAuthStore.shared.signOut() }
             }
         }
         .alert(
@@ -70,52 +81,24 @@ struct DeleteAccountView: View {
         }
     }
 
-    // MARK: - Header
-    private var header: some View {
-        HStack(spacing: 0) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 18 * m.scale, weight: .medium))
-                    .foregroundStyle(AppColors.textPrimary)
-                    .frame(width: 44 * m.scale, height: 44 * m.scale)
-            }
-            .buttonStyle(.plain)
-
-            Spacer(minLength: 0)
-
-            Text("계정 삭제")
-                .font(.system(size: 15 * m.scale, weight: .medium))
-                .foregroundStyle(AppColors.textPrimary)
-
-            Spacer(minLength: 0)
-
-            Color.clear
-                .frame(width: 44 * m.scale, height: 44 * m.scale)
-        }
-        .padding(.horizontal, m.space8)
-        .frame(height: 44 * m.scale)
-    }
-
     // MARK: - Content
     private var content: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text("계정을 삭제하시겠습니까?")
-                .font(.system(size: 14 * m.scale, weight: .medium))
+                .font(AppTypography.notoSans(14 * m.scale, weight: .medium))
                 .foregroundStyle(AppColors.textPrimary)
 
             Text("계정 삭제 시 활동 내역이 영구 삭제되며 복구가 불가능합니다. \n정말 삭제하시겠습니까?")
-                .font(.system(size: 11 * m.scale, weight: .regular))
+                .font(AppTypography.notoSans(11 * m.scale))
                 .foregroundStyle(secondaryTextColor)
                 .multilineTextAlignment(.leading)
                 .lineSpacing(4 * m.scale)
-                .padding(.top, 16 * m.scale)
+                .padding(.top, m.space4)
 
             Text("비밀번호를 입력해주세요.")
-                .font(.system(size: 11 * m.scale, weight: .regular))
+                .font(AppTypography.notoSans(11 * m.scale))
                 .foregroundStyle(isDeleteEnabled ? AppColors.textPrimary : secondaryTextColor)
-                .padding(.top, 53 * m.scale)
+                .padding(.top, m.scale * 44)
 
             passwordField
                 .padding(.top, 11 * m.scale)
@@ -128,7 +111,7 @@ struct DeleteAccountView: View {
 
     private var passwordField: some View {
         SecureField("", text: $password)
-            .font(.system(size: 11 * m.scale, weight: .regular))
+            .font(AppTypography.notoSans(11 * m.scale))
             .foregroundStyle(AppColors.textPrimary)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
@@ -138,7 +121,7 @@ struct DeleteAccountView: View {
 
     private var dividerLine: some View {
         Rectangle()
-            .fill(isDeleteEnabled ? Color.black : secondaryTextColor)
+            .fill(isDeleteEnabled ? AppColors.grey800 : secondaryTextColor)
             .frame(width: 184 * m.scale, height: 0.5)
     }
 
@@ -148,12 +131,12 @@ struct DeleteAccountView: View {
             Task {
                 let ok = await vm.deleteAccount(password: password)
                 if ok {
-                    dismiss()
+                    showDeleteSuccess = true
                 }
             }
         } label: {
             Text("네, 삭제하겠습니다.")
-                .font(.system(size: 11 * m.scale, weight: .medium))
+                .font(AppTypography.notoSans(11 * m.scale, weight: .medium))
                 .foregroundStyle(.white)
                 .frame(width: 157 * m.scale, height: 30 * m.scale)
                 .background(
