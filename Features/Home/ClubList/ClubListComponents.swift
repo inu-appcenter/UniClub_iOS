@@ -1,64 +1,85 @@
 //
 //  ClubListComponents.swift
 //  UniClub
-//
-//  Created by 제욱 on 2/9/26.
-//
 
 import SwiftUI
 
 struct ClubListCard: View {
     @Environment(\.appMetrics) private var m
     let item: ClubsService.ClubDTO
+    var onFavoriteTap: (() -> Void)? = nil
 
     var body: some View {
+        // B-Clublist-4, 5: 하트/상태 라벨을 카드 외부 ZStack으로 배치
+        ZStack(alignment: .topTrailing) {
+            ZStack(alignment: .bottomTrailing) {
+                cardContent
+
+                // B-Clublist-5: 상태 라벨 - 카드 외부 우하단
+                if let statusText = ClubStatus(rawValue: item.status ?? "")?.displayText {
+                    Text(statusText)
+                        .font(AppTypography.notoSans(9, weight: .medium))
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(AppColors.grey800.opacity(0.7))
+                        .clipShape(Capsule())
+                        .offset(x: 0, y: 12)
+                }
+            }
+
+            // B-Clublist-4: 하트 - 카드 외부 우상단, 글로우 (tappable)
+            heartButton
+                .offset(x: 4, y: -10)
+        }
+        .padding(.bottom, 12)
+    }
+
+    // MARK: - Card Content (without heart/status)
+
+    private var cardContent: some View {
         HStack(spacing: m.space12) {
             avatar
 
             VStack(alignment: .leading, spacing: m.space8) {
-                topRow
+                nameAndCategory
                 descriptionText
-                bottomRow
             }
         }
         .padding(m.space14)
-        .background(AppColors.brand) // ✅ 카드 배경(주황) — 토큰 확정되면 교체
-        .clipShape(RoundedRectangle(cornerRadius: 28)) // TODO: AppMetrics에 radius28 토큰 생기면 교체
+        .background(AppColors.brandLight)
+        .clipShape(RoundedRectangle(cornerRadius: m.radiusClubCard))
         .shadow(radius: 10)
     }
 
-    // MARK: - Rows
+    // MARK: - Name + Category Row
 
-    private var topRow: some View {
+    private var nameAndCategory: some View {
         HStack(spacing: m.space8) {
-            // 이름: 14pt (JSON 기반)
+            // B-Clublist-2: weight bold
             Text(item.name)
-                .font(AppTypography.notoSans(14, weight: .medium))
+                .font(AppTypography.notoSans(14, weight: .bold))
                 .foregroundStyle(.white)
                 .lineLimit(1)
 
             categoryPill
 
             Spacer(minLength: 0)
-
-            Image(systemName: item.favorite ? "heart.fill" : "heart")
-                .font(AppTypography.notoSans(16, weight: .semibold))
-                .foregroundStyle(item.favorite ? .pink : .white.opacity(0.95))
         }
     }
 
     private var categoryPill: some View {
+        // B-Clublist-3: #3C3C3C bg, r=5, 8pt
         Text(CategoryType(rawValue: item.category)?.displayText ?? "")
-            .font(AppTypography.notoSans(10, weight: .medium))
+            .font(AppTypography.notoSans(8, weight: .medium))
             .foregroundStyle(.white.opacity(0.95))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 4)
-            .background(AppColors.grey800.opacity(0.28))
-            .clipShape(Capsule())
+            .padding(.horizontal, 8)
+            .padding(.vertical, 3)
+            .background(Color(hex: 0x3C3C3C))
+            .clipShape(RoundedRectangle(cornerRadius: 5))
     }
 
     private var descriptionText: some View {
-        // 소개: 9pt (JSON 기반)
         Text(item.info ?? "")
             .font(AppTypography.notoSans(9, weight: .medium))
             .foregroundStyle(.white.opacity(0.95))
@@ -66,26 +87,24 @@ struct ClubListCard: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
-    private var bottomRow: some View {
-        HStack(spacing: m.space8) {
-            Spacer(minLength: 0)
+    // MARK: - Heart (B-Clublist-4, tappable)
 
-            if statusDotVisible {
-                Circle()
-                    .fill(.green)
-                    .frame(width: 3, height: 3)
-            }
-
-            // 상태: 10pt (JSON 기반)
-            Text(ClubStatus(rawValue: item.status ?? "")?.displayText ?? "")
-                .font(AppTypography.notoSans(10, weight: .medium))
-                .foregroundStyle(.white.opacity(0.95))
+    private var heartButton: some View {
+        Button {
+            onFavoriteTap?()
+        } label: {
+            Image(systemName: item.favorite ? "heart.fill" : "heart")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(item.favorite ? AppColors.error : .white.opacity(0.9))
+                .shadow(
+                    color: item.favorite ? Color(hex: 0xFFBFC7) : .clear,
+                    radius: 4.1, x: 0, y: 0
+                )
+                .frame(width: 24, height: 24)
+                .contentShape(Rectangle())
         }
-    }
-
-    private var statusDotVisible: Bool {
-        // 서버 enum: SCHEDULED / ACTIVE / CLOSED
-        ClubStatus(rawValue: item.status ?? "") == .active
+        .buttonStyle(.plain)
+        .disabled(onFavoriteTap == nil)
     }
 
     // MARK: - Avatar
@@ -112,41 +131,5 @@ struct ClubListCard: View {
                     .foregroundStyle(AppColors.grey800.opacity(0.25))
             }
         }
-    }
-}
-
-struct ClubListSortButton: View {
-    @Environment(\.appMetrics) private var m
-
-    let selected: SortOption
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: m.space8) {
-                Text("정렬순")
-                    .font(AppTypography.caption())
-                    .foregroundStyle(AppColors.textPrimary)
-
-                Text(selected.rawValue)
-                    .font(AppTypography.caption())
-                    .foregroundStyle(AppColors.textSecondary)
-
-                Image(systemName: "chevron.down")
-                    .font(AppTypography.notoSans(12, weight: .semibold))
-                    .foregroundStyle(AppColors.textSecondary)
-
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, m.space12)
-            .padding(.vertical, m.space10)
-            .background(AppColors.cardFill)
-            .clipShape(RoundedRectangle(cornerRadius: m.radius18))
-            .overlay(
-                RoundedRectangle(cornerRadius: m.radius18)
-                    .stroke(AppColors.border, lineWidth: m.hairline)
-            )
-        }
-        .buttonStyle(.plain)
     }
 }

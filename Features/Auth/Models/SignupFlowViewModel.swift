@@ -34,11 +34,13 @@ final class SignupFlowViewModel: ObservableObject {
     // 공용 UI 상태
     @Published var isLoading: Bool = false
     @Published var errorMessage: String? = nil
+    @Published var isAlreadyRegistered: Bool = false
 
     // MARK: - Actions
 
     func verifyStudent() async -> Bool {
         errorMessage = nil
+        isAlreadyRegistered = false
 
         let sid = studentId.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !sid.isEmpty, !password.isEmpty else {
@@ -52,8 +54,13 @@ final class SignupFlowViewModel: ObservableObject {
         do {
             let res = try await SignupService.verifyStudent(studentId: sid, password: password)
 
-            isPortalVerified = res.verified ?? false
+            let msg = res.message?.lowercased() ?? ""
+            if msg.contains("이미") || msg.contains("already") || msg.contains("exists") || msg.contains("duplicate") {
+                isAlreadyRegistered = true
+                return false
+            }
 
+            isPortalVerified = res.verified ?? false
             return isPortalVerified
         } catch {
             isPortalVerified = false

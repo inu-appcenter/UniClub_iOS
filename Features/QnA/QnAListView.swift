@@ -221,6 +221,8 @@ struct QnAListView: View {
                             clubName: question.clubName,
                             content: question.content,
                             answerCount: question.countAnswer,
+                            isAnswered: question.answered,
+                            isPresident: question.president,
                             onTap: {
                                 onOpenDetail(question.questionId)
                             },

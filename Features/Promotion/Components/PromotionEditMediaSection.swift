@@ -8,7 +8,7 @@ struct PromotionEditMediaSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: m.space12) {
             Text("대표이미지")
-                .font(AppTypography.notoSans(10, weight: .bold))
+                .font(AppTypography.notoSans(13, weight: .bold))
                 .foregroundStyle(AppColors.textPrimary)
 
             ScrollView(.horizontal, showsIndicators: false) {
@@ -16,7 +16,7 @@ struct PromotionEditMediaSection: View {
                     PhotosPicker(selection: .constant(nil), matching: .images) {
                         ZStack {
                             RoundedRectangle(cornerRadius: m.scale * 25, style: .continuous)
-                                .fill(AppColors.fieldFill)
+                                .fill(AppColors.separatorLight)
                                 .frame(width: m.scale * 139, height: m.scale * 183)
                             Image(systemName: "plus.circle")
                                 .font(AppTypography.notoSans(24))
@@ -39,10 +39,11 @@ struct PromotionEditMediaSection: View {
                             Button {
                                 vm.promotionImages.removeAll { $0.id == media.id }
                             } label: {
+                                // B-Promotion-5: 흰 원 + 진회색 X
                                 Image(systemName: "xmark.circle.fill")
                                     .font(AppTypography.notoSans(20))
-                                    .foregroundStyle(.white)
-                                    .background(Color.black.opacity(0.4).clipShape(Circle()))
+                                    .foregroundStyle(Color(hex: 0x2A2A2A))
+                                    .background(Circle().fill(.white))
                             }
                             .buttonStyle(.plain)
                             .padding(m.space8)

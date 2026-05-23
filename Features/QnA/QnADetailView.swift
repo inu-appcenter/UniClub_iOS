@@ -17,6 +17,7 @@ struct QnADetailView: View {
 
     @State private var showDeleteQuestionAlert: Bool = false
     @State private var pendingDeleteAnswer: QnAAnswerItem?
+    @State private var showMarkAnsweredDialog: Bool = false
 
     @State private var selectedReplyTarget: QnAAnswerItem?
     @State private var isAnonymousReply: Bool = false
@@ -55,7 +56,7 @@ struct QnADetailView: View {
                 }
             }
 
-            if activeMoreAnswer != nil || pendingDeleteAnswer != nil || viewModel.showReportDialog || viewModel.showBlockDialog {
+            if activeMoreAnswer != nil || pendingDeleteAnswer != nil || showMarkAnsweredDialog || viewModel.showReportDialog || viewModel.showBlockDialog {
                 AppColors.grey800.opacity(0.32)
                     .ignoresSafeArea()
                     .onTapGesture {
@@ -73,6 +74,11 @@ struct QnADetailView: View {
 
             if pendingDeleteAnswer != nil {
                 deleteAnswerConfirmDialog
+                    .transition(.opacity)
+            }
+
+            if showMarkAnsweredDialog {
+                markAnsweredConfirmDialog
                     .transition(.opacity)
             }
 
@@ -144,9 +150,60 @@ struct QnADetailView: View {
 
             Spacer(minLength: 0)
 
-            Color.clear
-                .frame(width: m.controlHeight44, height: m.controlHeight44)
+            // B-QnA-4: 회장 + 미답변일 때 더보기 버튼
+            if let detail = viewModel.detail, detail.president && !detail.answered {
+                Button {
+                    withAnimation { showMarkAnsweredDialog = true }
+                } label: {
+                    Image(systemName: "ellipsis")
+                        .rotationEffect(.degrees(90))
+                        .font(AppTypography.notoSans(m.space18, weight: .semibold))
+                        .foregroundStyle(AppColors.textPrimary)
+                        .frame(width: m.controlHeight44, height: m.controlHeight44)
+                }
+                .buttonStyle(.plain)
+            } else {
+                Color.clear
+                    .frame(width: m.controlHeight44, height: m.controlHeight44)
+            }
         }
+    }
+
+    private var markAnsweredConfirmDialog: some View {
+        VStack(spacing: 0) {
+            Text("답변 완료로 변경하시겠습니까?")
+                .font(AppTypography.notoSans(14, weight: .bold))
+                .foregroundStyle(AppColors.textPrimary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 28)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
+
+            Divider()
+
+            HStack(spacing: 0) {
+                Button("취소") {
+                    withAnimation { showMarkAnsweredDialog = false }
+                }
+                .font(AppTypography.body())
+                .foregroundStyle(AppColors.textSecondary)
+                .frame(maxWidth: .infinity, minHeight: 44)
+
+                Divider().frame(height: 44)
+
+                Button("확인") {
+                    withAnimation { showMarkAnsweredDialog = false }
+                    Task { await viewModel.markAnswered() }
+                }
+                .font(AppTypography.bodyStrong())
+                .foregroundStyle(AppColors.brand)
+                .frame(maxWidth: .infinity, minHeight: 44)
+            }
+        }
+        .frame(width: 270)
+        .background(AppColors.background)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
     }
 
     @ViewBuilder

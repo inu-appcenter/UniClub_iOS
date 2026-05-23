@@ -34,6 +34,7 @@ struct MyPageView: View {
                     .padding(.bottom, m.scale * 30)
 
                 MyPageProfileHeader(profile: vm.profileUI)
+                    .shadow(color: .black.opacity(0.25), radius: 3.6, x: 0, y: 4)
                     .padding(.bottom, m.space28)
 
                 MyPageDivider()

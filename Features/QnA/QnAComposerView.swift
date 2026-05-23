@@ -121,9 +121,14 @@ struct QnAComposerView: View {
     private var contentSection: some View {
         VStack(alignment: .leading, spacing: m.space10) {
             if let selectedClub = viewModel.selectedClub {
-                Text("@\(selectedClub.clubName)")
-                    .font(AppTypography.captionStrong())
-                    .foregroundStyle(AppColors.brand)
+                // B-QnA-5: dark chip
+                Text(selectedClub.clubName)
+                    .font(AppTypography.notoSans(12, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color(hex: 0x2A2A2A))
+                    .clipShape(RoundedRectangle(cornerRadius: 11))
             }
 
             Text("동아리 부원들에게 궁금한 것을 물어보세요.")

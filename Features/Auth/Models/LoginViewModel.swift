@@ -19,13 +19,34 @@ final class LoginViewModel: ObservableObject {
 
         do {
             let res = try await LoginService.login(studentId: studentId, password: password)
-
-            // ✅ 토큰 저장 (현재 프로젝트의 단일 진실)
             MyAuthStore.shared.setAccessToken(res.accessToken)
-
             errorMessage = nil
+        } catch let apiError as APIError {
+            errorMessage = loginErrorMessage(from: apiError)
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = "알 수 없는 오류가 발생했습니다."
         }
     }
+
+    private func loginErrorMessage(from error: APIError) -> String {
+        switch error {
+        case .badResponse(_, let body):
+            if let data = body.data(using: .utf8),
+               let parsed = try? JSONDecoder().decode(ServerErrorBody.self, from: data),
+               !parsed.message.isEmpty {
+                return parsed.message
+            }
+            return "로그인에 실패했습니다."
+        case .transport:
+            return "네트워크 연결을 확인해주세요."
+        case .decoding:
+            return "서버 응답을 처리할 수 없습니다."
+        case .badURL, .unknown:
+            return "알 수 없는 오류가 발생했습니다."
+        }
+    }
+}
+
+private struct ServerErrorBody: Decodable {
+    let message: String
 }

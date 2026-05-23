@@ -8,26 +8,18 @@
 import SwiftUI
 
 enum SortOption: String, CaseIterable, Identifiable {
-    /// UI 표시용
+    case favorite = "즐겨찾기"
+    case active   = "모집중"
     case `default` = "기본"
-    case recent = "최신순"
-    case popular = "인기순"
 
     var id: String { rawValue }
 
-    /// ✅ 서버 sortBy로 변환 (API 계약 확정 전까지는 안전하게 name으로 고정)
-    /// - NOTE: Swagger 상 default value가 name이고, 유효하지 않으면 400(INVALID_SORT_CONDITION).
-    /// - TODO(backend): sortBy 허용값 확정되면 아래 매핑을 업데이트.
+    // TODO(backend): sortBy 허용값 확정되면 아래 매핑을 업데이트.
     var serverSortBy: String {
         switch self {
-        case .default:
-            return "name"
-        case .recent:
-            // TODO: 예) "createdAt" 또는 "recent"
-            return "name"
-        case .popular:
-            // TODO: 예) "popular" 또는 "views"
-            return "name"
+        case .favorite: return "name"
+        case .active:   return "name"
+        case .default:  return "name"
         }
     }
 }
@@ -41,7 +33,7 @@ struct ClubListView: View {
     @StateObject private var vm = ClubListViewModel()
 
     @State private var sort: SortOption = .default
-    @State private var showSortSheet = false
+    @State private var showSortDropdown = false
 
     // ✅ 페이징 중복 트리거 방지 (같은 마지막 id로는 1회만)
     @State private var lastPagingTriggeredItemId: Int? = nil
@@ -49,34 +41,96 @@ struct ClubListView: View {
     var body: some View {
         // ✅ 커스텀 헤더를 화면 내부에 두기 때문에 topPadding을 제거한다.
         ScreenContainer(scroll: true, topPadding: .none) { m in
-            VStack(alignment: .leading, spacing: 0) {
+            ZStack(alignment: .topTrailing) {
+                VStack(alignment: .leading, spacing: 0) {
 
-                ClubListHeader(
-                    title: mode.title,
-                    onTapBack: { dismiss() },
-                    onTapSearch: { onTapSearch() }
-                )
-                .padding(.bottom, m.space12)
+                    ClubListHeader(
+                        title: mode.title,
+                        onTapBack: { dismiss() },
+                        onTapSearch: { onTapSearch() }
+                    )
+                    .padding(.bottom, m.space12)
 
-                // 정렬 버튼 (UI는 keep)
-                ClubListSortButton(selected: sort) {
-                    showSortSheet = true
+                    // ✅ 상태 분기 (로딩/에러/빈/정상)
+                    content(m)
+
+                    Spacer(minLength: m.space24)
                 }
-                .padding(.bottom, m.space12)
 
-                // ✅ 상태 분기 (로딩/에러/빈/정상)
-                content(m)
+                // Dropdown 열렸을 때 외부 탭으로 닫기
+                if showSortDropdown {
+                    Color.clear
+                        .contentShape(Rectangle())
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .onTapGesture {
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                showSortDropdown = false
+                            }
+                        }
+                }
 
-                Spacer(minLength: m.space24)
+                // Floating sort pill + dropdown
+                VStack(alignment: .trailing, spacing: 4) {
+                    // Sort pill button
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.15)) {
+                            showSortDropdown.toggle()
+                        }
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(sort.rawValue)
+                                .font(AppTypography.notoSans(10, weight: .medium))
+                                .foregroundStyle(.white)
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 8, weight: .medium))
+                                .foregroundStyle(.white)
+                                .rotationEffect(.degrees(showSortDropdown ? 180 : 0))
+                        }
+                        .frame(width: 70, height: 25)
+                        .background(Color(hex: 0x3C3C3C))
+                        .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+
+                    // Dropdown options
+                    if showSortDropdown {
+                        VStack(spacing: 0) {
+                            ForEach(SortOption.allCases) { option in
+                                Button {
+                                    sort = option
+                                    withAnimation { showSortDropdown = false }
+                                } label: {
+                                    HStack {
+                                        Text(option.rawValue)
+                                            .font(AppTypography.notoSans(10, weight: .medium))
+                                            .foregroundStyle(.white)
+                                        Spacer(minLength: 0)
+                                        if sort == option {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(size: 9, weight: .bold))
+                                                .foregroundStyle(.white)
+                                        }
+                                    }
+                                    .padding(.horizontal, 12)
+                                    .frame(height: 32)
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .frame(width: 100)
+                        .background(Color(hex: 0x3C3C3C))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 4)
+                        .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .topTrailing)))
+                    }
+                }
+                .padding(.trailing, m.horizontalPadding)
+                .padding(.top, m.space8)
             }
         }
         // ✅ 시스템 네비바는 숨기고(Back 중복 방지) 커스텀 헤더만 사용
         .navigationBarBackButtonHidden(true)
         .modifier(NavigationBarHiddenIfAvailable())
-        .sheet(isPresented: $showSortSheet) {
-            SortSheet(selected: $sort)
-                .modifier(SortSheetDetent(height: 260))
-        }
         .onChange(of: sort) { newValue in
             vm.configure(categoryQuery: mode.categoryQuery, sortBy: newValue.serverSortBy)
             lastPagingTriggeredItemId = nil
@@ -151,7 +205,12 @@ struct ClubListView: View {
             // 정상 리스트 + 무한스크롤
             LazyVStack(spacing: m.space12) {
                 ForEach(vm.state.items) { item in
-                    ClubListCard(item: dto(from: item))
+                    ClubListCard(
+                        item: dto(from: item),
+                        onFavoriteTap: {
+                            Task { await handleFavoriteTap(itemId: item.id) }
+                        }
+                    )
                         .onAppear {
                             // ✅ 마지막 아이템이 나타났을 때만 페이징 트리거
                             guard vm.state.items.last?.id == item.id else { return }
@@ -181,6 +240,14 @@ struct ClubListView: View {
         }
     }
 
+    // MARK: - Favorite
+
+    @MainActor
+    private func handleFavoriteTap(itemId: Int) async {
+        _ = try? await MainClubsService.toggleFavorite(clubId: itemId)
+        await vm.refresh()
+    }
+
     // MARK: - Adapter
 
     private func dto(from item: ClubListViewModel.Item) -> ClubsService.ClubDTO {
@@ -204,18 +271,6 @@ private struct NavigationBarHiddenIfAvailable: ViewModifier {
             content.toolbar(.hidden, for: .navigationBar)
         } else {
             content.navigationBarHidden(true)
-        }
-    }
-}
-
-/// .presentationDetents는 iOS 16+ API
-private struct SortSheetDetent: ViewModifier {
-    let height: CGFloat
-    func body(content: Content) -> some View {
-        if #available(iOS 16.0, *) {
-            content.presentationDetents([.height(height)])
-        } else {
-            content
         }
     }
 }

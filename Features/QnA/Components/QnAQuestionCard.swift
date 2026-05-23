@@ -16,11 +16,38 @@ struct QnAQuestionCard: View {
     let clubName: String
     let content: String
     let answerCount: Int
+    let isAnswered: Bool
+    let isPresident: Bool
     let onTap: () -> Void
     let onMore: (() -> Void)?
 
+    init(
+        profileURL: URL?,
+        nickname: String,
+        updatedAt: String,
+        clubName: String,
+        content: String,
+        answerCount: Int,
+        isAnswered: Bool = false,
+        isPresident: Bool = false,
+        onTap: @escaping () -> Void,
+        onMore: (() -> Void)? = nil
+    ) {
+        self.profileURL = profileURL
+        self.nickname = nickname
+        self.updatedAt = updatedAt
+        self.clubName = clubName
+        self.content = content
+        self.answerCount = answerCount
+        self.isAnswered = isAnswered
+        self.isPresident = isPresident
+        self.onTap = onTap
+        self.onMore = onMore
+    }
+
     var body: some View {
         Button(action: onTap) {
+            ZStack(alignment: .topTrailing) {
             VStack(alignment: .leading, spacing: m.space10) {
                 HStack(alignment: .top, spacing: m.space10) {
                     avatarView(size: m.space32)
@@ -75,8 +102,22 @@ struct QnAQuestionCard: View {
             .padding(m.space16)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColors.background)
-            .clipShape(RoundedRectangle(cornerRadius: m.radius18, style: .continuous))
-            .shadow(color: .black.opacity(0.04), radius: 12, x: 0, y: 2)
+
+            // B-QnA-3: 답변 완료 뱃지 (회장 권한 표시 또는 답변 상태)
+            if isPresident || isAnswered {
+                Text(isAnswered ? "답변완료" : "미답변")
+                    .font(AppTypography.notoSans(9, weight: .medium))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(isAnswered ? AppColors.brand : Color(hex: 0xD9D9D9))
+                    .clipShape(RoundedRectangle(cornerRadius: 9))
+                    .padding(.top, m.space8)
+                    .padding(.trailing, m.space8)
+            }
+            }  // ZStack
+            .clipShape(RoundedRectangle(cornerRadius: m.radiusQnACard, style: .continuous))
+            .shadow(color: Color(hex: 0xB2B2B2).opacity(0.25), radius: 22.8, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }

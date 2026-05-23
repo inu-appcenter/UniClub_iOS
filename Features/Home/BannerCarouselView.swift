@@ -23,7 +23,7 @@ struct BannerCarouselView: View {
         BannerSizeReader(aspect: bannerAspect) { width, height in
             ZStack {
                 if items.isEmpty {
-                    RoundedRectangle(cornerRadius: m.radius18, style: .continuous)
+                    RoundedRectangle(cornerRadius: m.radiusBanner, style: .continuous)
                         .fill(AppColors.fieldFill)
                         .frame(width: width, height: height)
                         .overlay {
@@ -51,7 +51,7 @@ struct BannerCarouselView: View {
                                 }
                             }
                             .frame(width: width, height: height)
-                            .clipShape(RoundedRectangle(cornerRadius: m.radius18, style: .continuous))
+                            .clipShape(RoundedRectangle(cornerRadius: m.radiusBanner, style: .continuous))
                             .tag(item.id) // ✅ 한 번만
                         }
                     }
@@ -60,6 +60,7 @@ struct BannerCarouselView: View {
                 }
             }
             .frame(width: width, height: height)
+            .buttonShadow(.medium)
         }
         .task { await load() }
         .onAppear { isActive = true }

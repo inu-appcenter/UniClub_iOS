@@ -19,7 +19,7 @@ struct QnAAnswerRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: m.space10) {
             HStack(alignment: .top, spacing: m.space10) {
-                avatarView(size: m.space28 + m.space4)
+                avatarView(size: m.space32)
 
                 VStack(alignment: .leading, spacing: m.space2) {
                     HStack(spacing: m.space4) {
@@ -73,7 +73,7 @@ struct QnAAnswerRow: View {
         .padding(m.space14)
         .background(isReplyTarget ? AppColors.separator : AppColors.background)
         .overlay(
-            RoundedRectangle(cornerRadius: m.radius16, style: .continuous)
+            RoundedRectangle(cornerRadius: m.radiusQnACard, style: .continuous)
                 .stroke(
                     isReplyTarget ? AppColors.grey400 : Color.clear,
                     lineWidth: 0.5

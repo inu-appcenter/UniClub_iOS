@@ -57,8 +57,8 @@ struct MyPageProfileHeader: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(nicknameText)
-                    .font(AppTypography.notoSans(10, weight: .medium))
-                    .foregroundStyle(hasNickname ? AppColors.textSecondary : AppColors.grey300)
+                    .font(AppTypography.notoSans(10, weight: .bold))
+                    .foregroundStyle(hasNickname ? AppColors.brand : AppColors.grey300)
                     .padding(.bottom, 4 * m.scale)
 
                 Text(name)

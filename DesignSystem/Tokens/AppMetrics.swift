@@ -38,6 +38,14 @@ public struct AppMetrics: Equatable {
     public let radius24: CGFloat
     public let radiusPill: CGFloat
 
+    // Feature-specific radius tokens (Figma 사양값, 스케일 미적용)
+    public let radiusBanner: CGFloat
+    public let radiusRecommendCard: CGFloat
+    public let radiusClubCard: CGFloat
+    public let radiusNotificationCard: CGFloat
+    public let radiusQnACard: CGFloat
+    public let radiusPromotionProfile: CGFloat
+
     // Control tokens
     public let controlHeight44: CGFloat
     public let controlHeight48: CGFloat
@@ -89,6 +97,13 @@ public struct AppMetrics: Equatable {
             radius18: scaled(18),
             radius24: scaled(24),
             radiusPill: scaled(999), // pill
+
+            radiusBanner: 21,
+            radiusRecommendCard: 17,
+            radiusClubCard: 28,
+            radiusNotificationCard: 22,
+            radiusQnACard: 31,
+            radiusPromotionProfile: 40,
 
             controlHeight44: 44,                 // 최소 터치영역은 고정
             controlHeight48: max(44, scaled(48)), // 제한적 스케일

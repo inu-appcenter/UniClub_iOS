@@ -25,7 +25,7 @@ struct UniClubApp: App {
                 }
                 .environment(\.appMetrics, metrics)
             }
-            .ignoresSafeArea()
+            .ignoresSafeArea(.container, edges: .top)
             .preferredColorScheme(.light)
         }
     }

@@ -23,6 +23,8 @@ struct QnAQuestionSummary: Identifiable, Decodable, Hashable {
     let countAnswer: Int
     let updatedAt: String
     let profileURL: URL?
+    let answered: Bool
+    let president: Bool
 
     var id: Int { questionId }
 
@@ -35,6 +37,8 @@ struct QnAQuestionSummary: Identifiable, Decodable, Hashable {
         case countAnswer
         case updatedAt
         case profile
+        case answered
+        case president
     }
 
     init(from decoder: Decoder) throws {
@@ -47,6 +51,8 @@ struct QnAQuestionSummary: Identifiable, Decodable, Hashable {
         countAnswer = try container.decode(Int.self, forKey: .countAnswer)
         updatedAt = try container.decode(String.self, forKey: .updatedAt)
         profileURL = try container.decodeOptionalURL(forKey: .profile)
+        answered = (try? container.decode(Bool.self, forKey: .answered)) ?? false
+        president = (try? container.decode(Bool.self, forKey: .president)) ?? false
     }
 }
 

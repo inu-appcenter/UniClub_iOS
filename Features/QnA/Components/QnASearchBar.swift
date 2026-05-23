@@ -44,11 +44,7 @@ struct QnASearchBar: View {
         }
         .padding(.horizontal, m.space12)
         .frame(height: m.controlHeight44)
-        .background(AppColors.fieldFill)
+        .background(Color(hex: 0xD9D9D9))
         .clipShape(RoundedRectangle(cornerRadius: m.radius16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: m.radius16, style: .continuous)
-                .stroke(AppColors.border, lineWidth: m.hairline)
-        )
     }
 }

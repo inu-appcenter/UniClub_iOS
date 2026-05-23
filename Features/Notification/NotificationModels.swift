@@ -14,6 +14,14 @@ enum NotificationType: Equatable {
     case reply
     case system
 
+    var iconSystemName: String {
+        switch self {
+        case .recruitStart, .recruitEnd: return "megaphone.fill"
+        case .answer, .question, .reply: return "questionmark.circle.fill"
+        case .system:                    return "checkmark.circle.fill"
+        }
+    }
+
     static func from(serverType: String) -> NotificationType {
         switch serverType.uppercased() {
         case "RECRUIT_START": return .recruitStart

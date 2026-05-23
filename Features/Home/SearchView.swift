@@ -38,12 +38,8 @@ struct SearchView: View {
                     }
                     .padding(.horizontal, m.space12)
                     .padding(.vertical, m.space10)
-                    .background(AppColors.cardFill)
+                    .background(Color(hex: 0xD9D9D9))
                     .clipShape(RoundedRectangle(cornerRadius: m.radius18))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: m.radius18)
-                            .stroke(AppColors.border, lineWidth: m.hairline)
-                    )
 
                     Button("취소") { dismiss() }
                         .font(AppTypography.body())

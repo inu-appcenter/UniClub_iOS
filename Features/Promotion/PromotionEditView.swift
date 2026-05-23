@@ -9,9 +9,10 @@ struct PromotionEditView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var showNoLinkAlert = false
 
-    @State private var showYoutubeSheet = false
-    @State private var showInstagramSheet = false
-    @State private var showApplicationSheet = false
+    // B-Promotion-4: 카드형 인라인 링크 입력 (Q-7)
+    private enum LinkTarget { case youtube, instagram, application }
+    @State private var activeLinkTarget: LinkTarget? = nil
+    @State private var linkDraft: String = ""
 
 
     private let scrollSpace = "edit.scroll"
@@ -33,8 +34,21 @@ struct PromotionEditView: View {
                 if stickyHeaderVisible {
                     stickyHeader
                 }
+
+                // B-Promotion-4: 카드형 인라인 링크 입력 (화면 중앙 정렬)
+                if activeLinkTarget != nil {
+                    Color.black.opacity(0.3)
+                        .ignoresSafeArea()
+                        .onTapGesture { withAnimation { activeLinkTarget = nil } }
+
+                    linkInputCard
+                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                        .ignoresSafeArea(.keyboard)
+                }
             }
             .animation(.easeInOut(duration: 0.15), value: stickyHeaderVisible)
+            .animation(.easeInOut(duration: 0.2), value: activeLinkTarget != nil)
             .padding(.horizontal, -m.horizontalPadding)
         }
         .modifier(NavBarHiddenModifier())
@@ -53,15 +67,6 @@ struct PromotionEditView: View {
             Button("확인", role: .cancel) {}
         } message: {
             Text(vm.errorMessage ?? "")
-        }
-        .sheet(isPresented: $showYoutubeSheet) {
-            LinkInputSheet(title: "YouTube 링크", url: $vm.youtubeLink)
-        }
-        .sheet(isPresented: $showInstagramSheet) {
-            LinkInputSheet(title: "Instagram 링크", url: $vm.instagramLink)
-        }
-        .sheet(isPresented: $showApplicationSheet) {
-            LinkInputSheet(title: "지원 링크", url: $vm.applicationFormLink)
         }
     }
 
@@ -95,10 +100,71 @@ struct PromotionEditView: View {
     private var topBackgroundSection: some View {
         PromotionEditProfileHeader(
             vm: vm,
-            onTapApplication: { showApplicationSheet = true },
-            onTapYoutube: { showYoutubeSheet = true },
-            onTapInstagram: { showInstagramSheet = true }
+            onTapApplication: { openLink(.application, current: vm.applicationFormLink) },
+            onTapYoutube: { openLink(.youtube, current: vm.youtubeLink) },
+            onTapInstagram: { openLink(.instagram, current: vm.instagramLink) }
         )
+    }
+
+    private func openLink(_ target: LinkTarget, current: String) {
+        linkDraft = current
+        withAnimation { activeLinkTarget = target }
+    }
+
+    private func commitLink() {
+        switch activeLinkTarget {
+        case .youtube:     vm.youtubeLink = linkDraft
+        case .instagram:   vm.instagramLink = linkDraft
+        case .application: vm.applicationFormLink = linkDraft
+        case nil: break
+        }
+        withAnimation { activeLinkTarget = nil }
+    }
+
+    private var linkInputCard: some View {
+        let title: String = {
+            switch activeLinkTarget {
+            case .youtube:     return "YouTube 링크"
+            case .instagram:   return "Instagram 링크"
+            case .application: return "지원 링크"
+            case nil:          return ""
+            }
+        }()
+
+        return VStack(spacing: 0) {
+            HStack {
+                Text(title)
+                    .font(AppTypography.notoSans(13, weight: .semibold))
+                    .foregroundStyle(AppColors.textPrimary)
+
+                Spacer()
+
+                Button("완료") { commitLink() }
+                    .font(AppTypography.notoSans(13, weight: .medium))
+                    .foregroundStyle(AppColors.brand)
+                    .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 14)
+            .padding(.bottom, 8)
+
+            TextField("https://", text: $linkDraft)
+                .font(AppTypography.notoSans(12))
+                .foregroundStyle(AppColors.textPrimary)
+                .keyboardType(.URL)
+                .autocorrectionDisabled()
+                .textInputAutocapitalization(.never)
+                .padding(.horizontal, 12)
+                .frame(height: 36)
+                .background(AppColors.fieldFill)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal, 16)
+                .padding(.bottom, 14)
+        }
+        .frame(width: 273)
+        .background(AppColors.background)
+        .clipShape(RoundedRectangle(cornerRadius: 22))
+        .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
     }
 
     // MARK: - Floating Top Bar
@@ -133,6 +199,7 @@ struct PromotionEditView: View {
                 .padding(.top, m.scale * 22)
 
             saveButton
+                .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.top, m.space24)
                 .padding(.bottom, m.scale * 36)
         }
@@ -154,9 +221,9 @@ struct PromotionEditView: View {
                         .foregroundStyle(.white)
                 }
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: m.scale * 54)
-            .background(AppColors.grey700)
+            // B-Promotion-6: 너비 152pt 고정, 중앙 정렬
+            .frame(width: 152, height: m.scale * 54)
+            .background(Color(hex: 0x353535))
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)

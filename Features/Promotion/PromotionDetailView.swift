@@ -154,22 +154,26 @@ struct PromotionDetailView: View {
             }
             .buttonStyle(.plain)
 
-            if let raw = promo.applicationFormLink, let url = URL(string: raw) {
-                Link(destination: url) { applyButtonLabel() }
+            let isClosed = promo.status == "CLOSED"
+            if let raw = promo.applicationFormLink, let url = URL(string: raw), !isClosed {
+                Link(destination: url) { applyButtonLabel(isClosed: false) }
             } else {
-                Button { showNoApplyAlert = true } label: { applyButtonLabel() }
+                Button {
+                    if !isClosed { showNoApplyAlert = true }
+                } label: { applyButtonLabel(isClosed: isClosed) }
                     .buttonStyle(.plain)
+                    .disabled(isClosed)
             }
         }
     }
 
-    private func applyButtonLabel() -> some View {
+    private func applyButtonLabel(isClosed: Bool = false) -> some View {
         Text("지원하기")
             .font(AppTypography.notoSans(15))
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
             .frame(height: m.scale * 54)
-            .background(AppColors.brand)
+            .background(isClosed ? Color(hex: 0x2A2A2A) : AppColors.brand)
             .clipShape(Capsule())
     }
 

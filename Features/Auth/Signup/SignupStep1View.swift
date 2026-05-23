@@ -22,11 +22,6 @@ struct SignupStep1View: View {
         && !model.majorCode.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
-    private var safeAreaTop: CGFloat {
-        (UIApplication.shared.connectedScenes.first as? UIWindowScene)?
-            .windows.first?.safeAreaInsets.top ?? 0
-    }
-
     var body: some View {
         ZStack {
             AppColors.background.ignoresSafeArea()
@@ -34,9 +29,7 @@ struct SignupStep1View: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 0) {
 
-                    // 뒤로가기 버튼 (Figma y=42 = 상태바 아래 18pt)
-                    IconButton.back { onBack() }
-                        .padding(.top, safeAreaTop + 18 * m.scale)
+                    AppPageHeader(onBack: { onBack() }) { }
 
                     // 회원가입 헤더 (뒤로가기 하단 ~ 헤더: 43pt)
                     Text("회원가입")
@@ -116,6 +109,7 @@ struct SignupStep1View: View {
                 }
             }
             .ignoresSafeArea(.container, edges: .top)
+            .safeAreaInset(edge: .bottom, spacing: 0) { Color.clear.frame(height: 10) }
 
             MajorPickerSheetView(
                 isPresented: $showMajorPicker,
@@ -124,6 +118,40 @@ struct SignupStep1View: View {
                     model.majorCode = item.code
                 }
             )
+
+            // B-Signup-1: 이미 가입된 회원 모달
+            if model.isAlreadyRegistered {
+                Color.black.opacity(0.4)
+                    .ignoresSafeArea()
+
+                VStack(spacing: 0) {
+                    Text("이미 가입된 회원입니다.")
+                        .font(AppTypography.notoSans(16 * m.scale, weight: .bold))
+                        .foregroundStyle(AppColors.textPrimary)
+                        .multilineTextAlignment(.center)
+                        .padding(.top, 28 * m.scale)
+                        .padding(.horizontal, 20 * m.scale)
+
+                    Spacer(minLength: 20 * m.scale)
+
+                    Button {
+                        model.isAlreadyRegistered = false
+                    } label: {
+                        Text("확인")
+                            .font(AppTypography.notoSans(14 * m.scale, weight: .medium))
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 48 * m.scale)
+                            .background(AppColors.brand)
+                            .clipShape(RoundedRectangle(cornerRadius: 0))
+                    }
+                    .buttonStyle(.plain)
+                }
+                .frame(width: 270 * m.scale)
+                .background(AppColors.background)
+                .clipShape(RoundedRectangle(cornerRadius: 20 * m.scale))
+                .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
+            }
         }
     }
 
@@ -153,8 +181,8 @@ struct SignupStep1View: View {
         isActive: Bool,
         scale: CGFloat
     ) -> some View {
-        let labelColor: Color = isActive ? AppColors.textPrimary : AppColors.grey300
-        let lineColor: Color = isActive ? AppColors.grey800 : AppColors.grey300
+        let labelColor: Color = isActive ? AppColors.textPrimary : AppColors.grey400
+        let lineColor: Color = isActive ? AppColors.grey800 : AppColors.grey400
 
         return VStack(alignment: .leading, spacing: 0) {
             Text(label)
@@ -199,7 +227,7 @@ struct SignupStep1View: View {
     // Figma: 14pt Regular text, chevron 12x6 at right, no underline
     private func majorPickerRow(scale: CGFloat) -> some View {
         let isActive = model.isPortalVerified
-        let labelColor: Color = isActive ? AppColors.textPrimary : AppColors.grey300
+        let labelColor: Color = isActive ? AppColors.textPrimary : AppColors.grey400
 
         return VStack(alignment: .leading, spacing: 0) {
             Button {
@@ -214,7 +242,7 @@ struct SignupStep1View: View {
 
                     Image(systemName: "chevron.down")
                         .font(.system(size: 9 * scale, weight: .regular))
-                        .foregroundStyle(labelColor)
+                        .foregroundStyle(AppColors.iconNeutral)
                         .frame(width: 12 * scale, height: 6 * scale)
                 }
                 .frame(width: 184 * scale)
@@ -224,7 +252,7 @@ struct SignupStep1View: View {
             Color.clear.frame(height: 8 * scale)
 
             Rectangle()
-                .fill(isActive ? AppColors.grey800 : AppColors.grey300)
+                .fill(isActive ? AppColors.grey800 : AppColors.grey400)
                 .frame(width: 184 * scale, height: 1 * scale)
         }
         .frame(width: 184 * scale, alignment: .leading)
@@ -246,6 +274,7 @@ struct SignupStep1View: View {
                     .frame(width: 132 * scale, height: 51 * scale)
                     .background(canTapNext ? AppColors.grey800 : AppColors.grey300)
                     .clipShape(RoundedRectangle(cornerRadius: 45 * scale))
+                    .buttonShadow(.small)
             }
             .buttonStyle(.plain)
             .disabled(!canTapNext)
@@ -261,6 +290,7 @@ struct SignupStep1View: View {
                     .frame(width: 173 * scale, height: 51 * scale)
                     .background(canTapVerify ? AppColors.grey800 : AppColors.grey300)
                     .clipShape(RoundedRectangle(cornerRadius: 45 * scale))
+                    .buttonShadow(.small)
             }
             .buttonStyle(.plain)
             .disabled(!canTapVerify)

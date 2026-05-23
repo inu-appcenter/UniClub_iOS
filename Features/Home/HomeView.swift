@@ -41,6 +41,8 @@ struct HomeView: View {
     /// 최초 로드 1회 보장
     @State private var didLoadOnce: Bool = false
 
+    @State private var hasUnreadNotification: Bool = false
+
     // MARK: Body
 
     var body: some View {
@@ -69,6 +71,7 @@ struct HomeView: View {
             .background(AppColors.background)
         }
         .task { await initialLoadIfNeeded() }
+        .task { await loadUnreadNotificationStatus() }
     }
 
     // MARK: - Header
@@ -96,11 +99,20 @@ struct HomeView: View {
             Spacer().frame(width: iconGap)
 
             Button(action: onTapNotification) {
-                Image("icon_alarm")
-                    .resizable()
-                    .renderingMode(.original)
-                    .scaledToFit()
-                    .frame(width: m.space24, height: m.space24)
+                ZStack(alignment: .topTrailing) {
+                    Image("icon_alarm")
+                        .resizable()
+                        .renderingMode(.original)
+                        .scaledToFit()
+                        .frame(width: m.space24, height: m.space24)
+
+                    if hasUnreadNotification {
+                        Circle()
+                            .fill(AppColors.brand)
+                            .frame(width: 8, height: 8)
+                            .offset(x: 2, y: -2)
+                    }
+                }
             }
             .buttonStyle(.plain)
         }
@@ -117,7 +129,7 @@ struct HomeView: View {
     private var recommendedSection: some View {
         VStack(alignment: .leading, spacing: m.space12) {
             Text("이런 동아리는 어떠세요?")
-                .font(AppTypography.bodyStrong())
+                .font(AppTypography.subtitleStrong())
                 .foregroundStyle(AppColors.textPrimary)
 
             if let mainClubsError {
@@ -222,15 +234,15 @@ struct HomeView: View {
 
             HStack {
                 Text("카테고리")
-                    .font(AppTypography.bodyStrong())
+                    .font(AppTypography.subtitleStrong())
                     .foregroundStyle(AppColors.textPrimary)
 
                 Spacer(minLength: 0)
 
                 Button(action: onTapAll) {
                     Text("전체보기")
-                        .font(AppTypography.caption())
-                        .foregroundStyle(AppColors.textSecondary)
+                        .font(AppTypography.notoSans(10, weight: .medium))
+                        .foregroundStyle(Color(hex: 0xB0B0B0))
                 }
                 .buttonStyle(.plain)
             }
@@ -242,7 +254,7 @@ struct HomeView: View {
                     GridItem(.flexible(), alignment: .center)
                 ],
                 alignment: .center,
-                spacing: m.space24
+                spacing: 64
             ) {
                 ForEach(categoryItems, id: \.title) { item in
                     Button {
@@ -256,7 +268,7 @@ struct HomeView: View {
                                 .frame(width: m.space32 + m.space12, height: m.space32 + m.space12)
 
                             Text(item.title)
-                                .font(AppTypography.caption())
+                                .font(AppTypography.notoSans(11, weight: .medium))
                                 .foregroundStyle(AppColors.textPrimary)
                         }
                         .frame(maxWidth: .infinity)
@@ -292,6 +304,12 @@ struct HomeView: View {
     }
 
     // MARK: - Data Loading
+
+    @MainActor
+    private func loadUnreadNotificationStatus() async {
+        guard let items = try? await NotificationService.fetchAll() else { return }
+        hasUnreadNotification = items.contains { !$0.isRead }
+    }
 
     @MainActor
     private func initialLoadIfNeeded() async {

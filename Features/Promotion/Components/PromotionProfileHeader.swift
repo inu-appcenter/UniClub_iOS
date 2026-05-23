@@ -19,7 +19,7 @@ struct PromotionProfileHeader: View {
             HStack(alignment: .bottom, spacing: 0) {
                 profileImageView
                     .frame(width: m.scale * 113, height: m.scale * 113)
-                    .clipShape(RoundedRectangle(cornerRadius: m.radius24, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: m.radiusPromotionProfile, style: .continuous))
                     .padding(.leading, m.space24)
                     .padding(.bottom, m.scale * 15)
 

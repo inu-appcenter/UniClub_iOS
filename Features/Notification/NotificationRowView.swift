@@ -11,8 +11,31 @@ struct NotificationRowView: View {
     let onAction: () -> Void
 
     var body: some View {
+        // B-Notification-5: 시스템 알림 별도 컴팩트 레이아웃
+        Group {
+            if item.type == .system {
+                systemRow
+            } else {
+                standardRow
+            }
+        }
+        // UX: 안읽은 알림 시각 표시 (좌측 brand 라인 + 불투명도)
+        .overlay(alignment: .leading) {
+            if !item.isRead {
+                Rectangle()
+                    .fill(AppColors.brand)
+                    .frame(width: 3)
+                    .clipShape(RoundedRectangle(cornerRadius: 1.5))
+            }
+        }
+        .opacity(item.isRead ? 0.7 : 1.0)
+    }
+
+    // MARK: - Standard Row
+
+    private var standardRow: some View {
         HStack(alignment: .top, spacing: m.space12) {
-            clubIcon
+            typeIcon
 
             VStack(alignment: .leading, spacing: m.space6) {
                 HStack(alignment: .top) {
@@ -49,24 +72,66 @@ struct NotificationRowView: View {
         .padding(.vertical, m.space14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColors.background)
-        .clipShape(RoundedRectangle(cornerRadius: m.radius12, style: .continuous))
+        // B-Notification-1: r=22
+        .clipShape(RoundedRectangle(cornerRadius: m.radiusNotificationCard, style: .continuous))
+        // B-Notification-2: card shadow
+        .shadow(color: Color(hex: 0xB2B2B2).opacity(0.25), radius: 22.8, x: 0, y: 4)
     }
 
-    // 빨간 원형 아이콘 (동아리 로고 자리)
-    private var clubIcon: some View {
+    // MARK: - System Row (B-Notification-5)
+
+    private var systemRow: some View {
+        HStack(spacing: m.space12) {
+            ZStack {
+                Circle()
+                    .fill(Color(hex: 0x00BA5E))
+                    .frame(width: 18, height: 18)
+                Image(systemName: "checkmark")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(.white)
+            }
+
+            Text(item.body)
+                .font(AppTypography.notoSans(12))
+                .foregroundStyle(AppColors.grey700)
+                .lineLimit(2)
+
+            Spacer(minLength: 0)
+
+            Text(item.receivedAt.relativeString)
+                .font(AppTypography.notoSans(10))
+                .foregroundStyle(AppColors.grey500)
+                .fixedSize()
+        }
+        .padding(.horizontal, m.space16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: 63)
+        .background(AppColors.background)
+        .clipShape(RoundedRectangle(cornerRadius: m.radiusNotificationCard, style: .continuous))
+        .shadow(color: Color(hex: 0xB2B2B2).opacity(0.25), radius: 22.8, x: 0, y: 4)
+    }
+
+    // MARK: - Type Icon (B-Notification-3)
+
+    private var typeIcon: some View {
         ZStack {
             Circle()
-                .fill(AppColors.error)
+                .fill(iconBackground)
                 .frame(width: 32, height: 32)
 
-            // 시스템 알림만 경고 아이콘
-            if item.type == .system {
-                Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.white)
-                    .font(AppTypography.notoSans(14, weight: .bold))
-            }
+            Image(systemName: item.type.iconSystemName)
+                .foregroundStyle(.white)
+                .font(.system(size: 14, weight: .medium))
         }
         .frame(width: 32, height: 32)
+    }
+
+    private var iconBackground: Color {
+        switch item.type {
+        case .recruitStart, .recruitEnd: return AppColors.brand
+        case .answer, .question, .reply: return Color(hex: 0x5A7AFF)
+        case .system:                    return Color(hex: 0x00BA5E)
+        }
     }
 }
 

@@ -69,7 +69,7 @@ struct NotificationView: View {
         return VStack(spacing: 0) {
             // 인디케이터가 위
             Rectangle()
-                .fill(isActive ? AppColors.brand : AppColors.grey300)
+                .fill(isActive ? AppColors.brand : AppColors.inactiveTab)
                 .frame(height: 4)
 
             Button(action: {
@@ -119,12 +119,20 @@ struct NotificationView: View {
             Spacer()
         } else {
             ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: m.space8) {
+                LazyVStack(spacing: 16) {
                     ForEach(current) { item in
                         NotificationRowView(
                             item: item,
                             onAction: { handleAction(item) }
                         )
+                        .swipeActions(edge: .trailing) {
+                            Button(role: .destructive) {
+                                Task { await vm.delete(item: item) }
+                            } label: {
+                                Label("삭제", systemImage: "trash")
+                            }
+                            .tint(AppColors.brand)
+                        }
                     }
                 }
                 .padding(.horizontal, m.space16)

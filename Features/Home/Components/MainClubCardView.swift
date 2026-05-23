@@ -17,21 +17,13 @@ struct MainClubCardView: View {
                 .frame(width: cardWidth, height: cardHeight)
                 .clipped()
 
-            LinearGradient(
-                colors: [
-                    AppColors.grey800.opacity(0.55),
-                    AppColors.grey800.opacity(0.15),
-                    Color.clear
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: m.space32 + m.space24)
-            .frame(maxWidth: .infinity, alignment: .top)
+            Color(hex: 0x131313)
+                .frame(height: 34)
+                .frame(maxWidth: .infinity, alignment: .top)
 
             HStack(alignment: .center) {
                 Text(club.name)
-                    .font(AppTypography.captionStrong())
+                    .font(AppTypography.notoSans(13, weight: .medium))
                     .foregroundStyle(.white)
                     .lineLimit(1)
 
@@ -58,7 +50,8 @@ struct MainClubCardView: View {
             .padding(.top, m.space10)
         }
         .frame(width: cardWidth, height: cardHeight)
-        .clipShape(RoundedRectangle(cornerRadius: m.radius18, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: m.radiusRecommendCard, style: .continuous))
+        .buttonShadow(.medium)
         }
         .buttonStyle(.plain)
     }

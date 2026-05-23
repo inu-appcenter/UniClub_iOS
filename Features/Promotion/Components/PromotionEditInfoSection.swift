@@ -85,14 +85,36 @@ struct PromotionEditInfoSection: View {
 
     private var recruitNoticeBlock: some View {
         VStack(alignment: .leading, spacing: m.space12) {
-            editRow("모집기간 시작", text: $vm.startTime,   placeholder: "2025-08-03T14:30:00")
-            editRow("모집기간 종료", text: $vm.endTime,     placeholder: "2025-08-03T14:30:00")
-            editRow("공지",        text: $vm.notice,       placeholder: "공지 내용을 입력하세요")
+            dateRow("모집 시작", date: $vm.startDate)
+            dateRow("모집 종료", date: $vm.endDate)
+            editRow("공지", text: $vm.notice, placeholder: "공지 내용을 입력하세요")
+        }
+    }
+
+    /// 모집기간 입력용 DatePicker (wheel 스타일, 초는 00 고정)
+    private func dateRow(_ label: String, date: Binding<Date?>) -> some View {
+        HStack(alignment: .center, spacing: m.space2) {
+            Text(label)
+                .font(AppTypography.notoSans(10, weight: .bold))
+                .foregroundStyle(AppColors.textPrimary)
+                .frame(width: m.scale * 56, alignment: .leading)
+
+            DatePicker(
+                "",
+                selection: Binding(
+                    get: { date.wrappedValue ?? Date() },
+                    set: { date.wrappedValue = $0 }
+                ),
+                displayedComponents: [.date, .hourAndMinute]
+            )
+            .datePickerStyle(.compact)
+            .labelsHidden()
+            .tint(AppColors.brand)
         }
     }
 
     private func editRow(_ label: String, text: Binding<String>, placeholder: String? = nil) -> some View {
-        HStack(alignment: .center, spacing: m.space18) {
+        HStack(alignment: .center, spacing: m.space2) {
             Text(label)
                 .font(AppTypography.notoSans(10, weight: .bold))
                 .foregroundStyle(AppColors.textPrimary)

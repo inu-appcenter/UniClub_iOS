@@ -142,7 +142,7 @@ private struct UniToggle: View {
 
     private var trackColor: Color {
         if isOn { return AppColors.brand }
-        return Color(white: 0.678)
+        return AppColors.grey350  // #ACACAC
     }
 }
 

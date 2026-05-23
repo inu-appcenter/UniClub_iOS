@@ -1,19 +1,14 @@
 //
 //  SignupStep2NicnameView.swift
 //  UniClub
-//
-//  Created by 제욱 on 2/3/26.
-//
 
 import SwiftUI
 
-/// Signup_6: 닉네임 입력 단계
-/// - 다음 버튼은 닉네임이 비어있지 않으면 활성화
-/// - 완료 시 상위에서 다음 플로우로 연결
 struct SignupStep2NicknameView: View {
     @EnvironmentObject private var vm: SignupFlowViewModel
+    @Environment(\.appMetrics) private var m
 
-    let onBack: (() -> Void)?        // 필요 없으면 nil로
+    let onBack: (() -> Void)?
     let onComplete: () -> Void
 
     private var canGoNext: Bool {
@@ -22,68 +17,63 @@ struct SignupStep2NicknameView: View {
     }
 
     var body: some View {
-        ScreenContainer(scroll: true) { m in
+        ZStack {
+            AppColors.background.ignoresSafeArea()
+
             VStack(alignment: .leading, spacing: 0) {
 
-                // 상단 헤더 (뒤로/타이틀)
-                HStack(spacing: m.space10) {
-                    if let onBack {
-                        IconButton.back { onBack() }
-                    } else {
-                        Spacer().frame(width: 44, height: 44)
-                    }
+                AppPageHeader(onBack: onBack) { }
 
-                    Text("회원가입")
-                        .font(AppTypography.bodyStrong())
-                        .foregroundStyle(AppColors.textPrimary)
+                Text("회원가입")
+                    .font(AppTypography.notoSans(32 * m.scale, weight: .bold))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .padding(.top, 17 * m.scale)
 
-                    Spacer(minLength: 0)
-
-                    Spacer().frame(width: 44, height: 44)
-                }
-                .padding(.top, m.space10)
-                .padding(.bottom, m.space18)
-
-                // 안내 문구
                 Text("닉네임을 입력해주세요.")
-                    .font(AppTypography.body())
-                    .foregroundStyle(AppColors.textSecondary)
-                    .padding(.bottom, m.space18)
+                    .font(AppTypography.notoSans(14 * m.scale))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .padding(.top, 22 * m.scale)
 
-                // 닉네임 입력
-                AppTextField(
-                    title: "닉네임",
-                    text: $vm.nickname,
-                    style: .underline
-                )
-                .padding(.bottom, m.space24)
+                TextField("", text: $vm.nickname)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .font(AppTypography.notoSans(14 * m.scale))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .frame(width: 184 * m.scale)
+                    .padding(.top, 8 * m.scale)
 
-                // 완료 버튼
+                Rectangle()
+                    .fill(AppColors.grey800)
+                    .frame(width: 184 * m.scale, height: 1 * m.scale)
+                    .padding(.top, 8 * m.scale)
+
+                Spacer(minLength: 0)
+
                 Button {
                     guard canGoNext else { return }
                     onComplete()
                 } label: {
-                    Text("완료")
-                        .font(AppTypography.bodyStrong())
-                        .foregroundStyle(canGoNext ? AppColors.onBrand : AppColors.textSecondary)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, m.space12)
-                        .background(canGoNext ? AppColors.brand : AppColors.fieldFill)
-                        .clipShape(RoundedRectangle(cornerRadius: m.radius18))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: m.radius18)
-                                .stroke(AppColors.border, lineWidth: m.hairline)
-                        )
+                    Text("다음")
+                        .font(AppTypography.notoSans(14 * m.scale))
+                        .foregroundStyle(.white)
+                        .frame(width: 132 * m.scale, height: 51 * m.scale)
+                        .background(canGoNext ? AppColors.grey800 : AppColors.grey300)
+                        .clipShape(RoundedRectangle(cornerRadius: 45 * m.scale))
+                        .buttonShadow(.small)
                 }
                 .buttonStyle(.plain)
                 .disabled(!canGoNext)
-                .opacity(canGoNext ? 1.0 : 0.65)
-
-                Spacer(minLength: m.space24)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.bottom, 48 * m.scale)
             }
-            .scrollDismissesKeyboard(.interactively)
+            .padding(.horizontal, 31 * m.scale)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                UIApplication.shared.sendAction(
+                    #selector(UIResponder.resignFirstResponder),
+                    to: nil, from: nil, for: nil
+                )
+            }
         }
     }
 }
-
-
