@@ -1,17 +1,15 @@
 {
   "images" : [
     {
-      "filename" : "image_default_clubs.png",
+      "filename" : "image_default_clubs.pdf",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "image_default_clubs@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "image_default_clubs@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
