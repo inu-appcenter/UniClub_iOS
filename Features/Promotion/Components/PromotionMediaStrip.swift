@@ -30,7 +30,7 @@ struct PromotionMediaStrip: View {
         .frame(width: m.scale * 139, height: m.scale * 183)
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: m.scale * 25, style: .continuous))
-        .shadow(color: AppColors.grey800.opacity(0.12), radius: m.scale * 4, x: 0, y: m.scale * 4)
+        .shadow(color: AppColors.grey800.opacity(0.12), radius: m.space4, x: 0, y: m.space4)
     }
 
     private func mediaCard(url: URL?, isLast: Bool = false) -> some View {
@@ -64,6 +64,6 @@ struct PromotionMediaStrip: View {
                 style: .continuous
               )
         )
-        .shadow(color: AppColors.grey800.opacity(0.12), radius: m.scale * 4, x: 0, y: m.scale * 4)
+        .shadow(color: AppColors.grey800.opacity(0.12), radius: m.space4, x: 0, y: m.space4)
     }
 }

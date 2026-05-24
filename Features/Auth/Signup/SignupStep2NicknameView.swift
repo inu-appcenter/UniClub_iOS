@@ -17,9 +17,12 @@ struct SignupStep2NicknameView: View {
     }
 
     var body: some View {
-        ZStack {
-            AppColors.background.ignoresSafeArea()
-
+        ScreenContainer(
+            scroll: false,
+            topPadding: .none,
+            bottomPadding: .none,
+            horizontalPadding: .custom(31 * m.scale)
+        ) { _ in
             VStack(alignment: .leading, spacing: 0) {
 
                 AppPageHeader(onBack: onBack) { }
@@ -40,12 +43,12 @@ struct SignupStep2NicknameView: View {
                     .font(AppTypography.notoSans(14 * m.scale))
                     .foregroundStyle(AppColors.textPrimary)
                     .frame(width: 184 * m.scale)
-                    .padding(.top, 8 * m.scale)
+                    .padding(.top, m.space8)
 
                 Rectangle()
                     .fill(AppColors.grey800)
                     .frame(width: 184 * m.scale, height: 1 * m.scale)
-                    .padding(.top, 8 * m.scale)
+                    .padding(.top, m.space8)
 
                 Spacer(minLength: 0)
 
@@ -66,7 +69,6 @@ struct SignupStep2NicknameView: View {
                 .frame(maxWidth: .infinity, alignment: .center)
                 .padding(.bottom, 48 * m.scale)
             }
-            .padding(.horizontal, 31 * m.scale)
             .contentShape(Rectangle())
             .onTapGesture {
                 UIApplication.shared.sendAction(

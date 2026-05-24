@@ -6,19 +6,12 @@ struct PromotionEditView: View {
     @Environment(\.appMetrics) private var m
     @StateObject private var vm: PromotionEditViewModel
 
-    @State private var scrollOffset: CGFloat = 0
     @State private var showNoLinkAlert = false
 
     // B-Promotion-4: 카드형 인라인 링크 입력 (Q-7)
     private enum LinkTarget { case youtube, instagram, application }
     @State private var activeLinkTarget: LinkTarget? = nil
     @State private var linkDraft: String = ""
-
-
-    private let scrollSpace = "edit.scroll"
-    private var topBackgroundHeight: CGFloat { m.scale * 276 }
-    private var backgroundImageHeight: CGFloat { m.scale * 209 }
-    private var stickyHeaderVisible: Bool { scrollOffset >= topBackgroundHeight - m.controlHeight44 }
 
     init(clubId: Int) {
         _vm = StateObject(wrappedValue: PromotionEditViewModel(clubId: clubId))
@@ -28,11 +21,14 @@ struct PromotionEditView: View {
         ScreenContainer(scroll: false, background: AppColors.backgroundTertiary, topPadding: .none, bottomPadding: .none) { _ in
             ZStack(alignment: .top) {
                 scrollBody
-                floatingTopBar
-                    .opacity(stickyHeaderVisible ? 0 : 1)
-                    .allowsHitTesting(!stickyHeaderVisible)
-                if stickyHeaderVisible {
-                    stickyHeader
+                    .padding(.horizontal, -m.horizontalPadding)  // 이미지/콘텐츠만 풀-블리드
+                AppPageHeader(onBack: { dismiss() }, tint: .white) {
+                    EmptyView()
+                } trailing: {
+                    Image(systemName: "gearshape.fill")
+                        .font(AppTypography.notoSans(18))
+                        .foregroundStyle(.white)
+                        .frame(width: m.controlHeight44, height: m.controlHeight44)
                 }
 
                 // B-Promotion-4: 카드형 인라인 링크 입력 (화면 중앙 정렬)
@@ -47,9 +43,7 @@ struct PromotionEditView: View {
                         .ignoresSafeArea(.keyboard)
                 }
             }
-            .animation(.easeInOut(duration: 0.15), value: stickyHeaderVisible)
             .animation(.easeInOut(duration: 0.2), value: activeLinkTarget != nil)
-            .padding(.horizontal, -m.horizontalPadding)
         }
         .modifier(NavBarHiddenModifier())
         .tabBarPresent(false)
@@ -82,17 +76,7 @@ struct PromotionEditView: View {
                     contentSection
                 }
             }
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.preference(
-                        key: EditScrollOffsetKey.self,
-                        value: proxy.frame(in: .named(scrollSpace)).minY
-                    )
-                }
-            )
         }
-        .coordinateSpace(name: scrollSpace)
-        .onPreferenceChange(EditScrollOffsetKey.self) { scrollOffset = max(0, -$0) }
     }
 
     // MARK: - Top Background Section
@@ -167,18 +151,6 @@ struct PromotionEditView: View {
         .shadow(color: .black.opacity(0.2), radius: 10, x: 0, y: 4)
     }
 
-    // MARK: - Floating Top Bar
-
-    private var floatingTopBar: some View {
-        PromotionEditFloatingTopBar(onDismiss: { dismiss() })
-    }
-
-    // MARK: - Sticky Header
-
-    private var stickyHeader: some View {
-        PromotionEditStickyHeader(vm: vm, onDismiss: { dismiss() })
-    }
-
     // MARK: - Content Section
 
     private var contentSection: some View {
@@ -242,13 +214,6 @@ struct PromotionEditView: View {
         .frame(maxWidth: .infinity)
         .padding(.top, m.scale * 60)
     }
-}
-
-// MARK: - Scroll Offset Key
-
-private struct EditScrollOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
 
 // MARK: - Nav Bar Hidden

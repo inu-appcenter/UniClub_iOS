@@ -57,7 +57,7 @@ struct PromotionInfoSection: View {
             .font(AppTypography.notoSans(10))
             .foregroundStyle(.white)
             .padding(.horizontal, m.space10)
-            .frame(height: m.scale * 18)
+            .frame(height: m.space18)
             .background(bg)
             .clipShape(Capsule())
     }
@@ -87,8 +87,8 @@ struct PromotionInfoSection: View {
             .shadow(
                 color: Color(hex: 0x999999).opacity(0.19),
                 radius: m.scale * 17,
-                x: m.scale * 14,
-                y: m.scale * 2
+                x: m.space14,
+                y: m.space2
             )
             .padding(.horizontal, -m.space20)
     }

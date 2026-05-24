@@ -26,6 +26,21 @@ public enum ScreenEdgePadding {
     }
 }
 
+/// 좌우 패딩 모드. 표준 18pt(`.default`) 외에 피그마 사양상 다른 inset이 필요한 화면(예: Signup 31pt)을 위한 `.custom`.
+public enum ScreenHorizontalPadding {
+    case `default`
+    case custom(CGFloat)
+
+    fileprivate func value(using m: AppMetrics) -> CGFloat {
+        switch self {
+        case .default:
+            return m.horizontalPadding
+        case .custom(let v):
+            return v
+        }
+    }
+}
+
 public struct ScreenContainer<Content: View>: View {
     @Environment(\.appMetrics) private var metrics
 
@@ -34,6 +49,7 @@ public struct ScreenContainer<Content: View>: View {
     private let background: Color
     private let topPadding: ScreenEdgePadding
     private let bottomPadding: ScreenEdgePadding
+    private let horizontalPadding: ScreenHorizontalPadding
     private let content: (AppMetrics) -> Content
 
     public init(
@@ -42,6 +58,7 @@ public struct ScreenContainer<Content: View>: View {
         background: Color = AppColors.background,
         topPadding: ScreenEdgePadding = .default,
         bottomPadding: ScreenEdgePadding = .default,
+        horizontalPadding: ScreenHorizontalPadding = .default,
         @ViewBuilder content: @escaping (AppMetrics) -> Content
     ) {
         self.scroll = scroll
@@ -49,6 +66,7 @@ public struct ScreenContainer<Content: View>: View {
         self.background = background
         self.topPadding = topPadding
         self.bottomPadding = bottomPadding
+        self.horizontalPadding = horizontalPadding
         self.content = content
     }
 
@@ -73,7 +91,7 @@ public struct ScreenContainer<Content: View>: View {
     private func inner(_ m: AppMetrics) -> some View {
         content(m)
             .frame(maxWidth: m.contentMaxWidth, alignment: .topLeading)
-            .padding(.horizontal, m.horizontalPadding)
+            .padding(.horizontal, horizontalPadding.value(using: m))
             .padding(.top, topPadding.value(using: m))
             .padding(.bottom, bottomPadding.value(using: m))
             .keyboardAvoiding()

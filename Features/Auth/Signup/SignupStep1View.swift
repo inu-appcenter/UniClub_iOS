@@ -23,94 +23,94 @@ struct SignupStep1View: View {
     }
 
     var body: some View {
-        ZStack {
-            AppColors.background.ignoresSafeArea()
+        ScreenContainer(
+            scroll: true,
+            showsIndicators: false,
+            topPadding: .none,
+            bottomPadding: .none,
+            horizontalPadding: .custom(31 * m.scale)
+        ) { _ in
+            VStack(alignment: .leading, spacing: 0) {
 
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
+                AppPageHeader(onBack: { onBack() }) { }
 
-                    AppPageHeader(onBack: { onBack() }) { }
+                // 회원가입 헤더 (뒤로가기 하단 ~ 헤더: 43pt)
+                Text("회원가입")
+                    .font(AppTypography.notoSans(32 * m.scale, weight: .bold))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .padding(.top, 43 * m.scale)
 
-                    // 회원가입 헤더 (뒤로가기 하단 ~ 헤더: 43pt)
-                    Text("회원가입")
-                        .font(AppTypography.notoSans(32 * m.scale, weight: .bold))
-                        .foregroundStyle(AppColors.textPrimary)
-                        .padding(.top, 43 * m.scale)
+                // 포털 안내 배지 (Figma y=165 → 헤더 하단 y=158 기준 7pt)
+                portalBadge(scale: m.scale)
+                    .padding(.top, 7 * m.scale)
 
-                    // 포털 안내 배지 (Figma y=165 → 헤더 하단 y=158 기준 7pt)
-                    portalBadge(scale: m.scale)
-                        .padding(.top, 7 * m.scale)
+                Color.clear.frame(height: 42 * m.scale)
 
-                    Color.clear.frame(height: 42 * m.scale)
+                signupField(
+                    label: "학번을 입력해주세요.",
+                    text: Binding(get: { model.studentId }, set: { model.studentId = $0 }),
+                    isSecure: false,
+                    isActive: !model.isPortalVerified,
+                    scale: m.scale
+                )
+                .disabled(model.isPortalVerified)
 
-                    signupField(
-                        label: "학번을 입력해주세요.",
-                        text: Binding(get: { model.studentId }, set: { model.studentId = $0 }),
-                        isSecure: false,
-                        isActive: !model.isPortalVerified,
-                        scale: m.scale
-                    )
-                    .disabled(model.isPortalVerified)
+                Color.clear.frame(height: m.space20)
 
-                    Color.clear.frame(height: 20 * m.scale)
+                signupField(
+                    label: "비밀번호를 입력해주세요.",
+                    text: Binding(get: { model.password }, set: { model.password = $0 }),
+                    isSecure: true,
+                    isActive: !model.isPortalVerified,
+                    scale: m.scale
+                )
+                .disabled(model.isPortalVerified)
 
-                    signupField(
-                        label: "비밀번호를 입력해주세요.",
-                        text: Binding(get: { model.password }, set: { model.password = $0 }),
-                        isSecure: true,
-                        isActive: !model.isPortalVerified,
-                        scale: m.scale
-                    )
-                    .disabled(model.isPortalVerified)
+                if model.isPortalVerified {
+                    Text("재학생 확인이 완료되었습니다.")
+                        .font(AppTypography.notoSans(11 * m.scale, weight: .medium))
+                        .foregroundStyle(AppColors.brand)
+                        .padding(.top, m.space16)
+                    Color.clear.frame(height: 48 * m.scale)
+                } else if model.errorMessage != nil {
+                    errorTooltip(scale: m.scale)
+                        .padding(.top, 26 * m.scale)
+                    Color.clear.frame(height: 29 * m.scale)
+                } else {
+                    Color.clear.frame(height: 81 * m.scale)
+                }
 
-                    if model.isPortalVerified {
-                        Text("재학생 확인이 완료되었습니다.")
-                            .font(AppTypography.notoSans(11 * m.scale, weight: .medium))
-                            .foregroundStyle(AppColors.brand)
-                            .padding(.top, 16 * m.scale)
-                        Color.clear.frame(height: 48 * m.scale)
-                    } else if model.errorMessage != nil {
-                        errorTooltip(scale: m.scale)
-                            .padding(.top, 26 * m.scale)
-                        Color.clear.frame(height: 29 * m.scale)
-                    } else {
-                        Color.clear.frame(height: 81 * m.scale)
-                    }
+                signupField(
+                    label: "이름을 입력해주세요.",
+                    text: Binding(get: { model.name }, set: { model.name = $0 }),
+                    isSecure: false,
+                    isActive: model.isPortalVerified,
+                    scale: m.scale
+                )
+                .disabled(!model.isPortalVerified)
 
-                    signupField(
-                        label: "이름을 입력해주세요.",
-                        text: Binding(get: { model.name }, set: { model.name = $0 }),
-                        isSecure: false,
-                        isActive: model.isPortalVerified,
-                        scale: m.scale
-                    )
+                Color.clear.frame(height: m.space20)
+
+                majorPickerRow(scale: m.scale)
                     .disabled(!model.isPortalVerified)
 
-                    Color.clear.frame(height: 20 * m.scale)
+                Color.clear.frame(height: 117 * m.scale)
 
-                    majorPickerRow(scale: m.scale)
-                        .disabled(!model.isPortalVerified)
+                actionButton(scale: m.scale)
+                    .frame(maxWidth: .infinity, alignment: .center)
 
-                    Color.clear.frame(height: 117 * m.scale)
-
-                    actionButton(scale: m.scale)
-                        .frame(maxWidth: .infinity, alignment: .center)
-
-                    Color.clear.frame(height: 40 * m.scale)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading, 31 * m.scale)
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    UIApplication.shared.sendAction(
-                        #selector(UIResponder.resignFirstResponder),
-                        to: nil, from: nil, for: nil
-                    )
-                }
+                Color.clear.frame(height: 40 * m.scale)
             }
-            .ignoresSafeArea(.container, edges: .top)
-            .safeAreaInset(edge: .bottom, spacing: 0) { Color.clear.frame(height: 10) }
-
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                UIApplication.shared.sendAction(
+                    #selector(UIResponder.resignFirstResponder),
+                    to: nil, from: nil, for: nil
+                )
+            }
+        }
+        .overlay {
             MajorPickerSheetView(
                 isPresented: $showMajorPicker,
                 onSelectMajor: { item in
@@ -118,39 +118,42 @@ struct SignupStep1View: View {
                     model.majorCode = item.code
                 }
             )
-
+        }
+        .overlay {
             // B-Signup-1: 이미 가입된 회원 모달
             if model.isAlreadyRegistered {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
+                ZStack {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    Text("이미 가입된 회원입니다.")
-                        .font(AppTypography.notoSans(16 * m.scale, weight: .bold))
-                        .foregroundStyle(AppColors.textPrimary)
-                        .multilineTextAlignment(.center)
-                        .padding(.top, 28 * m.scale)
-                        .padding(.horizontal, 20 * m.scale)
+                    VStack(spacing: 0) {
+                        Text("이미 가입된 회원입니다.")
+                            .font(AppTypography.notoSans(16 * m.scale, weight: .bold))
+                            .foregroundStyle(AppColors.textPrimary)
+                            .multilineTextAlignment(.center)
+                            .padding(.top, m.space28)
+                            .padding(.horizontal, m.space20)
 
-                    Spacer(minLength: 20 * m.scale)
+                        Spacer(minLength: m.space20)
 
-                    Button {
-                        model.isAlreadyRegistered = false
-                    } label: {
-                        Text("확인")
-                            .font(AppTypography.notoSans(14 * m.scale, weight: .medium))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 48 * m.scale)
-                            .background(AppColors.brand)
-                            .clipShape(RoundedRectangle(cornerRadius: 0))
+                        Button {
+                            model.isAlreadyRegistered = false
+                        } label: {
+                            Text("확인")
+                                .font(AppTypography.notoSans(14 * m.scale, weight: .medium))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 48 * m.scale)
+                                .background(AppColors.brand)
+                                .clipShape(RoundedRectangle(cornerRadius: 0))
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
+                    .frame(width: 270 * m.scale)
+                    .background(AppColors.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 20 * m.scale))
+                    .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
                 }
-                .frame(width: 270 * m.scale)
-                .background(AppColors.background)
-                .clipShape(RoundedRectangle(cornerRadius: 20 * m.scale))
-                .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
             }
         }
     }

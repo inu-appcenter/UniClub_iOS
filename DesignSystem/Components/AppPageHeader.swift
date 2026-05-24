@@ -4,15 +4,18 @@ public struct AppPageHeader<Center: View, Trailing: View>: View {
     @Environment(\.appMetrics) private var m
 
     private let onBack: (() -> Void)?
+    private let tint: Color
     private let center: Center
     private let trailing: Trailing
 
     public init(
         onBack: (() -> Void)? = nil,
+        tint: Color = AppColors.textPrimary,
         @ViewBuilder center: () -> Center,
         @ViewBuilder trailing: () -> Trailing
     ) {
         self.onBack = onBack
+        self.tint = tint
         self.center = center()
         self.trailing = trailing()
     }
@@ -24,7 +27,7 @@ public struct AppPageHeader<Center: View, Trailing: View>: View {
 
             HStack(spacing: 0) {
                 if let onBack {
-                    IconButton.back(action: onBack)
+                    IconButton.back(tint: tint, action: onBack)
                 } else {
                     Color.clear
                         .frame(width: m.controlHeight44, height: m.controlHeight44)
@@ -47,8 +50,9 @@ public struct AppPageHeader<Center: View, Trailing: View>: View {
 public extension AppPageHeader where Trailing == EmptyView {
     init(
         onBack: (() -> Void)? = nil,
+        tint: Color = AppColors.textPrimary,
         @ViewBuilder center: () -> Center
     ) {
-        self.init(onBack: onBack, center: center, trailing: { EmptyView() })
+        self.init(onBack: onBack, tint: tint, center: center, trailing: { EmptyView() })
     }
 }

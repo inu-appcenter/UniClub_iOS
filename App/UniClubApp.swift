@@ -25,7 +25,10 @@ struct UniClubApp: App {
                 }
                 .environment(\.appMetrics, metrics)
             }
-            .ignoresSafeArea(.container, edges: .top)
+            // 전역 ignoresSafeArea(.top)은 두지 않는다.
+            // 상태바 뒤로 콘텐츠를 확장해야 하는 화면은 자체적으로 `.ignoresSafeArea(.container, edges: .top)`을 호출한다.
+            // (예: LoginView의 ScrollView — 피그마 좌표가 상태바 포함 기준)
+            // 그 외 화면(ScreenContainer 사용)은 safe area를 자연스럽게 존중한다.
             .preferredColorScheme(.light)
         }
     }

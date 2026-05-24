@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct MainShellView: View {
+    @Environment(\.appMetrics) private var m
     @State private var tab: AppTab = .home
     @State private var homePath = NavigationPath()
     @State private var qnaPath = NavigationPath()
@@ -10,6 +11,12 @@ struct MainShellView: View {
     private var tabBarHidden: Bool {
         if tab == .qna { return true }
         return !isTabBarVisible
+    }
+
+    /// 탭바가 화면에 보일 때 자식이 보상해야 할 하단 높이.
+    /// 숨김 상태이면 0. 자식은 `@Environment(\.tabBarHeight)` 로 읽는다.
+    private var tabBarBottomInset: CGFloat {
+        tabBarHidden ? 0 : AppTabBarChrome.height(scale: m.scale)
     }
 
     var body: some View {
@@ -58,6 +65,7 @@ struct MainShellView: View {
                 isHidden: tabBarHidden
             )
         }
+        .environment(\.tabBarHeight, tabBarBottomInset)
         .ignoresSafeArea(edges: .bottom)
     }
 }

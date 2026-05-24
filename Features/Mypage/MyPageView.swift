@@ -64,7 +64,6 @@ struct MyPageView: View {
 
                 Spacer(minLength: m.space24)
             }
-            .padding(.horizontal, m.space8 + m.space2)
         }
         .navigationDestination(for: Route.self) { r in
             switch r {

@@ -64,7 +64,7 @@ struct MajorPickerSheetView: View {
                 // 고정 102pt 인디케이터
                 Rectangle()
                     .fill(isActive ? AppColors.brand : AppColors.grey300)
-                    .frame(width: 102 * m.scale, height: 4 * m.scale)
+                    .frame(width: 102 * m.scale, height: m.space4)
                     .clipShape(RoundedRectangle(cornerRadius: 2 * m.scale))
             }
             .padding(.leading, leadingPad)
@@ -93,9 +93,9 @@ struct MajorPickerSheetView: View {
                         Rectangle()
                             .fill(Color(hex: 0xD9D9D9))
                             .frame(height: 1)
-                            .padding(.horizontal, 28 * m.scale)
+                            .padding(.horizontal, m.space28)
                             .padding(.top, 25 * m.scale)
-                            .padding(.bottom, 24 * m.scale)
+                            .padding(.bottom, m.space24)
                     }
                 }
             }

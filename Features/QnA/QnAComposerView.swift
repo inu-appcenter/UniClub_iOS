@@ -70,19 +70,10 @@ struct QnAComposerView: View {
     }
 
     private var header: some View {
-        HStack {
-            IconButton.back { onDismiss() }
-
-            Spacer(minLength: 0)
-
+        AppPageHeader(onBack: { onDismiss() }) {
             Text(viewModel.isEditMode ? "질문 수정" : "질문하기")
                 .font(AppTypography.bodyStrong())
                 .foregroundStyle(AppColors.textPrimary)
-
-            Spacer(minLength: 0)
-
-            Color.clear
-                .frame(width: m.controlHeight44, height: m.controlHeight44)
         }
     }
 

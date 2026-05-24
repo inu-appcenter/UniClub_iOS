@@ -33,7 +33,7 @@ struct LoginView: View {
 
                     // 에러 배너 — 배너 높이(44) + 간격(19) = 63pt를 Spacer에서 차감해 총 여백 276pt 유지
                     if let error = displayError {
-                        HStack(spacing: 8 * m.scale) {
+                        HStack(spacing: m.space8) {
                             Image(systemName: "exclamationmark.circle.fill")
                                 .font(.system(size: 16 * m.scale))
                                 .foregroundStyle(.white)
@@ -42,7 +42,7 @@ struct LoginView: View {
                                 .foregroundStyle(.white)
                                 .lineLimit(1)
                         }
-                        .frame(width: 258 * m.scale, height: 44 * m.scale)
+                        .frame(width: 258 * m.scale, height: m.space44)
                         .background(AppColors.brand)
                         .clipShape(RoundedRectangle(cornerRadius: 10 * m.scale))
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -109,7 +109,7 @@ struct LoginView: View {
                             .foregroundStyle(AppColors.grey800)
                     }
                     .buttonStyle(.plain)
-                    .padding(.top, 18 * m.scale)
+                    .padding(.top, m.space18)
                     .frame(maxWidth: .infinity, alignment: .center)
 
                     Spacer(minLength: 40 * m.scale)

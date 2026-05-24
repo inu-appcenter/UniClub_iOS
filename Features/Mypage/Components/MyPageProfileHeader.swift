@@ -59,7 +59,7 @@ struct MyPageProfileHeader: View {
                 Text(nicknameText)
                     .font(AppTypography.notoSans(10, weight: .bold))
                     .foregroundStyle(hasNickname ? AppColors.brand : AppColors.grey300)
-                    .padding(.bottom, 4 * m.scale)
+                    .padding(.bottom, m.space4)
 
                 Text(name)
                     .font(AppTypography.notoSans(16, weight: .bold))

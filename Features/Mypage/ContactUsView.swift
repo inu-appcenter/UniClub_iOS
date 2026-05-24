@@ -53,7 +53,7 @@ struct ContactUsView: View {
             .font(AppTypography.notoSans(11 * m.scale))
             .foregroundStyle(AppColors.textSecondary)
             .multilineTextAlignment(.leading)
-            .lineSpacing(4 * m.scale)
+            .lineSpacing(m.space4)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -93,8 +93,8 @@ struct ContactUsView: View {
         value: String,
         onTap: @escaping () -> Void
     ) -> some View {
-        HStack(alignment: .center, spacing: 12 * m.scale) {
-            VStack(alignment: .leading, spacing: 4 * m.scale) {
+        HStack(alignment: .center, spacing: m.space12) {
+            VStack(alignment: .leading, spacing: m.space4) {
                 Text(title)
                     .font(AppTypography.notoSans(14 * m.scale, weight: .medium))
                     .foregroundStyle(AppColors.textPrimary)
@@ -126,7 +126,7 @@ struct ContactUsView: View {
         title: String,
         value: String
     ) -> some View {
-        VStack(alignment: .leading, spacing: 4 * m.scale) {
+        VStack(alignment: .leading, spacing: m.space4) {
             Text(title)
                 .font(AppTypography.notoSans(14 * m.scale, weight: .medium))
                 .foregroundStyle(AppColors.textPrimary)

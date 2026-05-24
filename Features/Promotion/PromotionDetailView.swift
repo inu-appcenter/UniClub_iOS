@@ -4,12 +4,10 @@ struct PromotionDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.appMetrics) private var m
     @StateObject private var vm: PromotionDetailViewModel
-    @State private var scrollOffset: CGFloat = 0
     @State private var noLinkMessage: String? = nil
     @State private var showNoApplyAlert = false
     @State private var navigateToEdit = false
 
-    private let scrollSpace = "promo.scroll"
     private let clubId: Int
 
     init(clubId: Int) {
@@ -17,25 +15,17 @@ struct PromotionDetailView: View {
         _vm = StateObject(wrappedValue: PromotionDetailViewModel(clubId: clubId))
     }
 
-    private var topBackgroundHeight: CGFloat { m.scale * 276 }
-    private var backgroundImageHeight: CGFloat { m.scale * 209 }
-    private var stickyHeaderVisible: Bool { scrollOffset >= topBackgroundHeight - m.controlHeight44 }
-
     var body: some View {
         ScreenContainer(scroll: false, background: AppColors.backgroundTertiary, topPadding: .none, bottomPadding: .none) { _ in
             ZStack(alignment: .top) {
                 scrollBody
-                floatingTopBar
-                    .opacity(stickyHeaderVisible ? 0 : 1)
-                    .allowsHitTesting(!stickyHeaderVisible)
-                if let promo = vm.promotion {
-                    stickyHeader(promo: promo)
-                        .opacity(stickyHeaderVisible ? 1 : 0)
-                        .allowsHitTesting(stickyHeaderVisible)
+                    .padding(.horizontal, -m.horizontalPadding)  // 이미지/콘텐츠만 풀-블리드
+                AppPageHeader(onBack: { dismiss() }, tint: .white) {
+                    EmptyView()
+                } trailing: {
+                    heartButton(filled: vm.isFavorite)
                 }
             }
-            .animation(.easeInOut(duration: 0.15), value: stickyHeaderVisible)
-            .padding(.horizontal, -m.horizontalPadding)
         }
         .modifier(NavBarHidden())
         .tabBarPresent(false)
@@ -68,17 +58,7 @@ struct PromotionDetailView: View {
                     errorSection(err)
                 }
             }
-            .background(
-                GeometryReader { proxy in
-                    Color.clear.preference(
-                        key: ScrollOffsetKey.self,
-                        value: proxy.frame(in: .named(scrollSpace)).minY
-                    )
-                }
-            )
         }
-        .coordinateSpace(name: scrollSpace)
-        .onPreferenceChange(ScrollOffsetKey.self) { scrollOffset = max(0, -$0) }
     }
 
     // MARK: - Top Background Section
@@ -89,18 +69,6 @@ struct PromotionDetailView: View {
             onTapEdit: { navigateToEdit = true },
             onNoLink: { noLinkMessage = $0 }
         )
-    }
-
-    // MARK: - Floating Top Bar
-
-    private var floatingTopBar: some View {
-        PromotionFloatingTopBar(vm: vm, onDismiss: { dismiss() })
-    }
-
-    // MARK: - Sticky Header
-
-    private func stickyHeader(promo: PromotionService.ClubPromotionDTO) -> some View {
-        PromotionStickyHeader(vm: vm, promo: promo, onDismiss: { dismiss() })
     }
 
     // MARK: - Content Section
@@ -225,13 +193,6 @@ struct PromotionDetailView: View {
         .frame(maxWidth: .infinity)
         .padding(.top, m.scale * 60)
     }
-}
-
-// MARK: - Scroll Offset Key
-
-private struct ScrollOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = nextValue() }
 }
 
 // MARK: - Nav Bar Hidden

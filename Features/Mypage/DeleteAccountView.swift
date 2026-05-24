@@ -92,13 +92,13 @@ struct DeleteAccountView: View {
                 .font(AppTypography.notoSans(11 * m.scale))
                 .foregroundStyle(secondaryTextColor)
                 .multilineTextAlignment(.leading)
-                .lineSpacing(4 * m.scale)
+                .lineSpacing(m.space4)
                 .padding(.top, m.space4)
 
             Text("비밀번호를 입력해주세요.")
                 .font(AppTypography.notoSans(11 * m.scale))
                 .foregroundStyle(isDeleteEnabled ? AppColors.textPrimary : secondaryTextColor)
-                .padding(.top, m.scale * 44)
+                .padding(.top, m.space44)
 
             passwordField
                 .padding(.top, 11 * m.scale)

@@ -38,12 +38,12 @@ struct LogoutConfirmOverlay: View {
                         action: onConfirm
                     )
                 }
-                .padding(.horizontal, 44 * m.scale)
+                .padding(.horizontal, m.space44)
                 .padding(.bottom, 13 * m.scale)
             }
             .frame(width: dialogWidth, height: dialogHeight)
             .background(AppColors.background)
-            .clipShape(RoundedRectangle(cornerRadius: 18 * m.scale))
+            .clipShape(RoundedRectangle(cornerRadius: m.radius18))
         }
     }
 
@@ -55,7 +55,7 @@ struct LogoutConfirmOverlay: View {
             Text(title)
                 .font(AppTypography.notoSans(13 * m.scale))
                 .foregroundStyle(AppColors.textPrimary)
-                .frame(minWidth: 24 * m.scale)
+                .frame(minWidth: m.space24)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

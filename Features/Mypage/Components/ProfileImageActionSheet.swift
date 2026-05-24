@@ -42,8 +42,8 @@ struct ProfileImageActionSheet: View {
             .padding(.vertical, 22 * m.scale)
             .background(Color(red: 0.168, green: 0.168, blue: 0.168))
             .clipShape(RoundedRectangle(cornerRadius: 18))
-            .padding(.horizontal, 8 * m.scale)
-            .padding(.bottom, 10 * m.scale)
+            .padding(.horizontal, m.space8)
+            .padding(.bottom, m.space10)
         }
     }
 
@@ -62,7 +62,7 @@ struct ProfileImageActionSheet: View {
         iconName: String,
         title: String
     ) -> some View {
-        HStack(spacing: 18 * m.scale) {
+        HStack(spacing: m.space18) {
             Image(iconName)
                 .resizable()
                 .scaledToFit()
@@ -74,7 +74,7 @@ struct ProfileImageActionSheet: View {
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 24 * m.scale)
+        .padding(.horizontal, m.space24)
         .frame(height: 48 * m.scale)
         .contentShape(Rectangle())
     }

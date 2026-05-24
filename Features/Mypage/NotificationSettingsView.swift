@@ -23,21 +23,17 @@ struct NotificationSettingsView: View {
 
     var body: some View {
         ScreenContainer(scroll: false, topPadding: .none) { _ in
-            ZStack(alignment: .top) {
-                AppColors.background.ignoresSafeArea()
-
-                VStack(spacing: 0) {
-                    AppPageHeader(onBack: { dismiss() }) {
-                        Text("알림 설정")
-                            .font(AppTypography.notoSans(15, weight: .medium))
-                            .foregroundStyle(AppColors.textPrimary)
-                    }
-                    .padding(.bottom, m.scale * 22)
-
-                    content
-                        .padding(.horizontal, m.space18)
-                    Spacer()
+            VStack(spacing: 0) {
+                AppPageHeader(onBack: { dismiss() }) {
+                    Text("알림 설정")
+                        .font(AppTypography.notoSans(15, weight: .medium))
+                        .foregroundStyle(AppColors.textPrimary)
                 }
+                .padding(.bottom, m.scale * 22)
+
+                content
+                    .padding(.horizontal, m.space18)
+                Spacer()
             }
         }
         .navigationBarHidden(true)

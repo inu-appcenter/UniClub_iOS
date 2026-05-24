@@ -39,18 +39,11 @@ struct NotificationView: View {
     // MARK: - Header
 
     private var header: some View {
-        ZStack {
+        AppPageHeader(onBack: { onBack() }) {
             Text("알림")
                 .font(AppTypography.notoSans(15, weight: .medium))
                 .foregroundStyle(AppColors.grey800)
-
-            HStack {
-                IconButton.back { onBack() }
-                Spacer()
-            }
         }
-        .frame(height: 44)
-        .padding(.top, m.space18)
     }
 
     // MARK: - Tab Bar (인디케이터가 텍스트 위)

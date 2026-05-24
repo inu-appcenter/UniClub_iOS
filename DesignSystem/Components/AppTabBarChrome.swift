@@ -11,7 +11,10 @@ public struct AppTabBarChrome: View {
 
     private let isHidden: Bool
 
-    private var barHeight: CGFloat { 89 * m.scale }
+    /// 탭바 기본 높이 (scale 적용). 콘텐츠 하단 보상 시 환경값 `\.tabBarHeight`를 사용하라.
+    public static func height(scale: CGFloat) -> CGFloat { 89 * scale }
+
+    private var barHeight: CGFloat { Self.height(scale: m.scale) }
 
     public init(
         selection: Binding<AppTab>,
@@ -57,5 +60,21 @@ public struct AppTabBarChrome: View {
             .allowsHitTesting(false)
         }
         .clipShape(Rectangle())
+    }
+}
+
+// MARK: - Environment Key
+
+/// Shell이 자식 화면에 전달하는 탭바 차지 높이.
+/// 탭 루트 화면이 콘텐츠 하단 보상 시 `@Environment(\.tabBarHeight)` 로 읽는다.
+/// 탭바가 숨겨진 상태(또는 셸 밖)이면 0.
+private struct TabBarHeightKey: EnvironmentKey {
+    static let defaultValue: CGFloat = 0
+}
+
+public extension EnvironmentValues {
+    var tabBarHeight: CGFloat {
+        get { self[TabBarHeightKey.self] }
+        set { self[TabBarHeightKey.self] = newValue }
     }
 }

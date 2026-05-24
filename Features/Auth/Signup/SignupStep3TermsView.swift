@@ -17,85 +17,86 @@ struct SignupStep3TermsView: View {
     private var canGoNext: Bool { vm.agreePrivacy && !vm.isLoading }
 
     var body: some View {
-        ZStack {
-            AppColors.background.ignoresSafeArea()
+        ScreenContainer(
+            scroll: true,
+            showsIndicators: false,
+            topPadding: .none,
+            bottomPadding: .none,
+            horizontalPadding: .custom(21 * m.scale)
+        ) { _ in
+            VStack(alignment: .leading, spacing: 0) {
 
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
+                AppPageHeader(onBack: { onBack() }) { }
 
-                    AppPageHeader(onBack: { onBack() }) { }
+                // 로고 (Figma x=31, w=188)
+                Image("logo_signup_uniclub")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 188 * m.scale)
+                    .padding(.top, m.space12)
+                    .padding(.leading, m.space10)
 
-                    // 로고 (Figma x=31, w=188)
-                    Image("logo_signup_uniclub")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 188 * m.scale)
-                        .padding(.top, 12 * m.scale)
-                        .padding(.leading, 10 * m.scale)
+                // 타이틀 (Figma x=31, 32pt Bold)
+                Text("이용약관")
+                    .font(AppTypography.notoSans(32 * m.scale, weight: .bold))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .padding(.top, m.space8)
+                    .padding(.leading, m.space10)
 
-                    // 타이틀 (Figma x=31, 32pt Bold)
-                    Text("이용약관")
-                        .font(AppTypography.notoSans(32 * m.scale, weight: .bold))
-                        .foregroundStyle(AppColors.textPrimary)
-                        .padding(.top, 8 * m.scale)
-                        .padding(.leading, 10 * m.scale)
+                // 약관 텍스트 (Figma x=34, 14pt)
+                Text(termsText)
+                    .font(AppTypography.notoSans(14 * m.scale))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .lineSpacing(4)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, 19 * m.scale)
+                    .padding(.leading, 13 * m.scale)
+                    .padding(.trailing, 13 * m.scale)
 
-                    // 약관 텍스트 (Figma x=34, 14pt)
-                    Text(termsText)
-                        .font(AppTypography.notoSans(14 * m.scale))
-                        .foregroundStyle(AppColors.textPrimary)
-                        .lineSpacing(4)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.top, 19 * m.scale)
-                        .padding(.leading, 13 * m.scale)
-                        .padding(.trailing, 13 * m.scale)
+                // 동의 섹션 제목 (Figma 20pt Bold)
+                Text("이용약관에 동의해 주세요.")
+                    .font(AppTypography.notoSans(20 * m.scale, weight: .bold))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .padding(.top, m.space44)
+                    .padding(.leading, 13 * m.scale)
 
-                    // 동의 섹션 제목 (Figma 20pt Bold)
-                    Text("이용약관에 동의해 주세요.")
-                        .font(AppTypography.notoSans(20 * m.scale, weight: .bold))
-                        .foregroundStyle(AppColors.textPrimary)
-                        .padding(.top, 44 * m.scale)
-                        .padding(.leading, 13 * m.scale)
+                // 필수 동의 box (C-3: 29pt)
+                checkboxBox(
+                    "(필수) 개인정보 수집 및 이용에 동의합니다.",
+                    isOn: $vm.agreePrivacy
+                )
+                .padding(.top, 29 * m.scale)  // already correct
 
-                    // 필수 동의 box (C-3: 29pt)
-                    checkboxBox(
-                        "(필수) 개인정보 수집 및 이용에 동의합니다.",
-                        isOn: $vm.agreePrivacy
-                    )
-                    .padding(.top, 29 * m.scale)  // already correct
+                // 선택 동의 box
+                checkboxBox(
+                    "(선택) 마케팅 및 광고 활용에 동의합니다.",
+                    isOn: $vm.agreeMarketing
+                )
+                .padding(.top, 7 * m.scale)
 
-                    // 선택 동의 box
-                    checkboxBox(
-                        "(선택) 마케팅 및 광고 활용에 동의합니다.",
-                        isOn: $vm.agreeMarketing
-                    )
-                    .padding(.top, 7 * m.scale)
-
-                    // 다음 버튼
-                    Button {
-                        guard canGoNext else { return }
-                        Task {
-                            let ok = await vm.register()
-                            if ok { onNext() } else { showAlert = true }
-                        }
-                    } label: {
-                        Text(vm.isLoading ? "처리 중..." : "다음")
-                            .font(AppTypography.notoSans(14 * m.scale))
-                            .foregroundStyle(.white)
-                            .frame(width: 132 * m.scale, height: 51 * m.scale)
-                            .background(canGoNext ? AppColors.brand : AppColors.grey300)
-                            .clipShape(RoundedRectangle(cornerRadius: 45 * m.scale))
-                            .buttonShadow(.small)
+                // 다음 버튼
+                Button {
+                    guard canGoNext else { return }
+                    Task {
+                        let ok = await vm.register()
+                        if ok { onNext() } else { showAlert = true }
                     }
-                    .buttonStyle(.plain)
-                    .disabled(!canGoNext || vm.isLoading)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, 35 * m.scale)
-                    .padding(.bottom, 64 * m.scale)
+                } label: {
+                    Text(vm.isLoading ? "처리 중..." : "다음")
+                        .font(AppTypography.notoSans(14 * m.scale))
+                        .foregroundStyle(.white)
+                        .frame(width: 132 * m.scale, height: 51 * m.scale)
+                        .background(canGoNext ? AppColors.brand : AppColors.grey300)
+                        .clipShape(RoundedRectangle(cornerRadius: 45 * m.scale))
+                        .buttonShadow(.small)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, 21 * m.scale)
+                .buttonStyle(.plain)
+                .disabled(!canGoNext || vm.isLoading)
+                .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.top, 35 * m.scale)
+                .padding(.bottom, 64 * m.scale)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .onChange(of: vm.errorMessage) { _, newValue in
             showAlert = (newValue != nil)
@@ -120,7 +121,7 @@ struct SignupStep3TermsView: View {
                             isOn.wrappedValue ? AppColors.brand : AppColors.grey300,
                             lineWidth: 2.0
                         )
-                        .frame(width: 24 * m.scale, height: 24 * m.scale)
+                        .frame(width: m.space24, height: m.space24)
 
                     if isOn.wrappedValue {
                         Image(systemName: "checkmark")
@@ -139,7 +140,7 @@ struct SignupStep3TermsView: View {
             Spacer(minLength: 0)
         }
         .padding(.leading, 13 * m.scale)
-        .padding(.trailing, 14 * m.scale)
+        .padding(.trailing, m.space14)
         .frame(maxWidth: .infinity)
         .frame(height: 49 * m.scale)
         .overlay(

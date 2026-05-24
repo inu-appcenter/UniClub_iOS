@@ -13,6 +13,7 @@ struct HomeView: View {
 
     // MARK: Dependencies
     @Environment(\.appMetrics) private var m
+    @Environment(\.tabBarHeight) private var tabBarHeight
 
     // MARK: Routing Callbacks
     let onTapAll: () -> Void
@@ -66,9 +67,8 @@ struct HomeView: View {
                         .padding(.top, m.space24 - m.space2)
 
                 }
-                .padding(.bottom, 89 * m.scale)
+                .padding(.bottom, tabBarHeight)
             }
-            .background(AppColors.background)
         }
         .task { await initialLoadIfNeeded() }
         .task { await loadUnreadNotificationStatus() }

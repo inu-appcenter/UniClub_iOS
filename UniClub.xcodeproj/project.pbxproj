@@ -17,8 +17,6 @@
 		CB1CAC0C2FB75B6B0000C423 /* PromotionMediaStrip.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1CAC072FB75B6B0000C423 /* PromotionMediaStrip.swift */; };
 		CB1CAC0D2FB75B6B0000C423 /* PromotionProfileHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1CAC082FB75B6B0000C423 /* PromotionProfileHeader.swift */; };
 		CB1CAC0E2FB75B6B0000C423 /* PromotionEditInfoSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1CAC022FB75B6B0000C423 /* PromotionEditInfoSection.swift */; };
-		CB1CAC0F2FB75B6B0000C423 /* PromotionStickyHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1CAC092FB75B6B0000C423 /* PromotionStickyHeader.swift */; };
-		CB1CAC102FB75B6B0000C423 /* PromotionEditStickyHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1CAC052FB75B6B0000C423 /* PromotionEditStickyHeader.swift */; };
 		CB1CAC112FB75B6B0000C423 /* PromotionInfoSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1CAC062FB75B6B0000C423 /* PromotionInfoSection.swift */; };
 		CB1CAC122FB75B6B0000C423 /* PromotionEditMediaSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1CAC032FB75B6B0000C423 /* PromotionEditMediaSection.swift */; };
 		CB1CAC132FB75B6B0000C423 /* PromotionEditProfileHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1CAC042FB75B6B0000C423 /* PromotionEditProfileHeader.swift */; };
@@ -163,11 +161,9 @@
 		CB1CAC022FB75B6B0000C423 /* PromotionEditInfoSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionEditInfoSection.swift; sourceTree = "<group>"; };
 		CB1CAC032FB75B6B0000C423 /* PromotionEditMediaSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionEditMediaSection.swift; sourceTree = "<group>"; };
 		CB1CAC042FB75B6B0000C423 /* PromotionEditProfileHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionEditProfileHeader.swift; sourceTree = "<group>"; };
-		CB1CAC052FB75B6B0000C423 /* PromotionEditStickyHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionEditStickyHeader.swift; sourceTree = "<group>"; };
 		CB1CAC062FB75B6B0000C423 /* PromotionInfoSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionInfoSection.swift; sourceTree = "<group>"; };
 		CB1CAC072FB75B6B0000C423 /* PromotionMediaStrip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionMediaStrip.swift; sourceTree = "<group>"; };
 		CB1CAC082FB75B6B0000C423 /* PromotionProfileHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionProfileHeader.swift; sourceTree = "<group>"; };
-		CB1CAC092FB75B6B0000C423 /* PromotionStickyHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionStickyHeader.swift; sourceTree = "<group>"; };
 		CB1CAC142FB75D040000C423 /* MainClubCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainClubCardView.swift; sourceTree = "<group>"; };
 		CB1CAC172FB75F410000C423 /* EditProfileFieldsBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileFieldsBlock.swift; sourceTree = "<group>"; };
 		CB1CAC182FB75F410000C423 /* EditProfileImageBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileImageBlock.swift; sourceTree = "<group>"; };
@@ -327,11 +323,9 @@
 				CB1CAC022FB75B6B0000C423 /* PromotionEditInfoSection.swift */,
 				CB1CAC032FB75B6B0000C423 /* PromotionEditMediaSection.swift */,
 				CB1CAC042FB75B6B0000C423 /* PromotionEditProfileHeader.swift */,
-				CB1CAC052FB75B6B0000C423 /* PromotionEditStickyHeader.swift */,
 				CB1CAC062FB75B6B0000C423 /* PromotionInfoSection.swift */,
 				CB1CAC072FB75B6B0000C423 /* PromotionMediaStrip.swift */,
 				CB1CAC082FB75B6B0000C423 /* PromotionProfileHeader.swift */,
-				CB1CAC092FB75B6B0000C423 /* PromotionStickyHeader.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -831,8 +825,6 @@
 				CB1CAC0C2FB75B6B0000C423 /* PromotionMediaStrip.swift in Sources */,
 				CB1CAC0D2FB75B6B0000C423 /* PromotionProfileHeader.swift in Sources */,
 				CB1CAC0E2FB75B6B0000C423 /* PromotionEditInfoSection.swift in Sources */,
-				CB1CAC0F2FB75B6B0000C423 /* PromotionStickyHeader.swift in Sources */,
-				CB1CAC102FB75B6B0000C423 /* PromotionEditStickyHeader.swift in Sources */,
 				CB1CAC112FB75B6B0000C423 /* PromotionInfoSection.swift in Sources */,
 				CB1CAC122FB75B6B0000C423 /* PromotionEditMediaSection.swift in Sources */,
 				CB1CAC132FB75B6B0000C423 /* PromotionEditProfileHeader.swift in Sources */,

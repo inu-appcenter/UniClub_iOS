@@ -39,12 +39,25 @@
 - 진입점(`@main`) 정의
 - `GeometryReader`로 `AppMetrics` 생성 후 환경값 주입
 - 인증 상태(`MyAuthStore.accessToken`)에 따른 루트 분기 (`MainShellView` vs `AuthRootView`)
-- 전역 safe area 정책 (`.ignoresSafeArea(.container, edges: .top)`)
 - 전역 컬러 스킴 (`.preferredColorScheme(.light)`)
 
 ### 위임 (하지 않는 것)
 - 화면별 패딩, 헤더, 탭바, 콘텐츠 렌더링
 - 비즈니스 로직, 라우팅 세부사항
+- **전역 safe area 무시** — 부모에 `.ignoresSafeArea(.top)`을 두면 NavigationStack 없는 자식(예: AuthRootView 분기 화면)으로 의도치 않게 전파되어 헤더가 상태바 뒤로 묻힌다. **safe area 확장이 필요한 화면이 자체적으로 호출**한다.
+
+### Safe area 세부 정책
+
+UniClubApp은 전역 ignoresSafeArea를 두지 않는다. 자식 화면은 자기 필요에 따라 명시적으로 호출한다.
+
+| 위치 | 허용/금지 | 설명 |
+|---|---|---|
+| `ScreenContainer` 사용 화면 | safe area 직접 호출 금지 | 컨테이너가 background/하단을 자동 처리, 상단은 자연 존중 |
+| ScreenContainer 미사용 화면(예: 피그마가 상태바 포함 좌표인 LoginView) | ScrollView에 `.ignoresSafeArea(.container, edges: .top)` 허용 | 자체 ScrollView 콘텐츠가 상태바 뒤까지 확장돼야 할 때만 |
+| 오버레이 dim 배경 (`Color.opacity(...).ignoresSafeArea()`) | 허용 | 모달/시트의 dim 배경은 전체 화면 덮어야 함 |
+| Feature의 `safeAreaTop` 직접 계산 (`UIApplication.shared...safeAreaInsets.top`) | **절대 금지** | UIKit 직접 접근 = 정책 우회 |
+| ScreenContainer 안에서 `AppColors.background.ignoresSafeArea()` 추가 | **금지 — 중복** | 컨테이너가 이미 동일 처리 중 |
+| App 레벨(`UniClubApp`)에 `.ignoresSafeArea(.top)` 추가 | **금지** | NavigationStack 없는 분기에서 자식 헤더가 상태바에 묻힘 |
 
 ---
 
@@ -193,6 +206,72 @@
 
 ---
 
+## 단일 책임 매핑 (Single Responsibility Map)
+
+**각 관심사(concern)는 오직 한 계층에서만 처리한다.** 다른 계층에서 같은 처리를 추가하는 것은 정책 위반(중복).
+
+| 관심사 | 책임 계층 | 적용 방법 | 다른 계층에서 금지 |
+|---|---|---|---|
+| 좌우 패딩 (18pt) | **3. Container** | `ScreenContainer.horizontalPadding` 자동 | Feature에서 `.padding(.horizontal, ...)` 추가 금지 |
+| 화면 배경색 | **3. Container** | `ScreenContainer.background` (기본 `AppColors.background`) | Feature에서 `.background(...)` 중복 금지 |
+| 상단 safe area | **자연 존중** (App 레벨 무시 X) | 자동 (필요 화면만 자체 `.ignoresSafeArea(.container, edges: .top)` 호출) | UniClubApp/Feature에서 `safeAreaTop` 직접 계산 금지, App 레벨 전역 ignore 금지 |
+| 하단 safe area | **3. Container** | `ScreenContainer`의 `.ignoresSafeArea(edges: .bottom)` | Feature에서 별도 처리 금지 |
+| 탭바 영역 보상 (88pt) | **2. Shell** | `MainShellView`가 환경값/`safeAreaInset`으로 전달 | Feature에서 `.padding(.bottom, 89 * m.scale)` 금지 |
+| 키보드 회피 | **3. Container** | `ScreenContainer.keyboardAvoiding()` 자동 | Feature에서 별도 modifier 금지 |
+| 콘텐츠 최대 너비 | **3. Container** | `ScreenContainer.contentMaxWidth` 자동 | Feature에서 `.frame(maxWidth:)` 제한 금지 |
+| 상단 헤더 (뒤로가기/타이틀) | **4. Chrome** | `AppPageHeader` | Feature에서 자체 `IconButton.back` + 패딩 금지 |
+| 탭바 자체 | **2. Shell** | `AppTabBarChrome` | Feature에서 탭바 그리기 금지 |
+| 라우트/네비게이션 | **2. Shell** | Route enum + `navigationDestination` | Feature에서 직접 view push 금지 |
+| 색상 값 | **6. Tokens** | `AppColors.*` | Feature에서 `Color(hex:)`, `Color(red:)` 직접 사용 금지 |
+| 폰트 | **6. Tokens** | `AppTypography.*` semantic alias 우선 | Feature에서 `.font(.system(size:))` 금지 |
+| 간격/사이즈 값 | **6. Tokens** | `AppMetrics.space*`, `.controlHeight*` | Feature에서 raw 매직 넘버 금지 |
+| 반경 | **6. Tokens** | `AppMetrics.radius*` | Feature에서 raw 매직 넘버 금지 |
+| 비즈니스 로직 | **7. Features** | ViewModel + Service | View가 직접 네트워크 호출 금지 |
+
+### 위반 발견 시 조치
+
+1. **위반된 줄을 제거** — 책임 계층이 이미 처리 중이므로 단순 삭제
+2. **인프라가 부족하면 책임 계층에 기능 추가** (예: 탭바 환경값 미존재 시 Shell에 추가)
+3. **README의 단일 책임 매핑 갱신** — 새로운 인프라 반영
+
+---
+
+## 마이그레이션 / 정리 순서
+
+기존 코드의 정책 위반을 정리할 때는 아래 순서로 진행한다. **위 계층의 인프라가 준비된 후 아래 계층의 위반을 정리**해야 회귀 위험이 적다.
+
+### Step 1 — 책임 계층의 인프라 보강 (위→아래)
+필요한 기능이 책임 계층에 없다면 먼저 추가.
+
+- 예: 탭바 보상을 Shell이 책임지려면, Shell에 환경값(`TabBarSafeAreaKey` 등) 또는 `safeAreaInset` 주입 필요
+- 예: 헤더를 4계층이 모두 책임지려면, `AppPageHeader`에 필요한 convenience init 추가
+
+### Step 2 — 책임 계층의 단일 source 보장
+같은 처리가 여러 곳에 흩어져 있다면 책임 계층으로 통합.
+
+- 예: ScreenContainer의 `horizontalPadding`이 항상 18pt 적용되는지 확인
+- 예: UniClubApp의 safe area 정책이 모든 경로에 적용되는지 확인
+
+### Step 3 — 하위 계층(주로 Features)의 중복 제거
+책임 계층이 이미 처리하고 있는 것을 Features에서 다시 하고 있다면 삭제.
+
+- 단순 1~2줄 삭제가 대부분 (예: `.background(AppColors.background)` 제거)
+- 시각적 회귀 확인 필수 — 책임 계층이 정말 같은 값을 제공하는지
+
+### Step 4 — 매직 넘버 → 토큰 치환 (기계적)
+토큰이 이미 있는 값(`space8`, `space14` 등) → 토큰 사용으로 치환.
+토큰 없는 반복 값 → 토큰 추가 후 치환.
+일회성 Figma 값 → raw 유지 + 주석.
+
+### Step 5 — 헤더/Chrome 통일 (Layer 4)
+3패턴(AppPageHeader / 인라인 Text / 자체 IconButton.back) → AppPageHeader로 수렴.
+탭 루트 화면만 예외적으로 인라인 헤더 허용.
+
+### Step 6 — 안티패턴 audit
+README의 안티패턴 섹션 기준으로 전 화면 grep 후 일괄 제거.
+
+---
+
 ## 신규 화면 추가 체크리스트
 
 새 화면을 만들 때 아래 순서로 결정:
@@ -241,3 +320,6 @@ ScreenContainer { _ in
 ## 변경 이력
 
 - 2026-05-23: 초안 작성 (7계층 정책 수립)
+- 2026-05-24: 단일 책임 매핑 + 마이그레이션 순서 추가
+- 2026-05-24: Layer 1 safe area 세부 정책 + ScreenContainer `horizontalPadding` 옵션 추가, Signup1/2/3 ScreenContainer 통합
+- 2026-05-24: UniClubApp의 전역 `.ignoresSafeArea(.top)` 제거 (NavigationStack 없는 분기로 의도치 않게 전파되는 문제 해결)

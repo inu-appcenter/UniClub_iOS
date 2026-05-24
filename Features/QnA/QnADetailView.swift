@@ -139,17 +139,11 @@ struct QnADetailView: View {
     }
 
     private var header: some View {
-        HStack {
-            IconButton.back { onBack() }
-
-            Spacer(minLength: 0)
-
+        AppPageHeader(onBack: { onBack() }) {
             Text("질의응답")
                 .font(AppTypography.bodyStrong())
                 .foregroundStyle(AppColors.textPrimary)
-
-            Spacer(minLength: 0)
-
+        } trailing: {
             // B-QnA-4: 회장 + 미답변일 때 더보기 버튼
             if let detail = viewModel.detail, detail.president && !detail.answered {
                 Button {
@@ -162,9 +156,6 @@ struct QnADetailView: View {
                         .frame(width: m.controlHeight44, height: m.controlHeight44)
                 }
                 .buttonStyle(.plain)
-            } else {
-                Color.clear
-                    .frame(width: m.controlHeight44, height: m.controlHeight44)
             }
         }
     }

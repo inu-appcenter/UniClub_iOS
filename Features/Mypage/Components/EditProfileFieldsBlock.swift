@@ -27,7 +27,7 @@ struct EditProfileFieldsBlock: View {
         text: Binding<String>,
         field: Field
     ) -> some View {
-        HStack(alignment: .center, spacing: 14 * m.scale) {
+        HStack(alignment: .center, spacing: m.space14) {
             Text(title)
                 .font(AppTypography.notoSans(12))
                 .foregroundStyle(AppColors.textPrimary)
@@ -44,7 +44,7 @@ struct EditProfileFieldsBlock: View {
                     .focused($focusedField, equals: field)
                     .font(AppTypography.notoSans(12))
                     .foregroundStyle(AppColors.textPrimary)
-                    .padding(.horizontal, 14 * m.scale)
+                    .padding(.horizontal, m.space14)
                     .frame(height: 31)
             }
             .frame(width: 196 * m.scale, alignment: .leading)
@@ -59,7 +59,7 @@ struct EditProfileFieldsBlock: View {
     }
 
     private var majorRow: some View {
-        HStack(alignment: .center, spacing: 14 * m.scale) {
+        HStack(alignment: .center, spacing: m.space14) {
             Text("학과")
                 .font(AppTypography.notoSans(12))
                 .foregroundStyle(AppColors.textPrimary)
@@ -79,7 +79,7 @@ struct EditProfileFieldsBlock: View {
                         .font(AppTypography.notoSans(12, weight: .semibold))
                         .foregroundStyle(isMajorSheetVisible ? AppColors.brand : AppColors.grey600)
                 }
-                .padding(.horizontal, 14 * m.scale)
+                .padding(.horizontal, m.space14)
                 .frame(width: 196 * m.scale, height: 31)
                 .background(Color(red: 0.9567, green: 0.9567, blue: 0.9567))
                 .clipShape(RoundedRectangle(cornerRadius: 13))

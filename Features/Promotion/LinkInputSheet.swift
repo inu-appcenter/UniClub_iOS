@@ -42,7 +42,7 @@ struct LinkInputSheet: View {
                     .autocorrectionDisabled()
                     .textInputAutocapitalization(.never)
                     .padding(.horizontal, m.space14)
-                    .frame(height: m.scale * 44)
+                    .frame(height: m.space44)
                     .background(AppColors.fieldFill)
                     .clipShape(RoundedRectangle(cornerRadius: m.radius12))
                     .overlay(
