@@ -193,7 +193,7 @@ struct QnADetailView: View {
         }
         .frame(width: 270)
         .background(AppColors.background)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: m.radius20))
         .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
     }
 

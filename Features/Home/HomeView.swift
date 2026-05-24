@@ -55,7 +55,7 @@ struct HomeView: View {
                         .padding(.top, m.space14)
 
                     bannerCarousel
-                        .padding(.top, m.space12)
+                        .padding(.top, m.space28)
 
                     recommendedSection
                         .padding(.top, m.space24 - m.space2)
@@ -254,7 +254,7 @@ struct HomeView: View {
                     GridItem(.flexible(), alignment: .center)
                 ],
                 alignment: .center,
-                spacing: 64
+                spacing: m.space8
             ) {
                 ForEach(categoryItems, id: \.title) { item in
                     Button {

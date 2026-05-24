@@ -32,15 +32,16 @@ struct ContactUsView: View {
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
-                guideText
-                    .padding(.top, m.scale * 22)
-                    .padding(.horizontal, contentHorizontalInset)
+                VStack(spacing: 0) {
+                    guideText
+                        .padding(.top, m.scale * 22)
 
-                contactList
-                    .padding(.top, m.space28)
-                    .padding(.horizontal, contentHorizontalInset)
+                    contactList
+                        .padding(.top, m.space28)
 
-                Spacer(minLength: 0)
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, contentHorizontalInset)
             }
         }
         .navigationBarBackButtonHidden(true)

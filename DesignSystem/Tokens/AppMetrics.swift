@@ -21,6 +21,7 @@ public struct AppMetrics: Equatable {
     public let space6: CGFloat
     public let space8: CGFloat
     public let space10: CGFloat
+    public let space11: CGFloat
     public let space12: CGFloat
     public let space14: CGFloat
     public let space16: CGFloat
@@ -32,9 +33,13 @@ public struct AppMetrics: Equatable {
     public let space44: CGFloat
 
     // Radius tokens
+    public let radius4: CGFloat
+    public let radius10: CGFloat
     public let radius12: CGFloat
+    public let radius14: CGFloat
     public let radius16: CGFloat
     public let radius18: CGFloat
+    public let radius20: CGFloat
     public let radius24: CGFloat
     public let radiusPill: CGFloat
 
@@ -82,6 +87,7 @@ public struct AppMetrics: Equatable {
             space6: scaled(6),
             space8: scaled(8),
             space10: scaled(10),
+            space11: scaled(11),
             space12: scaled(12),
             space14: scaled(14),
             space16: scaled(16),
@@ -92,9 +98,13 @@ public struct AppMetrics: Equatable {
             space32: scaled(32),
             space44: scaled(44),
 
+            radius4: scaled(4),
+            radius10: scaled(10),
             radius12: scaled(12),
+            radius14: scaled(14),
             radius16: scaled(16),
             radius18: scaled(18),
+            radius20: scaled(20),
             radius24: scaled(24),
             radiusPill: scaled(999), // pill
 

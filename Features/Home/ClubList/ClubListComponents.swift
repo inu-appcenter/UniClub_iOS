@@ -111,7 +111,7 @@ struct ClubListCard: View {
 
     private var avatar: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: m.radius20)
                 .fill(.white)
                 .frame(width: 54, height: 54)
 
@@ -125,7 +125,7 @@ struct ClubListCard: View {
                     }
                 }
                 .frame(width: 54, height: 54)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
+                .clipShape(RoundedRectangle(cornerRadius: m.radius20))
             } else {
                 Image(systemName: "person.fill")
                     .foregroundStyle(AppColors.grey800.opacity(0.25))

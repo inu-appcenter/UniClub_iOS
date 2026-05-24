@@ -31,9 +31,11 @@ struct NotificationSettingsView: View {
                 }
                 .padding(.bottom, m.scale * 22)
 
-                content
-                    .padding(.horizontal, m.space18)
-                Spacer()
+                VStack(spacing: 0) {
+                    content
+                    Spacer()
+                }
+                .padding(.horizontal, m.space18)
             }
         }
         .navigationBarHidden(true)

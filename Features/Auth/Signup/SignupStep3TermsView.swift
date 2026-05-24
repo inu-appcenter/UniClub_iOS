@@ -116,7 +116,7 @@ struct SignupStep3TermsView: View {
                 isOn.wrappedValue.toggle()
             } label: {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 4 * m.scale)
+                    RoundedRectangle(cornerRadius: m.radius4)
                         .stroke(
                             isOn.wrappedValue ? AppColors.brand : AppColors.grey300,
                             lineWidth: 2.0

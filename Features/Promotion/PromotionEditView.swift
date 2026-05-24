@@ -141,7 +141,7 @@ struct PromotionEditView: View {
                 .padding(.horizontal, 12)
                 .frame(height: 36)
                 .background(AppColors.fieldFill)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .clipShape(RoundedRectangle(cornerRadius: m.radius10))
                 .padding(.horizontal, 16)
                 .padding(.bottom, 14)
         }

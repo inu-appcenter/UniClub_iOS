@@ -119,7 +119,7 @@ struct ClubListView: View {
                         }
                         .frame(width: 100)
                         .background(Color(hex: 0x3C3C3C))
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .clipShape(RoundedRectangle(cornerRadius: m.radius10))
                         .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 4)
                         .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .topTrailing)))
                     }

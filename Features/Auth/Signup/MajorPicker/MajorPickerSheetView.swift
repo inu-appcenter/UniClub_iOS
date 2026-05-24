@@ -125,7 +125,7 @@ struct MajorPickerSheetView: View {
     }
 
     private func sectionView(_ section: MajorSection) -> some View {
-        VStack(alignment: .leading, spacing: 11 * m.scale) {
+        VStack(alignment: .leading, spacing: m.space11) {
             Text(section.title)
                 .font(AppTypography.notoSans(14, weight: .medium))
                 .foregroundStyle(AppColors.brand)
