@@ -16,6 +16,9 @@ struct QnAQuestionActionSheet: View {
                 }
                 .buttonStyle(.plain)
 
+                Divider()
+                    .background(AppColors.grey600)
+
                 Button(action: onDelete) {
                     actionRow(iconName: "icon_delete_trashcan", title: "삭제하기")
                 }
@@ -26,15 +29,19 @@ struct QnAQuestionActionSheet: View {
                 }
                 .buttonStyle(.plain)
 
+                Divider()
+                    .background(AppColors.grey600)
+
                 Button(action: onBlock) {
                     actionRow(systemIconName: "nosign", title: "차단하기")
                 }
                 .buttonStyle(.plain)
             }
         }
-        .frame(width: 307)
+        .frame(maxWidth: .infinity)
         .background(AppColors.grey700)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .padding(.horizontal, m.space16)
         .padding(.bottom, m.space16)
     }
 
@@ -62,7 +69,7 @@ struct QnAQuestionActionSheet: View {
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, m.space20)
-        .frame(height: 48)
+        .padding(.horizontal, m.space24)
+        .frame(maxWidth: .infinity, minHeight: 64)
     }
 }

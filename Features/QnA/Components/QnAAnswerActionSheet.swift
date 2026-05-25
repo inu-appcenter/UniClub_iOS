@@ -20,15 +20,19 @@ struct QnAAnswerActionSheet: View {
                 }
                 .buttonStyle(.plain)
 
+                Divider()
+                    .background(AppColors.grey600)
+
                 Button(action: onBlock) {
                     sheetRow(title: "차단하기", iconSystemName: "nosign")
                 }
                 .buttonStyle(.plain)
             }
         }
-        .frame(width: 307)
+        .frame(maxWidth: .infinity)
         .background(AppColors.grey700)
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .padding(.horizontal, m.space16)
         .padding(.bottom, m.space16)
     }
 
@@ -47,7 +51,7 @@ struct QnAAnswerActionSheet: View {
 
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, m.space20)
-        .frame(height: 48)
+        .padding(.horizontal, m.space24)
+        .frame(maxWidth: .infinity, minHeight: 64)
     }
 }

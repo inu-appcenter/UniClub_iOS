@@ -100,8 +100,8 @@ struct QnAQuestionCard: View {
                         .frame(width: m.controlHeight44)
                 }
                 .buttonStyle(.plain)
-                .padding(.top, 17)
-                .padding(.trailing, 22)
+                .padding(.top, 21)
+                .padding(.trailing, 2)
             }
 
             // B-QnA-3: 답변 완료 뱃지 (회장 권한 표시 또는 답변 상태)

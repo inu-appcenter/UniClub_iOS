@@ -241,7 +241,7 @@ struct QnAListView: View {
             .refreshable {
                 async let load: () = viewModel.loadQuestions()
                 async let delay: () = Task.sleep(nanoseconds: 500_000_000)
-                _ = await (load, delay)
+                _ = try? await (load, delay)
             }
             .background(AppColors.backgroundSecondary)
         }

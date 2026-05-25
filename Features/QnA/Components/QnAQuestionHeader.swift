@@ -16,9 +16,10 @@ struct QnAQuestionHeader: View {
                         .foregroundStyle(AppColors.textPrimary)
 
                     if detail.president {
-                        Circle()
-                            .fill(AppColors.brand)
-                            .frame(width: m.space6, height: m.space6)
+                        Image("icon_qna_admin_badge")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: m.space16, height: m.space16)
                     }
                 }
 
