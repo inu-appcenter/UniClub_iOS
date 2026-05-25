@@ -32,12 +32,14 @@ struct HomeView: View {
     /// 즐겨찾기 토글 중인 clubId 집합
     @State private var favoriteLoadingClubIDs: Set<Int> = []
 
-    /// “끝에서 더 당겼을 때만” 새로고침을 위한 트리거 진행도(0~1)
+    /// “끝에서 더 당겼을 때만” 추가 로드를 위한 트리거 진행도(0~1)
     @State private var refreshTriggerProgress: CGFloat = 0
     /// 한 번의 pull 동안 1회만 발동시키기 위한 락
     @State private var didFireRefreshOnThisPull: Bool = false
-    /// 새로고침 중 UI 상태
-    @State private var isRefreshingMainClubs: Bool = false
+    /// 추가 로딩 중 UI 상태
+    @State private var isLoadingMoreClubs: Bool = false
+    /// 더 불러올 동아리가 없을 때 true
+    @State private var allClubsLoaded: Bool = false
 
     /// 최초 로드 1회 보장
     @State private var didLoadOnce: Bool = false
@@ -138,38 +140,45 @@ struct HomeView: View {
                     .foregroundStyle(AppColors.textSecondary)
             }
 
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    LazyHStack(spacing: m.space12) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: m.space12) {
 
-                        ForEach(mainClubs) { club in
-                            MainClubCardView(
-                                club: club,
-                                cardWidth: recommendedCardWidth(),
-                                cardHeight: recommendedCardHeight(),
-                                isFavoriteLoading: favoriteLoadingClubIDs.contains(club.id),
-                                onTap: { onTapClub(club.id) },
-                                onFavoriteTap: {
-                                    Task { await handleFavoriteTap(clubId: club.id) }
-                                }
-                            )
-                            .id(club.id)
-                        }
+                    ForEach(mainClubs) { club in
+                        MainClubCardView(
+                            club: club,
+                            cardWidth: recommendedCardWidth(),
+                            cardHeight: recommendedCardHeight(),
+                            isFavoriteLoading: favoriteLoadingClubIDs.contains(club.id),
+                            onTap: { onTapClub(club.id) },
+                            onFavoriteTap: {
+                                Task { await handleFavoriteTap(clubId: club.id) }
+                            }
+                        )
+                        .id(club.id)
+                    }
 
+                    if !allClubsLoaded {
                         refreshTriggerCard(
-                            width: recommendedCardWidth(),
+                            width: recommendedCardWidth() / 2,
                             height: recommendedCardHeight()
                         )
                         .background(refreshTriggerProgressReader)
                     }
-                    .padding(.vertical, m.space4)
                 }
-                .coordinateSpace(name: mainClubsScrollSpace)
-                .onPreferenceChange(RefreshTriggerProgressKey.self) { progress in
-                    refreshTriggerProgress = progress
-                    handleRefreshTrigger(progress: progress, proxy: proxy)
-                }
+                .padding(.vertical, m.space4)
             }
+            .coordinateSpace(name: mainClubsScrollSpace)
+            .onPreferenceChange(RefreshTriggerProgressKey.self) { progress in
+                refreshTriggerProgress = progress
+                handleRefreshTrigger(progress: progress)
+            }
+        }
+        .onDisappear {
+            didLoadOnce = false
+            mainClubs = []
+            isLoadingMoreClubs = false
+            didFireRefreshOnThisPull = false
+            allClubsLoaded = false
         }
     }
 
@@ -188,15 +197,16 @@ struct HomeView: View {
         }
     }
 
-    private func handleRefreshTrigger(progress: CGFloat, proxy: ScrollViewProxy) {
+    private func handleRefreshTrigger(progress: CGFloat) {
         let threshold: CGFloat = 0.7
 
-        if !isRefreshingMainClubs,
+        if !isLoadingMoreClubs,
            !didFireRefreshOnThisPull,
+           !allClubsLoaded,
            progress >= threshold {
 
             didFireRefreshOnThisPull = true
-            Task { await refreshMainClubsAndScrollToFirst(proxy: proxy) }
+            Task { await appendMainClubs() }
         }
 
         if progress < 0.05, didFireRefreshOnThisPull {
@@ -209,10 +219,10 @@ struct HomeView: View {
             .fill(AppColors.fieldFill)
             .frame(width: width, height: height)
             .overlay {
-                if isRefreshingMainClubs {
+                if isLoadingMoreClubs {
                     ProgressView()
                 } else {
-                    Image(systemName: "arrow.clockwise")
+                    Image(systemName: "plus")
                         .font(AppTypography.notoSans(m.space18, weight: .semibold))
                         .foregroundStyle(AppColors.textSecondary)
                 }
@@ -338,12 +348,12 @@ struct HomeView: View {
     }
 
     @MainActor
-    private func refreshMainClubsAndScrollToFirst(proxy: ScrollViewProxy) async {
-        guard !isRefreshingMainClubs else { return }
+    private func appendMainClubs() async {
+        guard !isLoadingMoreClubs, !allClubsLoaded else { return }
 
         let start = Date()
-        isRefreshingMainClubs = true
-        defer { isRefreshingMainClubs = false }
+        isLoadingMoreClubs = true
+        defer { isLoadingMoreClubs = false }
 
         do {
             let result = try await MainClubsService.fetchMainClubs()
@@ -351,23 +361,28 @@ struct HomeView: View {
             var seen = Set<Int>()
             let unique = result.filter { seen.insert($0.clubId).inserted }
 
-            self.mainClubs = pickRandomFive(from: unique)
+            let existingIds = Set(mainClubs.map { $0.clubId })
+            let available = unique.filter { !existingIds.contains($0.clubId) }
+
+            let newClubs = Array(available.shuffled().prefix(5))
+
+            let elapsed = Date().timeIntervalSince(start)
+            if elapsed < 1.0 {
+                let ns = UInt64((1.0 - elapsed) * 1_000_000_000)
+                try? await Task.sleep(nanoseconds: ns)
+            }
+
+            if newClubs.isEmpty {
+                allClubsLoaded = true
+            } else {
+                self.mainClubs.append(contentsOf: newClubs)
+                if available.count <= newClubs.count {
+                    allClubsLoaded = true
+                }
+            }
             self.mainClubsError = nil
         } catch {
-            self.mainClubsError = "새 동아리를 불러오지 못했습니다."
-        }
-
-        let elapsed = Date().timeIntervalSince(start)
-        let minDuration: TimeInterval = 1.0
-        if elapsed < minDuration {
-            let ns = UInt64((minDuration - elapsed) * 1_000_000_000)
-            try? await Task.sleep(nanoseconds: ns)
-        }
-
-        if let first = mainClubs.first {
-            withAnimation(.easeInOut) {
-                proxy.scrollTo(first.id, anchor: .leading)
-            }
+            self.mainClubsError = "동아리를 더 불러오지 못했습니다."
         }
     }
 
