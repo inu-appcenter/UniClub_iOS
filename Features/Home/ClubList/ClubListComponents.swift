@@ -10,32 +10,21 @@ struct ClubListCard: View {
     var onFavoriteTap: (() -> Void)? = nil
 
     var body: some View {
-        // B-Clublist-4, 5: 하트/상태 라벨을 카드 외부 ZStack으로 배치
         ZStack(alignment: .topTrailing) {
-            ZStack(alignment: .bottomTrailing) {
-                cardContent
-
-                // B-Clublist-5: 상태 라벨 - 카드 외부 우하단
-                if let statusText = ClubStatus(rawValue: item.status ?? "")?.displayText {
-                    Text(statusText)
-                        .font(AppTypography.notoSans(10, weight: .medium))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(AppColors.grey800.opacity(0.7))
-                        .clipShape(Capsule())
-                        .offset(x: 0, y: 12)
+            cardContent
+                .overlay(alignment: .bottomTrailing) {
+                    if let status = ClubStatus(rawValue: item.status ?? "") {
+                        statusBadge(for: status)
+                            .padding(.trailing, m.space20)
+                            .padding(.bottom, 2)
+                    }
                 }
-            }
 
-            // B-Clublist-4: 하트 - 카드 외부 우상단, 글로우 (tappable)
             heartButton
-                .offset(x: 4, y: -10)
         }
-        .padding(.bottom, 12)
     }
 
-    // MARK: - Card Content (without heart/status)
+    // MARK: - Card Content
 
     private var cardContent: some View {
         HStack(spacing: m.space20) {
@@ -49,18 +38,18 @@ struct ClubListCard: View {
         .padding(m.space8)
         .background(AppColors.brandLight)
         .clipShape(RoundedRectangle(cornerRadius: m.radiusClubCard))
-        .shadow(radius: 10)
+        .shadow(color: .black.opacity(0.25), radius: 13.4, x: 0, y: 0)
     }
 
     // MARK: - Name + Category Row
 
     private var nameAndCategory: some View {
         HStack(spacing: m.space8) {
-            // B-Clublist-2: weight bold
             Text(item.name)
                 .font(AppTypography.notoSans(14, weight: .bold))
                 .foregroundStyle(.white)
                 .lineLimit(1)
+                .shadow(color: .black.opacity(0.25), radius: 3, x: 0, y: 0)
 
             categoryPill
 
@@ -69,7 +58,6 @@ struct ClubListCard: View {
     }
 
     private var categoryPill: some View {
-        // B-Clublist-3: #3C3C3C bg, r=5, 8pt
         Text(CategoryType(rawValue: item.category)?.displayText ?? "")
             .font(AppTypography.notoSans(8, weight: .medium))
             .foregroundStyle(.white.opacity(0.95))
@@ -87,7 +75,7 @@ struct ClubListCard: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
-    // MARK: - Heart (B-Clublist-4, tappable)
+    // MARK: - Heart
 
     private var heartButton: some View {
         Button {
@@ -105,30 +93,60 @@ struct ClubListCard: View {
         }
         .buttonStyle(.plain)
         .disabled(onFavoriteTap == nil)
+        .padding(8)
+    }
+
+    // MARK: - Status Badge
+
+    @ViewBuilder
+    private func statusBadge(for status: ClubStatus) -> some View {
+        switch status {
+        case .active:
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(Color(red: 0, green: 1, blue: 0.067))
+                    .frame(width: 3, height: 3)
+                Text(status.displayText)
+                    .font(AppTypography.notoSans(10, weight: .medium))
+                    .foregroundStyle(.white)
+                    .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 0)
+            }
+        case .scheduled, .closed:
+            Text(status.displayText)
+                .font(AppTypography.notoSans(10, weight: .medium))
+                .foregroundStyle(.white)
+                .shadow(color: .black.opacity(0.25), radius: 4, x: 0, y: 0)
+        }
     }
 
     // MARK: - Avatar
 
     private var avatar: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: m.radius20)
-                .fill(.white)
-                .frame(width: 54, height: 54)
-
             if let s = item.clubProfileUrl, let url = URL(string: s) {
+                RoundedRectangle(cornerRadius: m.radius20)
+                    .fill(.white)
+                    .frame(width: 54 * m.scale, height: 53 * m.scale)
+                    .shadow(color: .black.opacity(0.25), radius: 3.6, x: 0, y: 0)
+
                 AsyncImage(url: url) { phase in
                     switch phase {
                     case .success(let img):
                         img.resizable().scaledToFill()
                     default:
-                        AppColors.grey800.opacity(0.06)
+                        Image("image_default_clublist")
+                            .resizable()
+                            .scaledToFill()
                     }
                 }
-                .frame(width: 54, height: 54)
+                .frame(width: 54 * m.scale, height: 53 * m.scale)
                 .clipShape(RoundedRectangle(cornerRadius: m.radius20))
             } else {
-                Image(systemName: "person.fill")
-                    .foregroundStyle(AppColors.grey800.opacity(0.25))
+                Image("image_default_clublist")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 54 * m.scale, height: 53 * m.scale)
+                    .clipShape(RoundedRectangle(cornerRadius: m.radius20))
             }
         }
     }

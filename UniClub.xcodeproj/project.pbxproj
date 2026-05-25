@@ -58,6 +58,7 @@
 		CB86A4762FA30C0E00BBC386 /* KronaOne-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CB86A46C2FA30C0E00BBC386 /* KronaOne-Regular.ttf */; };
 		CB86A4792FA30E4300BBC386 /* AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB86A4782FA30E4300BBC386 /* AppColors.swift */; };
 		CB8BE8CF2F6254E60047B379 /* QnAReportDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB8BE8CE2F6254E60047B379 /* QnAReportDialog.swift */; };
+		CBB61A7F2FC3FFA600C9B9FC /* SearchService 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBB61A7E2FC3FFA600C9B9FC /* SearchService 2.swift */; };
 		CBBD81FB2FB5632A002D9795 /* UINavigationController+SwipeBack.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBBD81FA2FB5632A002D9795 /* UINavigationController+SwipeBack.swift */; };
 		CBBD81FD2FB5BCC8002D9795 /* AppPageHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBBD81FC2FB5BCC8002D9795 /* AppPageHeader.swift */; };
 		CBC272462FA615E8007A82A8 /* PromotionDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC272442FA615E8007A82A8 /* PromotionDetailViewModel.swift */; };
@@ -203,6 +204,7 @@
 		CB86A4772FA30CEC00BBC386 /* UniClub-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "UniClub-Info.plist"; sourceTree = "<group>"; };
 		CB86A4782FA30E4300BBC386 /* AppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppColors.swift; sourceTree = "<group>"; };
 		CB8BE8CE2F6254E60047B379 /* QnAReportDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QnAReportDialog.swift; sourceTree = "<group>"; };
+		CBB61A7E2FC3FFA600C9B9FC /* SearchService 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SearchService 2.swift"; sourceTree = "<group>"; };
 		CBBD81FA2FB5632A002D9795 /* UINavigationController+SwipeBack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+SwipeBack.swift"; sourceTree = "<group>"; };
 		CBBD81FC2FB5BCC8002D9795 /* AppPageHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPageHeader.swift; sourceTree = "<group>"; };
 		CBC272442FA615E8007A82A8 /* PromotionDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromotionDetailViewModel.swift; sourceTree = "<group>"; };
@@ -634,6 +636,7 @@
 			children = (
 				CBC90C9D2F3874470022ECDC /* HomeBannerService.swift */,
 				CBC90CA12F388E480022ECDC /* MainClubsService.swift */,
+				CBB61A7E2FC3FFA600C9B9FC /* SearchService 2.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -848,6 +851,7 @@
 				CB1CAC1A2FB75F410000C423 /* EditProfileImageBlock.swift in Sources */,
 				CBC3E7932F3178B100EF7F12 /* HomeView.swift in Sources */,
 				CBC90C842F370D480022ECDC /* LoginService.swift in Sources */,
+				CBB61A7F2FC3FFA600C9B9FC /* SearchService 2.swift in Sources */,
 				CBC90C992F38476F0022ECDC /* Color+Hex.swift in Sources */,
 				CBC90CA02F38746D0022ECDC /* BannerCarouselView.swift in Sources */,
 				CBC3E7AB2F31BCBC00EF7F12 /* HomeRootView.swift in Sources */,
