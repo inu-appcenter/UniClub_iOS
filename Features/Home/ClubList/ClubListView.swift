@@ -37,6 +37,7 @@ struct ClubListView: View {
     @State private var showSearch = false
 
     @State private var lastPagingTriggeredItemId: Int? = nil
+    @State private var selectedClubId: Int? = nil
 
     private var filteredItems: [ClubListViewModel.Item] {
         switch sort {
@@ -77,6 +78,9 @@ struct ClubListView: View {
                 vm.configure(categoryQuery: mode.categoryQuery, sortBy: sort.serverSortBy)
                 lastPagingTriggeredItemId = nil
                 await vm.initialLoadIfNeeded()
+            }
+            .navigationDestination(item: $selectedClubId) { clubId in
+                PromotionDetailView(clubId: clubId)
             }
 
             // ── 드롭다운 열렸을 때 외부 탭으로 닫기 ────────────
@@ -151,8 +155,11 @@ struct ClubListView: View {
 
             // ── 검색 오버레이 ───────────────────────────────────
             if showSearch {
-                SearchView(isPresented: $showSearch)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                SearchView(isPresented: $showSearch, onSelectClub: { clubId in
+                    showSearch = false
+                    selectedClubId = clubId
+                })
+                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .animation(.easeInOut(duration: 0.25), value: showSearch)
@@ -228,12 +235,17 @@ struct ClubListView: View {
         } else {
             LazyVStack(spacing: m.space16) {
                 ForEach(filteredItems) { item in
-                    ClubListCard(
-                        item: dto(from: item),
-                        onFavoriteTap: {
-                            Task { await handleFavoriteTap(itemId: item.id) }
-                        }
-                    )
+                    Button {
+                        selectedClubId = item.id
+                    } label: {
+                        ClubListCard(
+                            item: dto(from: item),
+                            onFavoriteTap: {
+                                Task { await handleFavoriteTap(itemId: item.id) }
+                            }
+                        )
+                    }
+                    .buttonStyle(.plain)
                     .onAppear {
                         guard filteredItems.last?.id == item.id else { return }
                         guard lastPagingTriggeredItemId != item.id else { return }

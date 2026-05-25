@@ -72,7 +72,6 @@ struct QnAComposerView: View {
     private var header: some View {
         AppPageHeader(onBack: { onDismiss() }) {
             Text(viewModel.isEditMode ? "질문 수정" : "질문하기")
-                .font(AppTypography.bodyStrong())
                 .foregroundStyle(AppColors.textPrimary)
         }
     }
@@ -112,14 +111,9 @@ struct QnAComposerView: View {
     private var contentSection: some View {
         VStack(alignment: .leading, spacing: m.space10) {
             if let selectedClub = viewModel.selectedClub {
-                // B-QnA-5: dark chip
-                Text(selectedClub.clubName)
-                    .font(AppTypography.notoSans(12, weight: .medium))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color(hex: 0x2A2A2A))
-                    .clipShape(RoundedRectangle(cornerRadius: 11))
+                Text("@\(selectedClub.clubName)")
+                    .font(AppTypography.captionStrong())
+                    .foregroundStyle(AppColors.brand)
             }
 
             Text("동아리 부원들에게 궁금한 것을 물어보세요.")

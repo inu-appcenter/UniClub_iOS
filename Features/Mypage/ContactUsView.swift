@@ -28,7 +28,6 @@ struct ContactUsView: View {
             VStack(spacing: 0) {
                 AppPageHeader(onBack: { dismiss() }) {
                     Text("문의하기")
-                        .font(AppTypography.notoSans(15, weight: .medium))
                         .foregroundStyle(AppColors.textPrimary)
                 }
 

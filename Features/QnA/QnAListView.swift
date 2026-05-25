@@ -32,9 +32,10 @@ struct QnAListView: View {
                 topPadding: .none,
                 bottomPadding: .none
             ) { _ in
-                VStack(alignment: .leading, spacing: m.space14) {
+                VStack(alignment: .leading, spacing: 0) {
                     header
                         .padding(.top, m.space18)
+                        .padding(.bottom, m.space24)
 
                     QnASearchBar(
                         placeholder: "질문을 검색해보세요.",
@@ -46,6 +47,7 @@ struct QnAListView: View {
                     .onChange(of: viewModel.keyword) { _ in
                         viewModel.scheduleSearch()
                     }
+                    .padding(.bottom, m.space32)
 
                     QnAFilterBar(
                         selectedClubName: viewModel.selectedClub?.clubName,
@@ -61,6 +63,7 @@ struct QnAListView: View {
                             viewModel.toggleOnlyMyQuestions()
                         }
                     )
+                    .padding(.bottom, m.space14)
 
                     contentSection
 
@@ -156,7 +159,7 @@ struct QnAListView: View {
             Spacer(minLength: 0)
 
             Text("질의응답")
-                .font(AppTypography.bodyStrong())
+                .font(AppTypography.notoSans(15, weight: .medium))
                 .foregroundStyle(AppColors.textPrimary)
 
             Spacer(minLength: 0)
@@ -235,6 +238,12 @@ struct QnAListView: View {
                 .padding(.top, m.space4)
                 .padding(.bottom, m.space8)
             }
+            .refreshable {
+                async let load: () = viewModel.loadQuestions()
+                async let delay: () = Task.sleep(nanoseconds: 500_000_000)
+                _ = await (load, delay)
+            }
+            .background(AppColors.backgroundSecondary)
         }
     }
 

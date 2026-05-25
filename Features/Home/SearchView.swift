@@ -7,6 +7,7 @@ import SwiftUI
 
 struct SearchView: View {
     @Binding var isPresented: Bool
+    var onSelectClub: ((Int) -> Void)? = nil
     @Environment(\.appMetrics) private var m
 
     @State private var query: String = ""
@@ -107,12 +108,18 @@ struct SearchView: View {
             ScrollView(showsIndicators: false) {
                 LazyVStack(spacing: m.space16) {
                     ForEach(clubs, id: \.id) { club in
-                        ClubListCard(
-                            item: club,
-                            onFavoriteTap: {
-                                Task { await handleFavoriteTap(clubId: club.id) }
-                            }
-                        )
+                        Button {
+                            isPresented = false
+                            onSelectClub?(club.id)
+                        } label: {
+                            ClubListCard(
+                                item: club,
+                                onFavoriteTap: {
+                                    Task { await handleFavoriteTap(clubId: club.id) }
+                                }
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding(.horizontal, m.horizontalPadding)

@@ -48,10 +48,10 @@ struct QnAQuestionCard: View {
     var body: some View {
         Button(action: onTap) {
             ZStack(alignment: .topTrailing) {
-            VStack(alignment: .leading, spacing: m.space10) {
-                HStack(alignment: .top, spacing: m.space10) {
-                    avatarView(size: m.space32)
+            HStack(alignment: .top, spacing: m.space10) {
+                avatarView(size: m.space32)
 
+                VStack(alignment: .leading, spacing: m.space6) {
                     VStack(alignment: .leading, spacing: m.space2) {
                         Text(nickname)
                             .font(AppTypography.bodyStrong())
@@ -63,45 +63,46 @@ struct QnAQuestionCard: View {
                             .foregroundStyle(AppColors.textSecondary)
                     }
 
-                    Spacer(minLength: 0)
-
-                    if let onMore {
-                        Button(action: onMore) {
-                            Image(systemName: "ellipsis")
-                                .rotationEffect(Angle(degrees: 90))
-                                .font(AppTypography.notoSans(m.space18, weight: .semibold))
-                                .foregroundStyle(AppColors.textPrimary)
-                                .frame(width: m.controlHeight44, height: m.controlHeight44)
-                        }
-                        .buttonStyle(.plain)
-                    }
-                }
-
-                Text("@\(clubName)")
-                    .font(AppTypography.captionStrong())
-                    .foregroundStyle(AppColors.brand)
-                    .lineLimit(1)
-
-                Text(content)
-                    .font(AppTypography.body())
-                    .foregroundStyle(AppColors.textPrimary)
-                    .lineLimit(2)
-                    .multilineTextAlignment(.leading)
-
-                HStack(spacing: m.space6) {
-                    Image("icon_qna_answer_count")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: m.space14, height: m.space14)
-
-                    Text("\(answerCount)")
+                    Text("@\(clubName)")
                         .font(AppTypography.captionStrong())
                         .foregroundStyle(AppColors.brand)
+                        .lineLimit(1)
+
+                    Text(content)
+                        .font(AppTypography.body())
+                        .foregroundStyle(AppColors.textPrimary)
+                        .lineLimit(2)
+                        .multilineTextAlignment(.leading)
+
+                    HStack(spacing: m.space6) {
+                        Image("icon_qna_answer_count")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: m.space14, height: m.space14)
+
+                        Text("\(answerCount)")
+                            .font(AppTypography.captionStrong())
+                            .foregroundStyle(AppColors.brand)
+                    }
                 }
+                .padding(.trailing, m.space32)
             }
             .padding(m.space16)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(AppColors.background)
+
+            // 더보기 버튼: Figma 기준 카드 상단 17pt, 우측 22pt
+            if let onMore {
+                Button(action: onMore) {
+                    Image(systemName: "ellipsis")
+                        .rotationEffect(Angle(degrees: 90))
+                        .font(AppTypography.notoSans(m.space18, weight: .semibold))
+                        .foregroundStyle(AppColors.textPrimary)
+                        .frame(width: m.controlHeight44)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 17)
+                .padding(.trailing, 22)
+            }
 
             // B-QnA-3: 답변 완료 뱃지 (회장 권한 표시 또는 답변 상태)
             if isPresident || isAnswered {
@@ -116,8 +117,9 @@ struct QnAQuestionCard: View {
                     .padding(.trailing, m.space8)
             }
             }  // ZStack
+            .background(AppColors.background)
             .clipShape(RoundedRectangle(cornerRadius: m.radiusQnACard, style: .continuous))
-            .shadow(color: Color(hex: 0xB2B2B2).opacity(0.25), radius: 22.8, x: 0, y: 4)
+            .shadow(color: Color(hex: 0xB3B3B5).opacity(0.25), radius: 11.4, x: 0, y: 4)
         }
         .buttonStyle(.plain)
     }

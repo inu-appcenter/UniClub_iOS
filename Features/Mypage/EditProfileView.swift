@@ -27,7 +27,6 @@ struct EditProfileView: View {
             VStack(spacing: 0) {
                 AppPageHeader(onBack: { dismiss() }) {
                     Text("프로필 수정")
-                        .font(AppTypography.notoSans(15, weight: .medium))
                         .foregroundStyle(AppColors.textPrimary)
                 } trailing: {
                     Button {

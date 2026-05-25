@@ -26,7 +26,6 @@ struct NotificationSettingsView: View {
             VStack(spacing: 0) {
                 AppPageHeader(onBack: { dismiss() }) {
                     Text("알림 설정")
-                        .font(AppTypography.notoSans(15, weight: .medium))
                         .foregroundStyle(AppColors.textPrimary)
                 }
                 .padding(.bottom, m.scale * 22)

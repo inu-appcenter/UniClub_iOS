@@ -41,7 +41,6 @@ struct NotificationView: View {
     private var header: some View {
         AppPageHeader(onBack: { onBack() }) {
             Text("알림")
-                .font(AppTypography.notoSans(15, weight: .medium))
                 .foregroundStyle(AppColors.grey800)
         }
     }

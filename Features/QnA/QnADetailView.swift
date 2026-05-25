@@ -141,7 +141,6 @@ struct QnADetailView: View {
     private var header: some View {
         AppPageHeader(onBack: { onBack() }) {
             Text("질의응답")
-                .font(AppTypography.bodyStrong())
                 .foregroundStyle(AppColors.textPrimary)
         } trailing: {
             // B-QnA-4: 회장 + 미답변일 때 더보기 버튼

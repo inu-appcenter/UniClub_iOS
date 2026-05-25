@@ -25,35 +25,23 @@ struct MyPageProfileHeader: View {
         let avatarRadius: CGFloat = 23 * m.scale
 
         return HStack(alignment: .center, spacing: m.space20) {
-            RoundedRectangle(cornerRadius: avatarRadius)
-                .fill(AppColors.fieldFill)
-                .frame(width: avatarW, height: avatarH)
-                .overlay {
-                    if let imageURL {
-                        AsyncImage(url: imageURL) { phase in
-                            switch phase {
-                            case .success(let img):
-                                img
-                                    .resizable()
-                                    .scaledToFill()
-
-                            default:
-                                Image("image_default_mypage")
-                                    .resizable()
-                                    .scaledToFill()
-                            }
+            Group {
+                if let imageURL {
+                    AsyncImage(url: imageURL) { phase in
+                        switch phase {
+                        case .success(let img):
+                            img.resizable().scaledToFill()
+                        default:
+                            Image("image_default_mypage").resizable().scaledToFill()
                         }
-                        .id(imageURL.absoluteString)
-                        .frame(width: avatarW, height: avatarH)
-                        .clipShape(RoundedRectangle(cornerRadius: avatarRadius))
-                    } else {
-                        Image("image_default_mypage")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: avatarW, height: avatarH)
-                            .clipShape(RoundedRectangle(cornerRadius: avatarRadius))
                     }
+                    .id(imageURL.absoluteString)
+                } else {
+                    Image("image_default_mypage").resizable().scaledToFill()
                 }
+            }
+            .frame(width: avatarW, height: avatarH)
+            .clipShape(RoundedRectangle(cornerRadius: avatarRadius))
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(nicknameText)
