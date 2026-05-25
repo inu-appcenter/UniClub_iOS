@@ -79,7 +79,7 @@ struct ClubListView: View {
                     } label: {
                         HStack(spacing: 4) {
                             Text(sort.rawValue)
-                                .font(AppTypography.notoSans(10, weight: .medium))
+                                .font(AppTypography.notoSans(11, weight: .medium))
                                 .foregroundStyle(.white)
                             Image(systemName: "chevron.down")
                                 .font(.system(size: 8, weight: .medium))
@@ -203,7 +203,7 @@ struct ClubListView: View {
 
         } else {
             // 정상 리스트 + 무한스크롤
-            LazyVStack(spacing: m.space12) {
+            LazyVStack(spacing: m.space4) {
                 ForEach(vm.state.items) { item in
                     ClubListCard(
                         item: dto(from: item),

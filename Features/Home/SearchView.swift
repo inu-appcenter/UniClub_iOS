@@ -17,7 +17,7 @@ struct SearchView: View {
             VStack(alignment: .leading, spacing: 0) {
 
                 // 검색 바
-                HStack(spacing: m.space10) {
+                HStack(spacing: m.space20) {
                     HStack(spacing: m.space8) {
                         Image(systemName: "magnifyingglass")
                             .foregroundStyle(AppColors.textSecondary)
@@ -42,7 +42,7 @@ struct SearchView: View {
                     .clipShape(RoundedRectangle(cornerRadius: m.radius18))
 
                     Button("취소") { dismiss() }
-                        .font(AppTypography.body())
+                        .font(AppTypography.notoSans(14, weight: .medium))
                         .foregroundStyle(AppColors.textPrimary)
                         .buttonStyle(.plain)
                 }

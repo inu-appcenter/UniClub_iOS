@@ -78,7 +78,7 @@ struct PromotionEditInfoSection: View {
                 x: m.space14,
                 y: m.space2
             )
-            .padding(.horizontal, -m.space20)
+            .padding(.horizontal, -m.space28)
     }
 
     // MARK: - Recruit / Notice
@@ -93,11 +93,11 @@ struct PromotionEditInfoSection: View {
 
     /// 모집기간 입력용 DatePicker (wheel 스타일, 초는 00 고정)
     private func dateRow(_ label: String, date: Binding<Date?>) -> some View {
-        HStack(alignment: .center, spacing: m.space2) {
+        HStack(alignment: .center, spacing: m.space18) {
             Text(label)
                 .font(AppTypography.notoSans(10, weight: .bold))
                 .foregroundStyle(AppColors.textPrimary)
-                .frame(width: m.scale * 56, alignment: .leading)
+                .frame(width: m.scale * 40, alignment: .leading)
 
             DatePicker(
                 "",
@@ -114,11 +114,11 @@ struct PromotionEditInfoSection: View {
     }
 
     private func editRow(_ label: String, text: Binding<String>, placeholder: String? = nil) -> some View {
-        HStack(alignment: .center, spacing: m.space2) {
+        HStack(alignment: .center, spacing: m.space18) {
             Text(label)
                 .font(AppTypography.notoSans(10, weight: .bold))
                 .foregroundStyle(AppColors.textPrimary)
-                .frame(width: m.scale * 56, alignment: .leading)
+                .frame(width: m.scale * 40, alignment: .leading)
 
             TextField(placeholder ?? label, text: text)
                 .font(AppTypography.notoSans(10, weight: .medium))

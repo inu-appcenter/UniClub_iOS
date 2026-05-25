@@ -104,7 +104,7 @@ struct HomeView: View {
                         .resizable()
                         .renderingMode(.original)
                         .scaledToFit()
-                        .frame(width: m.space24, height: m.space24)
+                        .frame(width: m.space20, height: m.space20)
 
                     if hasUnreadNotification {
                         Circle()
@@ -261,11 +261,14 @@ struct HomeView: View {
                         onTapCategory(item.title)
                     } label: {
                         VStack(spacing: m.space8) {
-                            Image(item.assetName)
-                                .resizable()
-                                .renderingMode(.original)
-                                .scaledToFit()
-                                .frame(width: m.space32 + m.space12, height: m.space32 + m.space12)
+                            ZStack(alignment: .bottom) {
+                                Color.clear.frame(height: 53 * m.scale)
+                                Image(item.assetName)
+                                    .resizable()
+                                    .renderingMode(.original)
+                                    .scaledToFit()
+                                    .frame(width: item.w * m.scale, height: item.h * m.scale)
+                            }
 
                             Text(item.title)
                                 .font(AppTypography.notoSans(11, weight: .medium))
@@ -280,14 +283,14 @@ struct HomeView: View {
         }
     }
 
-    private var categoryItems: [(title: String, assetName: String)] {
+    private var categoryItems: [(title: String, assetName: String, w: CGFloat, h: CGFloat)] {
         [
-            ("교양학술", "icon_category_academic"),
-            ("취미전시", "icon_category_hobby"),
-            ("체육",     "icon_category_sports"),
-            ("종교",     "icon_category_religion"),
-            ("봉사",     "icon_category_volunteer"),
-            ("문화",     "icon_category_culture")
+            ("교양학술", "icon_category_academic",  45, 40),
+            ("취미전시", "icon_category_hobby",     47, 37),
+            ("체육",     "icon_category_sports",    53, 53),
+            ("종교",     "icon_category_religion",  50, 50),
+            ("봉사",     "icon_category_volunteer", 46, 46),
+            ("문화",     "icon_category_culture",   50, 50)
         ]
     }
 

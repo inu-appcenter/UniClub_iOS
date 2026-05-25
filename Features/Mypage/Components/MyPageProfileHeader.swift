@@ -24,7 +24,7 @@ struct MyPageProfileHeader: View {
         let avatarH = 69 * m.scale
         let avatarRadius: CGFloat = 23 * m.scale
 
-        return HStack(alignment: .center, spacing: m.space16) {
+        return HStack(alignment: .center, spacing: m.space20) {
             RoundedRectangle(cornerRadius: avatarRadius)
                 .fill(AppColors.fieldFill)
                 .frame(width: avatarW, height: avatarH)
@@ -57,7 +57,7 @@ struct MyPageProfileHeader: View {
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(nicknameText)
-                    .font(AppTypography.notoSans(10, weight: .bold))
+                    .font(AppTypography.notoSans(10, weight: .medium))
                     .foregroundStyle(hasNickname ? AppColors.brand : AppColors.grey300)
                     .padding(.bottom, m.space4)
 
@@ -67,7 +67,7 @@ struct MyPageProfileHeader: View {
                     .padding(.bottom, 9 * m.scale)
 
                 Text(major)
-                    .font(AppTypography.notoSans(11, weight: .medium))
+                    .font(AppTypography.notoSans(11))
                     .foregroundStyle(AppColors.grey550)
                     .padding(.bottom, 5 * m.scale)
 

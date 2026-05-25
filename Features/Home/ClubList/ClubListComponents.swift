@@ -18,7 +18,7 @@ struct ClubListCard: View {
                 // B-Clublist-5: 상태 라벨 - 카드 외부 우하단
                 if let statusText = ClubStatus(rawValue: item.status ?? "")?.displayText {
                     Text(statusText)
-                        .font(AppTypography.notoSans(9, weight: .medium))
+                        .font(AppTypography.notoSans(10, weight: .medium))
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
@@ -38,15 +38,15 @@ struct ClubListCard: View {
     // MARK: - Card Content (without heart/status)
 
     private var cardContent: some View {
-        HStack(spacing: m.space12) {
+        HStack(spacing: m.space20) {
             avatar
 
-            VStack(alignment: .leading, spacing: m.space8) {
+            VStack(alignment: .leading, spacing: m.space4) {
                 nameAndCategory
                 descriptionText
             }
         }
-        .padding(m.space14)
+        .padding(m.space8)
         .background(AppColors.brandLight)
         .clipShape(RoundedRectangle(cornerRadius: m.radiusClubCard))
         .shadow(radius: 10)

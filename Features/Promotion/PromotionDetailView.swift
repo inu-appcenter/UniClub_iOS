@@ -82,7 +82,7 @@ struct PromotionDetailView: View {
                 .fill(AppColors.separator)
                 .frame(height: 1)
                 .padding(.top, m.scale * 22)
-                .padding(.horizontal, -m.space20)
+                .padding(.horizontal, -m.space28)
 
             if let desc = promo.description, !desc.isEmpty {
                 Text(desc)
@@ -91,17 +91,18 @@ struct PromotionDetailView: View {
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, m.scale * 36)
+                    .padding(.leading, m.space12)
             }
 
             PromotionMediaStrip(vm: vm)
                 .padding(.top, m.scale * 22)
-                .padding(.horizontal, -m.space20)
+                .padding(.horizontal, -m.space28)
 
             bottomButtons(promo: promo)
                 .padding(.top, m.space24)
                 .padding(.bottom, m.scale * 36)
         }
-        .padding(.horizontal, m.space20)
+        .padding(.horizontal, m.space28)
     }
 
 

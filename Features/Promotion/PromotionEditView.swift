@@ -162,7 +162,7 @@ struct PromotionEditView: View {
                 .fill(AppColors.separator)
                 .frame(height: 1)
                 .padding(.top, m.scale * 22)
-                .padding(.horizontal, -m.space20)
+                .padding(.horizontal, -m.space28)
 
             PromotionEditDescriptionField(vm: vm)
                 .padding(.top, m.scale * 36)
@@ -175,7 +175,7 @@ struct PromotionEditView: View {
                 .padding(.top, m.space24)
                 .padding(.bottom, m.scale * 36)
         }
-        .padding(.horizontal, m.space20)
+        .padding(.horizontal, m.space28)
     }
 
     // MARK: - Save Button
