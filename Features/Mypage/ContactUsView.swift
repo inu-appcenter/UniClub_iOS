@@ -28,19 +28,19 @@ struct ContactUsView: View {
             VStack(spacing: 0) {
                 AppPageHeader(onBack: { dismiss() }) {
                     Text("문의하기")
-                        .font(AppTypography.notoSans(15, weight: .medium))
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
-                guideText
-                    .padding(.top, m.scale * 22)
-                    .padding(.horizontal, contentHorizontalInset)
+                VStack(spacing: 0) {
+                    guideText
+                        .padding(.top, m.scale * 22)
 
-                contactList
-                    .padding(.top, m.space28)
-                    .padding(.horizontal, contentHorizontalInset)
+                    contactList
+                        .padding(.top, m.space28)
 
-                Spacer(minLength: 0)
+                    Spacer(minLength: 0)
+                }
+                .padding(.horizontal, contentHorizontalInset)
             }
         }
         .navigationBarBackButtonHidden(true)

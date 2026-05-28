@@ -61,6 +61,11 @@ enum AppConfig {
             static func delete(_ id: Int) -> String { "/api/v1/notifications/\(id)" }
         }
 
+        // MARK: - Search
+        enum Search {
+            static let clubs = "/api/v1/search"
+        }
+
         // MARK: - mypage
         enum User {
             static let me = "/api/v1/users/me"

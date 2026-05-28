@@ -17,7 +17,7 @@ struct MainClubCardView: View {
                 .frame(width: cardWidth, height: cardHeight)
                 .clipped()
 
-            Color(hex: 0x131313)
+            Color(hex: 0x131313).opacity(0.58)
                 .frame(height: 34)
                 .frame(maxWidth: .infinity, alignment: .top)
 
@@ -45,9 +45,10 @@ struct MainClubCardView: View {
                     .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .padding(.trailing, -4)
             }
-            .padding(.horizontal, m.space10)
-            .padding(.top, m.space10)
+            .padding(.horizontal, m.space14)
+            .padding(.top, 5)
         }
         .frame(width: cardWidth, height: cardHeight)
         .clipShape(RoundedRectangle(cornerRadius: m.radiusRecommendCard, style: .continuous))

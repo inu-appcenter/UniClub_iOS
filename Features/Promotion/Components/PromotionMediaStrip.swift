@@ -11,7 +11,7 @@ struct PromotionMediaStrip: View {
                     emptyMediaCard
                 } else {
                     ForEach(Array(vm.promotionImages.enumerated()), id: \.element.id) { index, media in
-                        let isLast = index == vm.promotionImages.count - 1
+                        let isLast = vm.promotionImages.count > 1 && index == vm.promotionImages.count - 1
                         mediaCard(url: media.url, isLast: isLast)
                     }
                 }
@@ -41,7 +41,11 @@ struct PromotionMediaStrip: View {
             if let url {
                 AsyncImage(url: url) { phase in
                     switch phase {
-                    case .success(let img): img.resizable().scaledToFill()
+                    case .success(let img):
+                        img.resizable()
+                            .scaledToFill()
+                            .frame(width: w, height: m.scale * 183)
+                            .clipped()
                     default: AppColors.cardFill
                     }
                 }

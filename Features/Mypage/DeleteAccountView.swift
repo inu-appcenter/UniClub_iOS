@@ -32,19 +32,19 @@ struct DeleteAccountView: View {
             VStack(spacing: 0) {
                 AppPageHeader(onBack: { dismiss() }) {
                     Text("계정 삭제")
-                        .font(AppTypography.notoSans(15, weight: .medium))
                         .foregroundStyle(AppColors.textPrimary)
                 }
 
-                content
-                    .padding(.top, m.scale * 33)
-                    .padding(.leading, m.space24)
+                VStack(spacing: 0) {
+                    content
+                        .padding(.top, m.scale * 33)
 
-                deleteButton
-                    .padding(.top, m.scale * 50)
-                    .padding(.leading, m.space24)
+                    deleteButton
+                        .padding(.top, m.scale * 50)
 
-                Spacer(minLength: 0)
+                    Spacer(minLength: 0)
+                }
+                .padding(.leading, m.space24)
             }
         }
         .navigationBarBackButtonHidden(true)
@@ -101,7 +101,7 @@ struct DeleteAccountView: View {
                 .padding(.top, m.space44)
 
             passwordField
-                .padding(.top, 11 * m.scale)
+                .padding(.top, m.space11)
 
             dividerLine
                 .padding(.top, 3 * m.scale)
@@ -144,7 +144,7 @@ struct DeleteAccountView: View {
                     ? Color(red: 1.0, green: 0.35, blue: 0.0)
                     : Color(red: 0.75, green: 0.75, blue: 0.75)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: 14 * m.scale))
+                .clipShape(RoundedRectangle(cornerRadius: m.radius14))
         }
         .buttonStyle(.plain)
         .disabled(!isDeleteEnabled || vm.isLoading)

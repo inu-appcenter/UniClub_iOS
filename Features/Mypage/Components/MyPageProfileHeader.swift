@@ -24,40 +24,28 @@ struct MyPageProfileHeader: View {
         let avatarH = 69 * m.scale
         let avatarRadius: CGFloat = 23 * m.scale
 
-        return HStack(alignment: .center, spacing: m.space16) {
-            RoundedRectangle(cornerRadius: avatarRadius)
-                .fill(AppColors.fieldFill)
-                .frame(width: avatarW, height: avatarH)
-                .overlay {
-                    if let imageURL {
-                        AsyncImage(url: imageURL) { phase in
-                            switch phase {
-                            case .success(let img):
-                                img
-                                    .resizable()
-                                    .scaledToFill()
-
-                            default:
-                                Image("image_default_mypage")
-                                    .resizable()
-                                    .scaledToFill()
-                            }
+        return HStack(alignment: .center, spacing: m.space20) {
+            Group {
+                if let imageURL {
+                    AsyncImage(url: imageURL) { phase in
+                        switch phase {
+                        case .success(let img):
+                            img.resizable().scaledToFill()
+                        default:
+                            Image("image_default_mypage").resizable().scaledToFill()
                         }
-                        .id(imageURL.absoluteString)
-                        .frame(width: avatarW, height: avatarH)
-                        .clipShape(RoundedRectangle(cornerRadius: avatarRadius))
-                    } else {
-                        Image("image_default_mypage")
-                            .resizable()
-                            .scaledToFill()
-                            .frame(width: avatarW, height: avatarH)
-                            .clipShape(RoundedRectangle(cornerRadius: avatarRadius))
                     }
+                    .id(imageURL.absoluteString)
+                } else {
+                    Image("image_default_mypage").resizable().scaledToFill()
                 }
+            }
+            .frame(width: avatarW, height: avatarH)
+            .clipShape(RoundedRectangle(cornerRadius: avatarRadius))
 
             VStack(alignment: .leading, spacing: 0) {
                 Text(nicknameText)
-                    .font(AppTypography.notoSans(10, weight: .bold))
+                    .font(AppTypography.notoSans(10, weight: .medium))
                     .foregroundStyle(hasNickname ? AppColors.brand : AppColors.grey300)
                     .padding(.bottom, m.space4)
 
@@ -67,7 +55,7 @@ struct MyPageProfileHeader: View {
                     .padding(.bottom, 9 * m.scale)
 
                 Text(major)
-                    .font(AppTypography.notoSans(11, weight: .medium))
+                    .font(AppTypography.notoSans(11))
                     .foregroundStyle(AppColors.grey550)
                     .padding(.bottom, 5 * m.scale)
 

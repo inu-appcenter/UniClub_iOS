@@ -14,7 +14,6 @@ struct BannerCarouselView: View {
     @State private var items: [HomeBannerItem] = []
     @State private var selectedID: String = ""
     @State private var isActive = true
-    @State private var loadError: String?
 
     // Figma 기준: 324×249 (가로/세로 비율)
     private let bannerAspect: CGFloat = 324.0 / 249.0
@@ -23,18 +22,11 @@ struct BannerCarouselView: View {
         BannerSizeReader(aspect: bannerAspect) { width, height in
             ZStack {
                 if items.isEmpty {
-                    RoundedRectangle(cornerRadius: m.radiusBanner, style: .continuous)
-                        .fill(AppColors.fieldFill)
+                    Image("image_default_home_banner")
+                        .resizable()
+                        .scaledToFill()
                         .frame(width: width, height: height)
-                        .overlay {
-                            if let loadError {
-                                Text(loadError)
-                                    .font(AppTypography.caption())
-                                    .foregroundStyle(AppColors.textSecondary)
-                                    .multilineTextAlignment(.center)
-                                    .padding(m.space12)
-                            }
-                        }
+                        .clipShape(RoundedRectangle(cornerRadius: m.radiusBanner, style: .continuous))
                 } else {
                     TabView(selection: $selectedID) {
                         ForEach(items) { item in
@@ -119,11 +111,9 @@ struct BannerCarouselView: View {
 
             self.items = unique
             self.selectedID = unique.first?.id ?? ""
-            self.loadError = nil
         } catch {
             self.items = []
             self.selectedID = ""
-            self.loadError = "배너를 불러오지 못했습니다."
         }
     }
     

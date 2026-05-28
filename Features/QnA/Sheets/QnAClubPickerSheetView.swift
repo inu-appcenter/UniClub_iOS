@@ -30,7 +30,13 @@ struct QnAClubPickerSheetView: View {
             bottomPadding: .custom(m.space16)
         ) { _ in
             VStack(alignment: .leading, spacing: m.space16) {
-                header
+                AppPageHeader {
+                    Text("동아리 선택")
+                } trailing: {
+                    Button("취소") { dismiss() }
+                        .font(AppTypography.caption())
+                        .foregroundStyle(AppColors.textPrimary)
+                }
 
                 QnASearchBar(
                     placeholder: "질문할 동아리를 검색하세요.",
@@ -113,29 +119,6 @@ struct QnAClubPickerSheetView: View {
             selectedClub = initiallySelectedClub
             await searchClubs()
         }
-    }
-
-    private var header: some View {
-        ZStack {
-            Text("동아리 선택")
-                .font(AppTypography.bodyStrong())
-                .foregroundStyle(AppColors.textPrimary)
-
-            HStack {
-                Color.clear
-                    .frame(width: m.controlHeight44, height: m.controlHeight44)
-
-                Spacer(minLength: 0)
-
-                Button("취소") {
-                    dismiss()
-                }
-                .font(AppTypography.caption())
-                .foregroundStyle(AppColors.textPrimary)
-                .frame(width: m.controlHeight44, height: m.controlHeight44)
-            }
-        }
-        .padding(.top, m.space18)
     }
 
     private func scheduleSearch() {

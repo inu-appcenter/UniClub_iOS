@@ -56,6 +56,20 @@ final class ClubListViewModel: ObservableObject {
         }
     }
 
+    func toggleFavoriteLocally(itemId: Int) {
+        guard let idx = state.items.firstIndex(where: { $0.id == itemId }) else { return }
+        let old = state.items[idx]
+        state.items[idx] = Item(
+            id: old.id,
+            name: old.name,
+            info: old.info,
+            status: old.status,
+            favorite: !old.favorite,
+            category: old.category,
+            imageURL: old.imageURL
+        )
+    }
+
     func refresh() async {
         state.items = []
         state.cursorName = nil

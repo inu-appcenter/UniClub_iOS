@@ -28,9 +28,10 @@ struct QnAAnswerRow: View {
                             .foregroundStyle(AppColors.textPrimary)
 
                         if answer.president {
-                            Circle()
-                                .fill(AppColors.brand)
-                                .frame(width: m.space6, height: m.space6)
+                            Image("icon_qna_admin_badge")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: m.space16, height: m.space16)
                         }
                     }
 
@@ -47,6 +48,7 @@ struct QnAAnswerRow: View {
                             .rotationEffect(Angle(degrees: 90))
                             .font(AppTypography.notoSans(m.space18, weight: .semibold))
                             .foregroundStyle(AppColors.textPrimary)
+                            .frame(width: m.controlHeight44, height: m.controlHeight44)
                     }
                     .buttonStyle(.plain)
                 }
@@ -71,15 +73,17 @@ struct QnAAnswerRow: View {
             }
         }
         .padding(m.space14)
-        .background(isReplyTarget ? AppColors.separator : AppColors.background)
+        .background(
+            RoundedRectangle(cornerRadius: m.radius16, style: .continuous)
+                .fill(isReplyTarget ? AppColors.separator : AppColors.background)
+        )
         .overlay(
-            RoundedRectangle(cornerRadius: m.radiusQnACard, style: .continuous)
+            RoundedRectangle(cornerRadius: m.radius16, style: .continuous)
                 .stroke(
                     isReplyTarget ? AppColors.grey400 : Color.clear,
                     lineWidth: 0.5
                 )
         )
-        .clipShape(RoundedRectangle(cornerRadius: m.radius16, style: .continuous))
         .padding(.leading, CGFloat(indentLevel) * (m.space16 + m.space4))
     }
 

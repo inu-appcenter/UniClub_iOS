@@ -107,6 +107,24 @@ UniClubApp은 전역 ignoresSafeArea를 두지 않는다. 자식 화면은 자�
 - **7계층에서 `.background(AppColors.background)` 추가 금지** — 컨테이너 기본값 사용
 - 헤더가 있는 화면은 `topPadding: .none`으로 설정하고 4계층(AppPageHeader)을 직접 배치
 
+### 콘텐츠 추가 인셋 패턴
+피그마 상 헤더(18pt edge)와 본문 콘텐츠 인셋이 다른 경우(예: 콘텐츠 36pt, 비대칭 42/18pt),  
+AppPageHeader는 항상 컨테이너 기본 18pt를 기준으로 음수 패딩 처리하므로 **컨테이너 레벨에서 인셋을 변경할 수 없다.**  
+이 경우 헤더를 제외한 콘텐츠를 **VStack 하나로 묶고 그 VStack에만 패딩 적용**한다.
+
+```swift
+ScreenContainer(topPadding: .none) { _ in
+    VStack(spacing: 0) {
+        AppPageHeader(...)          // 18pt 기본 유지
+        VStack(spacing: 0) {       // 콘텐츠 그룹
+            content
+            Spacer()
+        }
+        .padding(.horizontal, m.space18)  // Figma: total 36pt
+    }
+}
+```
+
 ---
 
 ## 4. Screen Chrome (Header / Footer)

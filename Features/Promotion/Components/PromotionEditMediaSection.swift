@@ -52,7 +52,7 @@ struct PromotionEditMediaSection: View {
                 }
                 .padding(.vertical, m.space4)
             }
-            .padding(.horizontal, -m.space20)
+            .padding(.horizontal, -m.space28)
         }
     }
 }

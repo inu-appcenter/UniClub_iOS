@@ -32,9 +32,11 @@ struct QnAListView: View {
                 topPadding: .none,
                 bottomPadding: .none
             ) { _ in
-                VStack(alignment: .leading, spacing: m.space14) {
-                    header
-                        .padding(.top, m.space18)
+                VStack(alignment: .leading, spacing: 0) {
+                    AppPageHeader(onBack: { onBackToHome() }) {
+                        Text("질의응답")
+                    }
+                    .padding(.bottom, m.space24)
 
                     QnASearchBar(
                         placeholder: "질문을 검색해보세요.",
@@ -46,6 +48,7 @@ struct QnAListView: View {
                     .onChange(of: viewModel.keyword) { _ in
                         viewModel.scheduleSearch()
                     }
+                    .padding(.bottom, m.space32)
 
                     QnAFilterBar(
                         selectedClubName: viewModel.selectedClub?.clubName,
@@ -61,6 +64,7 @@ struct QnAListView: View {
                             viewModel.toggleOnlyMyQuestions()
                         }
                     )
+                    .padding(.bottom, m.space14)
 
                     contentSection
 
@@ -149,23 +153,6 @@ struct QnAListView: View {
         .animation(.easeInOut(duration: 0.2), value: isShowingBlockDialog)
     }
 
-    private var header: some View {
-        HStack {
-            IconButton.back { onBackToHome() }
-
-            Spacer(minLength: 0)
-
-            Text("질의응답")
-                .font(AppTypography.bodyStrong())
-                .foregroundStyle(AppColors.textPrimary)
-
-            Spacer(minLength: 0)
-
-            Color.clear
-                .frame(width: m.controlHeight44, height: m.controlHeight44)
-        }
-    }
-
     @ViewBuilder
     private var contentSection: some View {
         if viewModel.isLoading {
@@ -235,6 +222,12 @@ struct QnAListView: View {
                 .padding(.top, m.space4)
                 .padding(.bottom, m.space8)
             }
+            .refreshable {
+                async let load: () = viewModel.loadQuestions()
+                async let delay: () = Task.sleep(nanoseconds: 500_000_000)
+                _ = try? await (load, delay)
+            }
+            .background(AppColors.backgroundSecondary)
         }
     }
 

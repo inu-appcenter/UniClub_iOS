@@ -48,9 +48,11 @@ struct PromotionEditInfoSection: View {
                 .zIndex(1)
             }
 
-            editRow("동아리방", text: $vm.location)
-            editRow("회장",    text: $vm.presidentName)
-            editRow("연락처",  text: $vm.presidentPhone)
+            HStack(spacing: m.space24) {
+                miniEditField("동아리방", text: $vm.location)
+                miniEditField("회장",    text: $vm.presidentName)
+                miniEditField("연락처",  text: $vm.presidentPhone)
+            }
         }
     }
 
@@ -78,7 +80,7 @@ struct PromotionEditInfoSection: View {
                 x: m.space14,
                 y: m.space2
             )
-            .padding(.horizontal, -m.space20)
+            .padding(.horizontal, -m.space28)
     }
 
     // MARK: - Recruit / Notice
@@ -91,13 +93,12 @@ struct PromotionEditInfoSection: View {
         }
     }
 
-    /// 모집기간 입력용 DatePicker (wheel 스타일, 초는 00 고정)
     private func dateRow(_ label: String, date: Binding<Date?>) -> some View {
-        HStack(alignment: .center, spacing: m.space2) {
+        HStack(alignment: .center, spacing: m.space18) {
             Text(label)
                 .font(AppTypography.notoSans(10, weight: .bold))
                 .foregroundStyle(AppColors.textPrimary)
-                .frame(width: m.scale * 56, alignment: .leading)
+                .frame(width: m.scale * 40, alignment: .leading)
 
             DatePicker(
                 "",
@@ -110,15 +111,29 @@ struct PromotionEditInfoSection: View {
             .datePickerStyle(.compact)
             .labelsHidden()
             .tint(AppColors.brand)
+            .scaleEffect(0.75, anchor: .leading)
+            .frame(height: 24)
+            .clipped()
+        }
+    }
+
+    private func miniEditField(_ label: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: m.space2) {
+            Text(label)
+                .font(AppTypography.notoSans(10, weight: .bold))
+                .foregroundStyle(AppColors.textPrimary)
+            TextField(label, text: text)
+                .font(AppTypography.notoSans(9))
+                .foregroundStyle(AppColors.textPrimary)
         }
     }
 
     private func editRow(_ label: String, text: Binding<String>, placeholder: String? = nil) -> some View {
-        HStack(alignment: .center, spacing: m.space2) {
+        HStack(alignment: .center, spacing: m.space18) {
             Text(label)
                 .font(AppTypography.notoSans(10, weight: .bold))
                 .foregroundStyle(AppColors.textPrimary)
-                .frame(width: m.scale * 56, alignment: .leading)
+                .frame(width: m.scale * 40, alignment: .leading)
 
             TextField(placeholder ?? label, text: text)
                 .font(AppTypography.notoSans(10, weight: .medium))

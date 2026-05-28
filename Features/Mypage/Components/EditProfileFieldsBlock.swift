@@ -36,8 +36,8 @@ struct EditProfileFieldsBlock: View {
                 .frame(width: 50 * m.scale, alignment: .leading)
 
             ZStack {
-                RoundedRectangle(cornerRadius: 13)
-                    .fill(Color(red: 0.9567, green: 0.9567, blue: 0.9567))
+                RoundedRectangle(cornerRadius: m.radius14, style: .continuous)
+                    .fill(AppColors.fieldFill)
                     .frame(height: 31)
 
                 TextField("", text: text)
@@ -49,7 +49,7 @@ struct EditProfileFieldsBlock: View {
             }
             .frame(width: 196 * m.scale, alignment: .leading)
             .overlay(
-                RoundedRectangle(cornerRadius: 13)
+                RoundedRectangle(cornerRadius: m.radius14, style: .continuous)
                     .stroke(
                         focusedField == field ? AppColors.brand : .clear,
                         lineWidth: focusedField == field ? 0.5 : 0
@@ -81,10 +81,10 @@ struct EditProfileFieldsBlock: View {
                 }
                 .padding(.horizontal, m.space14)
                 .frame(width: 196 * m.scale, height: 31)
-                .background(Color(red: 0.9567, green: 0.9567, blue: 0.9567))
-                .clipShape(RoundedRectangle(cornerRadius: 13))
+                .background(AppColors.fieldFill)
+                .clipShape(RoundedRectangle(cornerRadius: m.radius14, style: .continuous))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 13)
+                    RoundedRectangle(cornerRadius: m.radius14, style: .continuous)
                         .stroke(
                             isMajorSheetVisible ? AppColors.brand : .clear,
                             lineWidth: isMajorSheetVisible ? 0.5 : 0

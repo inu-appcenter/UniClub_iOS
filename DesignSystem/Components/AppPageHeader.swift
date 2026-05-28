@@ -23,6 +23,7 @@ public struct AppPageHeader<Center: View, Trailing: View>: View {
     public var body: some View {
         ZStack {
             center
+                .font(AppTypography.notoSans(15, weight: .medium))
                 .frame(maxWidth: .infinity)
 
             HStack(spacing: 0) {

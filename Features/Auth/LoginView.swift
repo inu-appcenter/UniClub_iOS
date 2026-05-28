@@ -44,7 +44,7 @@ struct LoginView: View {
                         }
                         .frame(width: 258 * m.scale, height: m.space44)
                         .background(AppColors.brand)
-                        .clipShape(RoundedRectangle(cornerRadius: 10 * m.scale))
+                        .clipShape(RoundedRectangle(cornerRadius: m.radius10))
                         .frame(maxWidth: .infinity, alignment: .center)
                         .padding(.bottom, 19 * m.scale)
                         .transition(.opacity.combined(with: .move(edge: .top)))

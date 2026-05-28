@@ -2,90 +2,178 @@
 //  SearchView.swift
 //  UniClub
 //
-//  Created by 제욱 on 2/3/26.
-//
 
 import SwiftUI
 
-/// Home_Tap_검색화면 + Home_Tap_검색어입력시 → 한 화면의 상태(query empty/non-empty)로 커버
 struct SearchView: View {
-    @Environment(\.dismiss) private var dismiss
+    @Binding var isPresented: Bool
+    var onSelectClub: ((Int) -> Void)? = nil
+    @Environment(\.appMetrics) private var m
+
     @State private var query: String = ""
+    @State private var clubs: [ClubsService.ClubDTO] = []
+    @State private var isLoading: Bool = false
+    @State private var searchTask: Task<Void, Never>? = nil
+    @FocusState private var searchFocused: Bool
 
     var body: some View {
-        ScreenContainer(scroll: true) { m in
-            VStack(alignment: .leading, spacing: 0) {
+        ZStack(alignment: .top) {
+            // White background (frame bg is white; gray search bar is visible against it)
+            AppColors.background
+                .ignoresSafeArea()
 
-                // 검색 바
-                HStack(spacing: m.space10) {
-                    HStack(spacing: m.space8) {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundStyle(AppColors.textSecondary)
+            VStack(spacing: 0) {
+                searchBarRow
+                    .padding(.horizontal, m.horizontalPadding)
+                    .padding(.top, m.space18)
+                    .padding(.bottom, m.space20)
 
-                        TextField("동아리를 검색해보세요 :D", text: $query)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled(true)
-
-                        if !query.isEmpty {
-                            Button {
-                                query = ""
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(AppColors.textSecondary)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .padding(.horizontal, m.space12)
-                    .padding(.vertical, m.space10)
-                    .background(Color(hex: 0xD9D9D9))
-                    .clipShape(RoundedRectangle(cornerRadius: m.radius18))
-
-                    Button("취소") { dismiss() }
-                        .font(AppTypography.body())
-                        .foregroundStyle(AppColors.textPrimary)
-                        .buttonStyle(.plain)
-                }
-                .padding(.bottom, m.space12)
-
-                // 상태 분기
-                if query.isEmpty {
-                    // 검색화면 기본 상태(더미)
-                    Text("추천 동아리")
-                        .font(AppTypography.bodyStrong())
-                        .padding(.bottom, m.space12)
-
-                    VStack(spacing: m.space12) {
-                        ForEach(0..<6, id: \.self) { idx in
-                            ClubCard(
-                                name: "추천 동아리 \(idx+1)",
-                                statusText: "모집중",
-                                imageURL: nil,
-                                tags: ["추가정보"]
-                            ) { }
-                        }
-                    }
-                } else {
-                    // 검색어 입력 상태(더미)
-                    Text("“\(query)” 검색 결과")
-                        .font(AppTypography.bodyStrong())
-                        .padding(.bottom, m.space12)
-
-                    VStack(spacing: m.space12) {
-                        ForEach(0..<6, id: \.self) { idx in
-                            ClubCard(
-                                name: "검색 결과 \(idx+1)",
-                                statusText: "모집기간이 아님",
-                                imageURL: nil,
-                                tags: ["추가정보"]
-                            ) { }
-                        }
-                    }
-                }
-
-                Spacer(minLength: m.space24)
+                sheetContent
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(AppColors.background)
+                    .ignoresSafeArea(edges: .bottom)
+                    .clipShape(
+                        UnevenRoundedRectangle(
+                            topLeadingRadius: 32 * m.scale,
+                            bottomLeadingRadius: 0,
+                            bottomTrailingRadius: 0,
+                            topTrailingRadius: 32 * m.scale
+                        )
+                    )
+                    .shadow(color: .black.opacity(0.25), radius: 50, x: 0, y: 4)
             }
         }
-        .navigationBarHidden(true) // JSON이 커스텀 검색바를 쓰는 느낌이라 기본 네비게이션 숨김
+        .tabBarPresent(false)
+        .onAppear { searchFocused = true }
+        .onChange(of: query) { _ in scheduleSearch() }
+    }
+
+    // MARK: - Search Bar
+
+    private var searchBarRow: some View {
+        HStack(spacing: m.space12) {
+            HStack(spacing: m.space8) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color(hex: 0x595959))
+
+                TextField("동아리를 검색해보세요 :D", text: $query)
+                    .font(AppTypography.notoSans(12))
+                    .foregroundStyle(AppColors.textPrimary)
+                    .focused($searchFocused)
+                    .autocorrectionDisabled()
+                    .textInputAutocapitalization(.never)
+
+                if !query.isEmpty {
+                    Button { query = "" } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(Color(hex: 0x595959))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, m.space12)
+            .frame(height: 35 * m.scale)
+            .background(Color(hex: 0xD9D9D9))
+            .clipShape(RoundedRectangle(cornerRadius: m.radius18, style: .continuous))
+
+            Button("취소") { close() }
+                .font(AppTypography.notoSans(14, weight: .medium))
+                .foregroundStyle(AppColors.textPrimary)
+                .buttonStyle(.plain)
+        }
+    }
+
+    // MARK: - Sheet Content
+
+    @ViewBuilder
+    private var sheetContent: some View {
+        if isLoading {
+            VStack {
+                Spacer()
+                ProgressView()
+                Spacer()
+            }
+        } else if clubs.isEmpty {
+            VStack {
+                Spacer()
+                if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    Text("검색 결과가 없어요")
+                        .font(AppTypography.body())
+                        .foregroundStyle(AppColors.textSecondary)
+                }
+                Spacer()
+            }
+        } else {
+            ScrollView(showsIndicators: false) {
+                LazyVStack(spacing: m.space16) {
+                    ForEach(clubs, id: \.id) { club in
+                        Button {
+                            isPresented = false
+                            onSelectClub?(club.id)
+                        } label: {
+                            ClubListCard(
+                                item: club,
+                                onFavoriteTap: {
+                                    Task { await handleFavoriteTap(clubId: club.id) }
+                                }
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, m.horizontalPadding)
+                .padding(.vertical, m.space16)
+            }
+        }
+    }
+
+    // MARK: - Actions
+
+    private func close() {
+        searchTask?.cancel()
+        isPresented = false
+    }
+
+    private func scheduleSearch() {
+        searchTask?.cancel()
+        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !q.isEmpty else {
+            clubs = []
+            return
+        }
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            guard !Task.isCancelled else { return }
+            await performSearch(keyword: q)
+        }
+    }
+
+    @MainActor
+    private func performSearch(keyword: String) async {
+        isLoading = true
+        defer { isLoading = false }
+        do {
+            clubs = try await SearchService.search(keyword: keyword)
+        } catch {
+            clubs = []
+        }
+    }
+
+    @MainActor
+    private func handleFavoriteTap(clubId: Int) async {
+        if let idx = clubs.firstIndex(where: { $0.id == clubId }) {
+            let old = clubs[idx]
+            clubs[idx] = ClubsService.ClubDTO(
+                id: old.id,
+                name: old.name,
+                info: old.info,
+                status: old.status,
+                favorite: !old.favorite,
+                category: old.category,
+                clubProfileUrl: old.clubProfileUrl
+            )
+        }
+        _ = try? await MainClubsService.toggleFavorite(clubId: clubId)
     }
 }

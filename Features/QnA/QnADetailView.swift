@@ -24,6 +24,8 @@ struct QnADetailView: View {
     @State private var isSubmittingReply: Bool = false
 
     @State private var activeMoreAnswer: QnAAnswerItem?
+    @State private var showReplyDepthAlert: Bool = false
+    @FocusState private var isInputFocused: Bool
 
     init(
         questionId: Int,
@@ -39,21 +41,23 @@ struct QnADetailView: View {
 
     var body: some View {
         ZStack {
-            ScreenContainer(
-                scroll: false,
-                background: AppColors.backgroundSecondary,
-                topPadding: .none,
-                bottomPadding: .none
-            ) { _ in
-                VStack(alignment: .leading, spacing: m.space14) {
-                    header
-                        .padding(.top, m.space18)
+            AppColors.backgroundSecondary.ignoresSafeArea()
 
-                    detailContent
+            VStack(spacing: 0) {
+                header
+                    .padding(.horizontal, m.horizontalPadding)
 
-                    answerInputBar
-                        .padding(.bottom, m.space16)
-                }
+                detailContent
+                    .padding(.horizontal, m.horizontalPadding)
+            }
+            .frame(maxWidth: m.contentMaxWidth, maxHeight: .infinity, alignment: .top)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                answerInputBar
+                    .padding(.horizontal, m.horizontalPadding)
+                    .padding(.top, m.space8)
+                    .padding(.bottom, m.space16)
+                    .background(AppColors.backgroundSecondary)
+                    .frame(maxWidth: m.contentMaxWidth)
             }
 
             if activeMoreAnswer != nil || pendingDeleteAnswer != nil || showMarkAnsweredDialog || viewModel.showReportDialog || viewModel.showBlockDialog {
@@ -116,10 +120,16 @@ struct QnADetailView: View {
                 .transition(.opacity)
             }
         }
+        .ignoresSafeArea(.container, edges: .bottom)
         .navigationBarBackButtonHidden(true)
         .toolbar(.hidden, for: .navigationBar)
         .task {
             await viewModel.loadDetail()
+        }
+        .alert("답글 작성 불가", isPresented: $showReplyDepthAlert) {
+            Button("확인", role: .cancel) {}
+        } message: {
+            Text("대댓글에는 답글을 작성할 수 없습니다.")
         }
         .alert("이 질문을 삭제하시겠습니까?", isPresented: $showDeleteQuestionAlert) {
             Button("취소", role: .cancel) {}
@@ -141,7 +151,6 @@ struct QnADetailView: View {
     private var header: some View {
         AppPageHeader(onBack: { onBack() }) {
             Text("질의응답")
-                .font(AppTypography.bodyStrong())
                 .foregroundStyle(AppColors.textPrimary)
         } trailing: {
             // B-QnA-4: 회장 + 미답변일 때 더보기 버튼
@@ -193,7 +202,7 @@ struct QnADetailView: View {
         }
         .frame(width: 270)
         .background(AppColors.background)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .clipShape(RoundedRectangle(cornerRadius: m.radius20))
         .shadow(color: .black.opacity(0.15), radius: 8, x: 0, y: 4)
     }
 
@@ -206,56 +215,68 @@ struct QnADetailView: View {
                 Spacer()
             }
         } else if let detail = viewModel.detail {
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: m.space16) {
-                    questionHeader(detail)
+            ScrollViewReader { proxy in
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: m.space16) {
+                        questionHeader(detail)
 
-                    Rectangle()
-                        .fill(AppColors.separator)
-                        .frame(height: max(1, m.hairline))
+                        Rectangle()
+                            .fill(AppColors.separator)
+                            .frame(height: max(1, m.hairline))
 
-                    ForEach(viewModel.topLevelAnswers) { answer in
-                        VStack(alignment: .leading, spacing: m.space10) {
-                            QnAAnswerRow(
-                                answer: answer,
-                                indentLevel: 0,
-                                isReplyTarget: selectedReplyTarget?.answerId == answer.answerId,
-                                onTapReply: {
-                                    selectedReplyTarget = answer
-                                },
-                                onTapMore: answer.deleted ? nil : {
-                                    activeMoreAnswer = answer
+                        ForEach(viewModel.topLevelAnswers) { answer in
+                            VStack(alignment: .leading, spacing: m.space10) {
+                                QnAAnswerRow(
+                                    answer: answer,
+                                    indentLevel: 0,
+                                    isReplyTarget: selectedReplyTarget?.answerId == answer.answerId,
+                                    onTapReply: {
+                                        selectedReplyTarget = answer
+                                        isInputFocused = true
+                                    },
+                                    onTapMore: answer.deleted ? nil : {
+                                        activeMoreAnswer = answer
+                                    }
+                                )
+                                .id(answer.answerId)
+
+                                ForEach(viewModel.replies(for: answer.answerId)) { reply in
+                                    HStack(alignment: .top, spacing: m.space8) {
+                                        Image("icon_answer_bindingarrow")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: m.space24, height: m.space24)
+                                            .padding(.top, m.space12)
+
+                                        QnAAnswerRow(
+                                            answer: reply,
+                                            indentLevel: 0,
+                                            isReplyTarget: false,
+                                            onTapReply: {
+                                                showReplyDepthAlert = true
+                                            },
+                                            onTapMore: reply.deleted ? nil : {
+                                                activeMoreAnswer = reply
+                                            }
+                                        )
+                                        .id(reply.answerId)
+                                    }
+                                    .padding(.leading, m.space24)
                                 }
-                            )
-
-                            ForEach(viewModel.replies(for: answer.answerId)) { reply in
-                                HStack(alignment: .top, spacing: m.space8) {
-                                    Image("icon_answer_bindingarrow")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: m.space24, height: m.space24)
-                                        .padding(.top, m.space12)
-
-                                    QnAAnswerRow(
-                                        answer: reply,
-                                        indentLevel: 0,
-                                        isReplyTarget: selectedReplyTarget?.answerId == reply.answerId,
-                                        onTapReply: {
-                                            selectedReplyTarget = reply
-                                        },
-                                        onTapMore: reply.deleted ? nil : {
-                                            activeMoreAnswer = reply
-                                        }
-                                    )
-                                }
-                                .padding(.leading, m.space16)
                             }
                         }
                     }
+                    .padding(.top, m.space4)
+                    .padding(.bottom, m.space8)
                 }
-                .padding(.top, m.space4)
-                .padding(.bottom, m.space8)
+                .onChange(of: selectedReplyTarget) { target in
+                    guard let target else { return }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+                        withAnimation { proxy.scrollTo(target.answerId, anchor: .bottom) }
+                    }
+                }
             }
+            .frame(maxHeight: .infinity)
         } else {
             VStack {
                 Spacer()
@@ -276,6 +297,7 @@ struct QnADetailView: View {
             viewModel: viewModel,
             isAnonymousReply: $isAnonymousReply,
             isSubmittingReply: isSubmittingReply,
+            focusBinding: $isInputFocused,
             onSubmit: { Task { await submitCurrentReply() } }
         )
     }

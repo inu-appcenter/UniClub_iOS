@@ -45,11 +45,22 @@ final class PromotionDetailViewModel: ObservableObject {
 
     var recruitPeriod: String? {
         switch (promotion?.startTime, promotion?.endTime) {
-        case (let s?, let e?): return "\(s) ~ \(e)"
-        case (let s?, nil):    return s
-        case (nil, let e?):    return e
+        case (let s?, let e?): return "\(formatDateTime(s)) ~ \(formatDateTime(e))"
+        case (let s?, nil):    return formatDateTime(s)
+        case (nil, let e?):    return formatDateTime(e)
         default:               return nil
         }
+    }
+
+    private func formatDateTime(_ iso: String) -> String {
+        let parser = DateFormatter()
+        parser.locale = Locale(identifier: "en_US_POSIX")
+        parser.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        guard let date = parser.date(from: iso) else { return iso }
+        let f = DateFormatter()
+        f.locale = Locale(identifier: "ko_KR")
+        f.dateFormat = "M월 d일 H시 m분"
+        return f.string(from: date)
     }
 
     // MARK: - Actions

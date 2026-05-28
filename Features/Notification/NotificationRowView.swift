@@ -69,7 +69,7 @@ struct NotificationRowView: View {
             }
         }
         .padding(.horizontal, m.space16)
-        .padding(.vertical, m.space14)
+        .padding(.vertical, m.space10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(AppColors.background)
         // B-Notification-1: r=22

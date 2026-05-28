@@ -37,7 +37,7 @@ struct PromotionInfoSection: View {
                     .zIndex(1)
             }
 
-            HStack(spacing: m.space16) {
+            HStack(spacing: m.space24) {
                 if let v = promo.location       { miniInfo("동아리방", v) }
                 if let v = promo.presidentName  { miniInfo("회장",    v) }
                 if let v = promo.presidentPhone { miniInfo("연락처",  v) }
@@ -90,7 +90,7 @@ struct PromotionInfoSection: View {
                 x: m.space14,
                 y: m.space2
             )
-            .padding(.horizontal, -m.space20)
+            .padding(.horizontal, -m.space28)
     }
 
     // MARK: - Recruit / Notice Block
@@ -107,7 +107,7 @@ struct PromotionInfoSection: View {
             Text(label)
                 .font(AppTypography.notoSans(10, weight: .bold))
                 .foregroundStyle(AppColors.textPrimary)
-                .frame(width: m.scale * 56, alignment: .leading)
+                .frame(width: m.scale * 40, alignment: .leading)
             Text(value)
                 .font(AppTypography.notoSans(10, weight: .medium))
                 .foregroundStyle(AppColors.textPrimary)

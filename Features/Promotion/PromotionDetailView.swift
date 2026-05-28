@@ -7,6 +7,7 @@ struct PromotionDetailView: View {
     @State private var noLinkMessage: String? = nil
     @State private var showNoApplyAlert = false
     @State private var navigateToEdit = false
+    @State private var showQnAComposer = false
 
     private let clubId: Int
 
@@ -17,15 +18,8 @@ struct PromotionDetailView: View {
 
     var body: some View {
         ScreenContainer(scroll: false, background: AppColors.backgroundTertiary, topPadding: .none, bottomPadding: .none) { _ in
-            ZStack(alignment: .top) {
-                scrollBody
-                    .padding(.horizontal, -m.horizontalPadding)  // 이미지/콘텐츠만 풀-블리드
-                AppPageHeader(onBack: { dismiss() }, tint: .white) {
-                    EmptyView()
-                } trailing: {
-                    heartButton(filled: vm.isFavorite)
-                }
-            }
+            scrollBody
+                .padding(.horizontal, -m.horizontalPadding)
         }
         .modifier(NavBarHidden())
         .tabBarPresent(false)
@@ -42,6 +36,16 @@ struct PromotionDetailView: View {
         .alert("지원기간이 아닙니다", isPresented: $showNoApplyAlert) {
             Button("확인", role: .cancel) {}
         }
+        .fullScreenCover(isPresented: $showQnAComposer) {
+            QnAComposerView(
+                selectedClub: QnAClubSummary(
+                    clubId: clubId,
+                    clubName: vm.promotion?.name ?? "",
+                    categoryType: ""
+                ),
+                onDismiss: { showQnAComposer = false }
+            )
+        }
     }
 
     // MARK: - Scroll Body
@@ -49,7 +53,25 @@ struct PromotionDetailView: View {
     private var scrollBody: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 0) {
-                topBackgroundSection
+                ZStack(alignment: .top) {
+                    topBackgroundSection
+                    AppPageHeader(onBack: { dismiss() }, tint: .white) {
+                        EmptyView()
+                    } trailing: {
+                        if vm.canEdit {
+                            Button { navigateToEdit = true } label: {
+                                Image("icon_promotionedit_setting")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: m.scale * 22, height: m.scale * 22)
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            heartButton(filled: vm.isFavorite)
+                        }
+                    }
+                    .padding(.horizontal, m.horizontalPadding)
+                }
                 if vm.isLoading && vm.promotion == nil {
                     loadingSection
                 } else if let promo = vm.promotion {
@@ -66,7 +88,6 @@ struct PromotionDetailView: View {
     private var topBackgroundSection: some View {
         PromotionProfileHeader(
             vm: vm,
-            onTapEdit: { navigateToEdit = true },
             onNoLink: { noLinkMessage = $0 }
         )
     }
@@ -82,7 +103,7 @@ struct PromotionDetailView: View {
                 .fill(AppColors.separator)
                 .frame(height: 1)
                 .padding(.top, m.scale * 22)
-                .padding(.horizontal, -m.space20)
+                .padding(.horizontal, -m.space28)
 
             if let desc = promo.description, !desc.isEmpty {
                 Text(desc)
@@ -91,17 +112,18 @@ struct PromotionDetailView: View {
                     .lineSpacing(4)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, m.scale * 36)
+                    .padding(.leading, m.space12)
             }
 
             PromotionMediaStrip(vm: vm)
                 .padding(.top, m.scale * 22)
-                .padding(.horizontal, -m.space20)
+                .padding(.horizontal, -m.space28)
 
             bottomButtons(promo: promo)
                 .padding(.top, m.space24)
                 .padding(.bottom, m.scale * 36)
         }
-        .padding(.horizontal, m.space20)
+        .padding(.horizontal, m.space28)
     }
 
 
@@ -110,7 +132,7 @@ struct PromotionDetailView: View {
     private func bottomButtons(promo: PromotionService.ClubPromotionDTO) -> some View {
         HStack(spacing: m.space14) {
             Button {
-                // TODO: navigate to QnAComposer
+                showQnAComposer = true
             } label: {
                 Text("질문하기")
                     .font(AppTypography.notoSans(15))

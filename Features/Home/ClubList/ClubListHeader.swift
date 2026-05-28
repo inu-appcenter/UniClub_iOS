@@ -17,7 +17,6 @@ struct ClubListHeader: View {
     var body: some View {
         AppPageHeader(onBack: { onTapBack() }) {
             Text(title)
-                .font(AppTypography.bodyStrong())
                 .foregroundStyle(AppColors.textPrimary)
                 .lineLimit(1)
         } trailing: {

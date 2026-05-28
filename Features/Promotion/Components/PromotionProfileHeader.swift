@@ -3,7 +3,6 @@ import SwiftUI
 struct PromotionProfileHeader: View {
     @Environment(\.appMetrics) private var m
     @ObservedObject var vm: PromotionDetailViewModel
-    let onTapEdit: () -> Void
     let onNoLink: (String) -> Void
 
     private var topBackgroundHeight: CGFloat { m.scale * 276 }
@@ -78,18 +77,6 @@ struct PromotionProfileHeader: View {
 
     private func socialRow(_ promo: PromotionService.ClubPromotionDTO) -> some View {
         HStack(spacing: m.space8) {
-            if vm.canEdit {
-                Button(action: onTapEdit) {
-                    Text("편집")
-                        .font(AppTypography.notoSans(10, weight: .medium))
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, m.space10)
-                        .frame(height: m.scale * 26)
-                        .background(AppColors.brand)
-                        .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-            }
             if let raw = promo.applicationFormLink, let url = URL(string: raw) {
                 Link(destination: url) {
                     Text("지원 링크")

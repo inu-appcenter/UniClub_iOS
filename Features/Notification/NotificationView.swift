@@ -21,7 +21,7 @@ struct NotificationView: View {
     var body: some View {
         ScreenContainer(
             scroll: false,
-            background: AppColors.backgroundSecondary,
+            background: AppColors.backgroundTertiary,
             topPadding: .none,
             bottomPadding: .none
         ) { _ in
@@ -41,7 +41,6 @@ struct NotificationView: View {
     private var header: some View {
         AppPageHeader(onBack: { onBack() }) {
             Text("알림")
-                .font(AppTypography.notoSans(15, weight: .medium))
                 .foregroundStyle(AppColors.grey800)
         }
     }
@@ -112,7 +111,7 @@ struct NotificationView: View {
             Spacer()
         } else {
             ScrollView(showsIndicators: false) {
-                LazyVStack(spacing: 16) {
+                LazyVStack(spacing: m.space16) {
                     ForEach(current) { item in
                         NotificationRowView(
                             item: item,
@@ -128,7 +127,6 @@ struct NotificationView: View {
                         }
                     }
                 }
-                .padding(.horizontal, m.space16)
                 .padding(.vertical, m.space8)
             }
         }

@@ -26,15 +26,12 @@ struct MyPageView: View {
         ) { m in
             VStack(alignment: .leading, spacing: 0) {
 
-                Text("마이페이지")
-                    .font(AppTypography.notoSans(15, weight: .medium))
-                    .foregroundStyle(AppColors.textPrimary)
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(.top, m.space16)
-                    .padding(.bottom, m.scale * 30)
+                AppPageHeader {
+                    Text("마이페이지")
+                }
+                .padding(.bottom, m.scale * 30)
 
                 MyPageProfileHeader(profile: vm.profileUI)
-                    .shadow(color: .black.opacity(0.25), radius: 3.6, x: 0, y: 4)
                     .padding(.bottom, m.space28)
 
                 MyPageDivider()
