@@ -48,7 +48,7 @@ struct ClubListView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .topTrailing) {
+        ZStack {
             // ── 스크롤 가능한 본문 ──────────────────────────────
             ScreenContainer(scroll: true, topPadding: .none) { _ in
                 VStack(alignment: .leading, spacing: 0) {
@@ -59,8 +59,64 @@ struct ClubListView: View {
                     )
                     .padding(.bottom, m.space12)
 
-                    // 정렬 버튼 높이만큼 공간 확보
-                    Color.clear.frame(height: m.space44 + m.space24)
+                    // ── 정렬 버튼 (콘텐츠와 함께 스크롤) ──────────
+                    HStack {
+                        Spacer()
+                        VStack(alignment: .trailing, spacing: 4) {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.15)) {
+                                    showSortDropdown.toggle()
+                                }
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text(sort.rawValue)
+                                        .font(AppTypography.notoSans(11, weight: .medium))
+                                        .foregroundStyle(.white)
+                                    Image(systemName: "chevron.down")
+                                        .font(.system(size: 8, weight: .medium))
+                                        .foregroundStyle(.white)
+                                        .rotationEffect(.degrees(showSortDropdown ? 180 : 0))
+                                }
+                                .padding(.horizontal, 12)
+                                .frame(height: 25)
+                                .background(Color(hex: 0x3C3C3C))
+                                .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+
+                            if showSortDropdown {
+                                VStack(spacing: 0) {
+                                    ForEach(SortOption.allCases) { option in
+                                        Button {
+                                            sort = option
+                                            withAnimation { showSortDropdown = false }
+                                        } label: {
+                                            HStack {
+                                                Text(option.rawValue)
+                                                    .font(AppTypography.notoSans(10, weight: .medium))
+                                                    .foregroundStyle(.white)
+                                                Spacer(minLength: 0)
+                                                if sort == option {
+                                                    Image(systemName: "checkmark")
+                                                        .font(.system(size: 9, weight: .bold))
+                                                        .foregroundStyle(.white)
+                                                }
+                                            }
+                                            .padding(.horizontal, 12)
+                                            .frame(height: 32)
+                                        }
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                                .frame(width: 100)
+                                .background(Color(hex: 0x3C3C3C))
+                                .clipShape(RoundedRectangle(cornerRadius: m.radius10))
+                                .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 4)
+                                .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .topTrailing)))
+                            }
+                        }
+                    }
+                    .padding(.bottom, m.space8)
 
                     content(m)
 
@@ -96,69 +152,13 @@ struct ClubListView: View {
                     }
             }
 
-            // ── 정렬 버튼 (ScrollView 밖 — 고정 위치) ──────────
-            VStack(alignment: .trailing, spacing: 4) {
-                Button {
-                    withAnimation(.easeInOut(duration: 0.15)) {
-                        showSortDropdown.toggle()
-                    }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(sort.rawValue)
-                            .font(AppTypography.notoSans(11, weight: .medium))
-                            .foregroundStyle(.white)
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 8, weight: .medium))
-                            .foregroundStyle(.white)
-                            .rotationEffect(.degrees(showSortDropdown ? 180 : 0))
-                    }
-                    .padding(.horizontal, 12)
-                    .frame(height: 25)
-                    .background(Color(hex: 0x3C3C3C))
-                    .clipShape(Capsule())
-                }
-                .buttonStyle(.plain)
-
-                if showSortDropdown {
-                    VStack(spacing: 0) {
-                        ForEach(SortOption.allCases) { option in
-                            Button {
-                                sort = option
-                                withAnimation { showSortDropdown = false }
-                            } label: {
-                                HStack {
-                                    Text(option.rawValue)
-                                        .font(AppTypography.notoSans(10, weight: .medium))
-                                        .foregroundStyle(.white)
-                                    Spacer(minLength: 0)
-                                    if sort == option {
-                                        Image(systemName: "checkmark")
-                                            .font(.system(size: 9, weight: .bold))
-                                            .foregroundStyle(.white)
-                                    }
-                                }
-                                .padding(.horizontal, 12)
-                                .frame(height: 32)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                    .frame(width: 100)
-                    .background(Color(hex: 0x3C3C3C))
-                    .clipShape(RoundedRectangle(cornerRadius: m.radius10))
-                    .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 4)
-                    .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .topTrailing)))
-                }
-            }
-            .padding(.trailing, m.horizontalPadding)
-            .padding(.top, m.controlHeight44 + m.space4 + m.space32)
-
             // ── 검색 오버레이 ───────────────────────────────────
             if showSearch {
                 SearchView(isPresented: $showSearch, onSelectClub: { clubId in
                     showSearch = false
                     selectedClubId = clubId
                 })
+                .tabBarPresent(false)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }

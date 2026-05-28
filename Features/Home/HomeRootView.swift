@@ -45,6 +45,7 @@ struct HomeRootView: View {
                     showSearch = false
                     path.append(HomeRoute.promotionDetail(clubId))
                 })
+                .tabBarPresent(false)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }

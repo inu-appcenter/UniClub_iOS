@@ -7,6 +7,7 @@ struct PromotionDetailView: View {
     @State private var noLinkMessage: String? = nil
     @State private var showNoApplyAlert = false
     @State private var navigateToEdit = false
+    @State private var showQnAComposer = false
 
     private let clubId: Int
 
@@ -34,6 +35,16 @@ struct PromotionDetailView: View {
         }
         .alert("지원기간이 아닙니다", isPresented: $showNoApplyAlert) {
             Button("확인", role: .cancel) {}
+        }
+        .fullScreenCover(isPresented: $showQnAComposer) {
+            QnAComposerView(
+                selectedClub: QnAClubSummary(
+                    clubId: clubId,
+                    clubName: vm.promotion?.name ?? "",
+                    categoryType: ""
+                ),
+                onDismiss: { showQnAComposer = false }
+            )
         }
     }
 
@@ -121,7 +132,7 @@ struct PromotionDetailView: View {
     private func bottomButtons(promo: PromotionService.ClubPromotionDTO) -> some View {
         HStack(spacing: m.space14) {
             Button {
-                // TODO: navigate to QnAComposer
+                showQnAComposer = true
             } label: {
                 Text("질문하기")
                     .font(AppTypography.notoSans(15))

@@ -22,27 +22,12 @@ struct HomeView: View {
     let onTapClub: (Int) -> Void
     let onTapNotification: () -> Void
 
-    // MARK: Constants (Coordinate Spaces)
-    private let mainClubsScrollSpace = "home.mainClubs.scroll"
-
     // MARK: State - Main Clubs (추천 동아리)
     @State private var mainClubs: [MainClubItem] = []
     @State private var mainClubsError: String?
-
-    /// 즐겨찾기 토글 중인 clubId 집합
     @State private var favoriteLoadingClubIDs: Set<Int> = []
-
-    /// “끝에서 더 당겼을 때만” 추가 로드를 위한 트리거 진행도(0~1)
-    @State private var refreshTriggerProgress: CGFloat = 0
-    /// 한 번의 pull 동안 1회만 발동시키기 위한 락
-    @State private var didFireRefreshOnThisPull: Bool = false
-    /// 추가 로딩 중 UI 상태
-    @State private var isLoadingMoreClubs: Bool = false
-    /// 더 불러올 동아리가 없을 때 true
-    @State private var allClubsLoaded: Bool = false
-
-    /// 최초 로드 1회 보장
     @State private var didLoadOnce: Bool = false
+    @State private var reachedEnd: Bool = false
 
     @State private var hasUnreadNotification: Bool = false
 
@@ -142,7 +127,6 @@ struct HomeView: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(spacing: m.space12) {
-
                     ForEach(mainClubs) { club in
                         MainClubCardView(
                             club: club,
@@ -155,78 +139,21 @@ struct HomeView: View {
                             }
                         )
                         .id(club.id)
+                        .onAppear {
+                            if club.id == mainClubs.last?.id {
+                                reachedEnd = true
+                            }
+                        }
                     }
 
-                    if !allClubsLoaded {
-                        refreshTriggerCard(
-                            width: recommendedCardWidth() / 2,
-                            height: recommendedCardHeight()
-                        )
-                        .background(refreshTriggerProgressReader)
+                    if reachedEnd {
+                        ProgressView()
+                            .frame(width: recommendedCardWidth() / 2, height: recommendedCardHeight())
                     }
                 }
                 .padding(.vertical, m.space4)
             }
-            .coordinateSpace(name: mainClubsScrollSpace)
-            .onPreferenceChange(RefreshTriggerProgressKey.self) { progress in
-                refreshTriggerProgress = progress
-                handleRefreshTrigger(progress: progress)
-            }
         }
-        .onDisappear {
-            didLoadOnce = false
-            mainClubs = []
-            isLoadingMoreClubs = false
-            didFireRefreshOnThisPull = false
-            allClubsLoaded = false
-        }
-    }
-
-    private var refreshTriggerProgressReader: some View {
-        GeometryReader { geo in
-            let frame = geo.frame(in: .named(mainClubsScrollSpace))
-            let w = max(1, frame.width)
-
-            let maxW = min(m.screenSize.width, m.contentMaxWidth)
-            let visibleMaxX = maxW - (m.horizontalPadding * 2)
-            let visible = max(0, min(w, visibleMaxX - frame.minX))
-            let progress = min(1, visible / w)
-
-            Color.clear
-                .preference(key: RefreshTriggerProgressKey.self, value: progress)
-        }
-    }
-
-    private func handleRefreshTrigger(progress: CGFloat) {
-        let threshold: CGFloat = 0.7
-
-        if !isLoadingMoreClubs,
-           !didFireRefreshOnThisPull,
-           !allClubsLoaded,
-           progress >= threshold {
-
-            didFireRefreshOnThisPull = true
-            Task { await appendMainClubs() }
-        }
-
-        if progress < 0.05, didFireRefreshOnThisPull {
-            didFireRefreshOnThisPull = false
-        }
-    }
-
-    private func refreshTriggerCard(width: CGFloat, height: CGFloat) -> some View {
-        RoundedRectangle(cornerRadius: m.radius18, style: .continuous)
-            .fill(AppColors.fieldFill)
-            .frame(width: width, height: height)
-            .overlay {
-                if isLoadingMoreClubs {
-                    ProgressView()
-                } else {
-                    Image(systemName: "plus")
-                        .font(AppTypography.notoSans(m.space18, weight: .semibold))
-                        .foregroundStyle(AppColors.textSecondary)
-                }
-            }
     }
 
     // MARK: - Divider
@@ -339,50 +266,11 @@ struct HomeView: View {
             var seen = Set<Int>()
             let unique = result.filter { seen.insert($0.clubId).inserted }
 
-            self.mainClubs = pickRandomFive(from: unique)
+            self.mainClubs = Array(unique.shuffled().prefix(5))
             self.mainClubsError = nil
         } catch {
             self.mainClubs = []
             self.mainClubsError = "추천 동아리를 불러오지 못했습니다."
-        }
-    }
-
-    @MainActor
-    private func appendMainClubs() async {
-        guard !isLoadingMoreClubs, !allClubsLoaded else { return }
-
-        let start = Date()
-        isLoadingMoreClubs = true
-        defer { isLoadingMoreClubs = false }
-
-        do {
-            let result = try await MainClubsService.fetchMainClubs()
-
-            var seen = Set<Int>()
-            let unique = result.filter { seen.insert($0.clubId).inserted }
-
-            let existingIds = Set(mainClubs.map { $0.clubId })
-            let available = unique.filter { !existingIds.contains($0.clubId) }
-
-            let newClubs = Array(available.shuffled().prefix(5))
-
-            let elapsed = Date().timeIntervalSince(start)
-            if elapsed < 1.0 {
-                let ns = UInt64((1.0 - elapsed) * 1_000_000_000)
-                try? await Task.sleep(nanoseconds: ns)
-            }
-
-            if newClubs.isEmpty {
-                allClubsLoaded = true
-            } else {
-                self.mainClubs.append(contentsOf: newClubs)
-                if available.count <= newClubs.count {
-                    allClubsLoaded = true
-                }
-            }
-            self.mainClubsError = nil
-        } catch {
-            self.mainClubsError = "동아리를 더 불러오지 못했습니다."
         }
     }
 
@@ -406,21 +294,7 @@ struct HomeView: View {
         }
     }
 
-    private func pickRandomFive(from items: [MainClubItem]) -> [MainClubItem] {
-        if items.count <= 5 { return items }
-        return Array(items.shuffled().prefix(5))
-    }
-}
 
-// MARK: - MainClubCardView (추천 카드)
-
-// MARK: - Refresh Trigger PreferenceKey
-
-private struct RefreshTriggerProgressKey: PreferenceKey {
-    static var defaultValue: CGFloat = 0
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = max(value, nextValue())
-    }
 }
 
 // MARK: - Preview

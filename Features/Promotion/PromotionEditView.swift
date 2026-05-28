@@ -21,20 +21,20 @@ struct PromotionEditView: View {
         ScreenContainer(scroll: false, background: AppColors.backgroundTertiary, topPadding: .none, bottomPadding: .none) { _ in
             scrollBody
                 .padding(.horizontal, -m.horizontalPadding)
-                .overlay {
-                    if activeLinkTarget != nil {
-                        Color.black.opacity(0.3)
-                            .ignoresSafeArea()
-                            .onTapGesture { withAnimation { activeLinkTarget = nil } }
-
-                        linkInputCard
-                            .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                            .ignoresSafeArea(.keyboard)
-                    }
-                }
-                .animation(.easeInOut(duration: 0.2), value: activeLinkTarget != nil)
         }
+        .overlay {
+            if activeLinkTarget != nil {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                    .onTapGesture { withAnimation { activeLinkTarget = nil } }
+
+                linkInputCard
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .ignoresSafeArea(.keyboard)
+            }
+        }
+        .animation(.easeInOut(duration: 0.2), value: activeLinkTarget != nil)
         .modifier(NavBarHiddenModifier())
         .tabBarPresent(false)
         .task { await vm.load() }
@@ -63,11 +63,6 @@ struct PromotionEditView: View {
                     topBackgroundSection
                     AppPageHeader(onBack: { dismiss() }, tint: .white) {
                         EmptyView()
-                    } trailing: {
-                        Image(systemName: "gearshape.fill")
-                            .font(AppTypography.notoSans(18))
-                            .foregroundStyle(.white)
-                            .frame(width: m.controlHeight44, height: m.controlHeight44)
                     }
                     .padding(.horizontal, m.horizontalPadding)
                 }
