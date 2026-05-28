@@ -17,15 +17,8 @@ struct PromotionDetailView: View {
 
     var body: some View {
         ScreenContainer(scroll: false, background: AppColors.backgroundTertiary, topPadding: .none, bottomPadding: .none) { _ in
-            ZStack(alignment: .top) {
-                scrollBody
-                    .padding(.horizontal, -m.horizontalPadding)  // 이미지/콘텐츠만 풀-블리드
-                AppPageHeader(onBack: { dismiss() }, tint: .white) {
-                    EmptyView()
-                } trailing: {
-                    heartButton(filled: vm.isFavorite)
-                }
-            }
+            scrollBody
+                .padding(.horizontal, -m.horizontalPadding)
         }
         .modifier(NavBarHidden())
         .tabBarPresent(false)
@@ -49,7 +42,25 @@ struct PromotionDetailView: View {
     private var scrollBody: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 0) {
-                topBackgroundSection
+                ZStack(alignment: .top) {
+                    topBackgroundSection
+                    AppPageHeader(onBack: { dismiss() }, tint: .white) {
+                        EmptyView()
+                    } trailing: {
+                        if vm.canEdit {
+                            Button { navigateToEdit = true } label: {
+                                Image("icon_promotionedit_setting")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: m.scale * 22, height: m.scale * 22)
+                            }
+                            .buttonStyle(.plain)
+                        } else {
+                            heartButton(filled: vm.isFavorite)
+                        }
+                    }
+                    .padding(.horizontal, m.horizontalPadding)
+                }
                 if vm.isLoading && vm.promotion == nil {
                     loadingSection
                 } else if let promo = vm.promotion {
@@ -66,7 +77,6 @@ struct PromotionDetailView: View {
     private var topBackgroundSection: some View {
         PromotionProfileHeader(
             vm: vm,
-            onTapEdit: { navigateToEdit = true },
             onNoLink: { noLinkMessage = $0 }
         )
     }

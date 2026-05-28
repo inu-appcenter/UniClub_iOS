@@ -40,7 +40,6 @@ struct QnAComposerView: View {
         ) { _ in
             VStack(alignment: .leading, spacing: 0) {
                 header
-                    .padding(.top, m.space18)
 
                 clubSelector
                     .padding(.top, m.space16)

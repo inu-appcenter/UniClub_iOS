@@ -19,31 +19,21 @@ struct PromotionEditView: View {
 
     var body: some View {
         ScreenContainer(scroll: false, background: AppColors.backgroundTertiary, topPadding: .none, bottomPadding: .none) { _ in
-            ZStack(alignment: .top) {
-                scrollBody
-                    .padding(.horizontal, -m.horizontalPadding)  // 이미지/콘텐츠만 풀-블리드
-                AppPageHeader(onBack: { dismiss() }, tint: .white) {
-                    EmptyView()
-                } trailing: {
-                    Image(systemName: "gearshape.fill")
-                        .font(AppTypography.notoSans(18))
-                        .foregroundStyle(.white)
-                        .frame(width: m.controlHeight44, height: m.controlHeight44)
-                }
+            scrollBody
+                .padding(.horizontal, -m.horizontalPadding)
+                .overlay {
+                    if activeLinkTarget != nil {
+                        Color.black.opacity(0.3)
+                            .ignoresSafeArea()
+                            .onTapGesture { withAnimation { activeLinkTarget = nil } }
 
-                // B-Promotion-4: 카드형 인라인 링크 입력 (화면 중앙 정렬)
-                if activeLinkTarget != nil {
-                    Color.black.opacity(0.3)
-                        .ignoresSafeArea()
-                        .onTapGesture { withAnimation { activeLinkTarget = nil } }
-
-                    linkInputCard
-                        .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .ignoresSafeArea(.keyboard)
+                        linkInputCard
+                            .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                            .ignoresSafeArea(.keyboard)
+                    }
                 }
-            }
-            .animation(.easeInOut(duration: 0.2), value: activeLinkTarget != nil)
+                .animation(.easeInOut(duration: 0.2), value: activeLinkTarget != nil)
         }
         .modifier(NavBarHiddenModifier())
         .tabBarPresent(false)
@@ -69,7 +59,18 @@ struct PromotionEditView: View {
     private var scrollBody: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 0) {
-                topBackgroundSection
+                ZStack(alignment: .top) {
+                    topBackgroundSection
+                    AppPageHeader(onBack: { dismiss() }, tint: .white) {
+                        EmptyView()
+                    } trailing: {
+                        Image(systemName: "gearshape.fill")
+                            .font(AppTypography.notoSans(18))
+                            .foregroundStyle(.white)
+                            .frame(width: m.controlHeight44, height: m.controlHeight44)
+                    }
+                    .padding(.horizontal, m.horizontalPadding)
+                }
                 if vm.isLoading {
                     loadingSection
                 } else {

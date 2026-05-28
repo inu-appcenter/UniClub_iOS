@@ -33,9 +33,10 @@ struct QnAListView: View {
                 bottomPadding: .none
             ) { _ in
                 VStack(alignment: .leading, spacing: 0) {
-                    header
-                        .padding(.top, m.space18)
-                        .padding(.bottom, m.space24)
+                    AppPageHeader(onBack: { onBackToHome() }) {
+                        Text("질의응답")
+                    }
+                    .padding(.bottom, m.space24)
 
                     QnASearchBar(
                         placeholder: "질문을 검색해보세요.",
@@ -150,23 +151,6 @@ struct QnAListView: View {
         .animation(.easeInOut(duration: 0.2), value: isShowingDeleteConfirmation)
         .animation(.easeInOut(duration: 0.2), value: isShowingReportDialog)
         .animation(.easeInOut(duration: 0.2), value: isShowingBlockDialog)
-    }
-
-    private var header: some View {
-        HStack {
-            IconButton.back { onBackToHome() }
-
-            Spacer(minLength: 0)
-
-            Text("질의응답")
-                .font(AppTypography.notoSans(15, weight: .medium))
-                .foregroundStyle(AppColors.textPrimary)
-
-            Spacer(minLength: 0)
-
-            Color.clear
-                .frame(width: m.controlHeight44, height: m.controlHeight44)
-        }
     }
 
     @ViewBuilder

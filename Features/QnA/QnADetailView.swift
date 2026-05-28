@@ -45,7 +45,6 @@ struct QnADetailView: View {
 
             VStack(spacing: 0) {
                 header
-                    .padding(.top, m.space14)
                     .padding(.horizontal, m.horizontalPadding)
 
                 detailContent
