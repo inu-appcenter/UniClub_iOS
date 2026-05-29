@@ -19,6 +19,14 @@ struct QnARootView: View {
             },
             onOpenComposer: { selectedClub in
                 path.append(QnARoute.compose(selectedClub: selectedClub))
+            },
+            onEditQuestion: { question in
+                let club = QnAClubSummary(clubId: 0, clubName: question.clubName, categoryType: "")
+                path.append(QnARoute.edit(
+                    questionId: question.questionId,
+                    club: club,
+                    initialContent: question.content
+                ))
             }
         )
         .tabBarPresent(false)

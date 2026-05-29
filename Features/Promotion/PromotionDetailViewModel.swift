@@ -31,7 +31,7 @@ final class PromotionDetailViewModel: ObservableObject {
     }
 
     var canEdit: Bool {
-        promotion?.role == "ADMIN" || promotion?.role == "PRESIDENT"
+        promotion?.role == "PRESIDENT"
     }
 
     var statusText: String {

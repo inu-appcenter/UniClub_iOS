@@ -62,59 +62,27 @@ struct ClubListView: View {
                     // ── 정렬 버튼 (콘텐츠와 함께 스크롤) ──────────
                     HStack {
                         Spacer()
-                        VStack(alignment: .trailing, spacing: 4) {
-                            Button {
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    showSortDropdown.toggle()
-                                }
-                            } label: {
-                                HStack(spacing: 4) {
-                                    Text(sort.rawValue)
-                                        .font(AppTypography.notoSans(11, weight: .medium))
-                                        .foregroundStyle(.white)
-                                    Image(systemName: "chevron.down")
-                                        .font(.system(size: 8, weight: .medium))
-                                        .foregroundStyle(.white)
-                                        .rotationEffect(.degrees(showSortDropdown ? 180 : 0))
-                                }
-                                .padding(.horizontal, 12)
-                                .frame(height: 25)
-                                .background(Color(hex: 0x3C3C3C))
-                                .clipShape(Capsule())
+                        Button {
+                            withAnimation(.easeInOut(duration: 0.15)) {
+                                showSortDropdown.toggle()
                             }
-                            .buttonStyle(.plain)
-
-                            if showSortDropdown {
-                                VStack(spacing: 0) {
-                                    ForEach(SortOption.allCases) { option in
-                                        Button {
-                                            sort = option
-                                            withAnimation { showSortDropdown = false }
-                                        } label: {
-                                            HStack {
-                                                Text(option.rawValue)
-                                                    .font(AppTypography.notoSans(10, weight: .medium))
-                                                    .foregroundStyle(.white)
-                                                Spacer(minLength: 0)
-                                                if sort == option {
-                                                    Image(systemName: "checkmark")
-                                                        .font(.system(size: 9, weight: .bold))
-                                                        .foregroundStyle(.white)
-                                                }
-                                            }
-                                            .padding(.horizontal, 12)
-                                            .frame(height: 32)
-                                        }
-                                        .buttonStyle(.plain)
-                                    }
-                                }
-                                .frame(width: 100)
-                                .background(Color(hex: 0x3C3C3C))
-                                .clipShape(RoundedRectangle(cornerRadius: m.radius10))
-                                .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 4)
-                                .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .topTrailing)))
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(sort.rawValue)
+                                    .font(AppTypography.notoSans(11, weight: .medium))
+                                    .foregroundStyle(.white)
+                                Image(systemName: "chevron.down")
+                                    .font(.system(size: 8, weight: .medium))
+                                    .foregroundStyle(.white)
+                                    .rotationEffect(.degrees(showSortDropdown ? 180 : 0))
                             }
+                            .padding(.horizontal, 12)
+                            .frame(height: 25)
+                            .background(Color(hex: 0x3C3C3C))
+                            .clipShape(Capsule())
                         }
+                        .buttonStyle(.plain)
+                        .anchorPreference(key: SortButtonBoundsKey.self, value: .bounds) { $0 }
                     }
                     .padding(.bottom, m.space8)
 
@@ -159,10 +127,48 @@ struct ClubListView: View {
                     selectedClubId = clubId
                 })
                 .tabBarPresent(false)
+                .ignoresSafeArea(edges: .bottom)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .animation(.easeInOut(duration: 0.25), value: showSearch)
+        .overlayPreferenceValue(SortButtonBoundsKey.self) { anchor in
+            if showSortDropdown, let anchor {
+                GeometryReader { geo in
+                    let frame = geo[anchor]
+                    VStack(spacing: 0) {
+                        ForEach(SortOption.allCases) { option in
+                            Button {
+                                sort = option
+                                withAnimation(.easeInOut(duration: 0.15)) { showSortDropdown = false }
+                            } label: {
+                                HStack {
+                                    Text(option.rawValue)
+                                        .font(AppTypography.notoSans(10, weight: .medium))
+                                        .foregroundStyle(.white)
+                                    Spacer(minLength: 0)
+                                    if sort == option {
+                                        Image(systemName: "checkmark")
+                                            .font(.system(size: 9, weight: .bold))
+                                            .foregroundStyle(.white)
+                                    }
+                                }
+                                .padding(.horizontal, 12)
+                                .frame(height: 32)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .frame(width: 100)
+                    .background(Color(hex: 0x3C3C3C))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .shadow(color: .black.opacity(0.2), radius: 6, x: 0, y: 4)
+                    .transition(.opacity.combined(with: .scale(scale: 0.95, anchor: .topTrailing)))
+                    .offset(x: frame.maxX - 100, y: frame.maxY + 4)
+                }
+                .ignoresSafeArea()
+            }
+        }
     }
 
     // MARK: - Content (State-driven)
@@ -289,6 +295,13 @@ struct ClubListView: View {
             category: item.category,
             clubProfileUrl: item.imageURL?.absoluteString
         )
+    }
+}
+
+private struct SortButtonBoundsKey: PreferenceKey {
+    static let defaultValue: Anchor<CGRect>? = nil
+    static func reduce(value: inout Anchor<CGRect>?, nextValue: () -> Anchor<CGRect>?) {
+        value = value ?? nextValue()
     }
 }
 

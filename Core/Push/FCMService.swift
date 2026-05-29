@@ -6,6 +6,7 @@ import Foundation
 import Combine
 import UserNotifications
 import UIKit
+import FirebaseMessaging
 
 @MainActor
 final class FCMService: NSObject, ObservableObject {
@@ -33,6 +34,13 @@ final class FCMService: NSObject, ObservableObject {
     func refreshAuthorizationStatus() async {
         let settings = await UNUserNotificationCenter.current().notificationSettings()
         authorizationStatus = settings.authorizationStatus
+    }
+
+    // MARK: - 로그인 시 현재 토큰 등록
+
+    func registerCurrentToken() async {
+        guard let token = Messaging.messaging().fcmToken else { return }
+        await registerTokenWithServer(token)
     }
 
     // MARK: - 서버 토큰 등록

@@ -58,11 +58,11 @@ struct NotificationView: View {
     private func tabItem(_ label: String, tab: NotificationTab) -> some View {
         let isActive = selectedTab == tab
 
-        return VStack(spacing: 0) {
-            // 인디케이터가 위
+        return VStack(alignment: .leading, spacing: 0) {
             Rectangle()
                 .fill(isActive ? AppColors.brand : AppColors.inactiveTab)
-                .frame(height: 4)
+                .frame(width: 140, height: 4)
+                .clipShape(RoundedRectangle(cornerRadius: 2))
 
             Button(action: {
                 withAnimation(.easeInOut(duration: 0.15)) { selectedTab = tab }
@@ -70,12 +70,14 @@ struct NotificationView: View {
                 Text(label)
                     .font(AppTypography.notoSans(11, weight: .medium))
                     .foregroundStyle(isActive ? AppColors.brand : AppColors.grey500)
-                    .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .frame(height: 32)
             }
             .buttonStyle(.plain)
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, isActive ? 0 : 8)
+        .animation(.easeInOut(duration: 0.15), value: isActive)
     }
 
     // MARK: - 전체 읽음 / 전체 삭제 (탭바 아래 별도 행)

@@ -3,7 +3,7 @@ import SwiftUI
 struct TabBarPresencePreferenceKey: PreferenceKey {
     static var defaultValue: Bool = true
     static func reduce(value: inout Bool, nextValue: () -> Bool) {
-        value = nextValue()
+        value = value && nextValue()
     }
 }
 

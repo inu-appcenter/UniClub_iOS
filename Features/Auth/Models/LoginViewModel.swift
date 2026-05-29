@@ -20,6 +20,7 @@ final class LoginViewModel: ObservableObject {
         do {
             let res = try await LoginService.login(studentId: studentId, password: password)
             MyAuthStore.shared.setAccessToken(res.accessToken)
+            await FCMService.shared.registerCurrentToken()
             errorMessage = nil
         } catch let apiError as APIError {
             errorMessage = loginErrorMessage(from: apiError)

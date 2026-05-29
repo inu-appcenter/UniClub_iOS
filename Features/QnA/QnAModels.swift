@@ -156,15 +156,13 @@ struct QnAClubSummary: Identifiable, Decodable, Hashable {
 
     var categoryDisplayName: String {
         switch categoryType {
-        case "ACADEMIC_EDUCATION": return "교양학술"
-        case "ART_CULTURE": return "문화"
+        case "ACADEMIC_EDUCATION", "LIBERAL_ACADEMIC", "IT_TECH": return "교양학술"
+        case "ART_CULTURE", "CULTURE": return "문화"
         case "SPORTS": return "체육"
         case "RELIGION": return "종교"
         case "VOLUNTEER": return "봉사"
-        case "IT_TECH": return "교양학술"
         case "HOBBY_EXHIBITION": return "취미전시"
-        default:
-            return categoryType.replacingOccurrences(of: "_", with: " ").capitalized
+        default: return categoryType
         }
     }
 }

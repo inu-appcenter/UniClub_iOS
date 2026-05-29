@@ -14,6 +14,7 @@ struct QnAListView: View {
     let onBackToHome: () -> Void
     let onOpenDetail: (Int) -> Void
     let onOpenComposer: (QnAClubSummary?) -> Void
+    let onEditQuestion: (QnAQuestionSummary) -> Void
 
     @State private var isClubPickerPresented: Bool = false
     @State private var selectedActionQuestion: QnAQuestionSummary?
@@ -237,8 +238,9 @@ struct QnAListView: View {
             QnAQuestionActionSheet(
                 question: question,
                 onEdit: {
+                    let q = question
                     selectedActionQuestion = nil
-                    onOpenDetail(question.questionId)
+                    onEditQuestion(q)
                 },
                 onDelete: { isShowingDeleteConfirmation = true },
                 onReport: { isShowingReportDialog = true },

@@ -16,7 +16,7 @@ struct ClubListCard: View {
                     if let status = ClubStatus(rawValue: item.status ?? "") {
                         statusBadge(for: status)
                             .padding(.trailing, m.space20)
-                            .padding(.bottom, 2)
+                            .padding(.bottom, 8)
                     }
                 }
 
@@ -27,7 +27,7 @@ struct ClubListCard: View {
     // MARK: - Card Content
 
     private var cardContent: some View {
-        HStack(spacing: m.space20) {
+        HStack(alignment: .top, spacing: m.space20) {
             avatar
 
             VStack(alignment: .leading, spacing: m.space4) {
@@ -36,7 +36,7 @@ struct ClubListCard: View {
             }
         }
         .padding(m.space8)
-        .background(AppColors.brandLight)
+        .background(AppColors.brandCardFill)
         .clipShape(RoundedRectangle(cornerRadius: m.radiusClubCard))
         .shadow(color: .black.opacity(0.25), radius: 13.4, x: 0, y: 0)
     }
@@ -81,7 +81,7 @@ struct ClubListCard: View {
         Button {
             onFavoriteTap?()
         } label: {
-            Image(systemName: item.favorite ? "heart.fill" : "heart")
+            Image(systemName: "heart.fill")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(item.favorite ? AppColors.error : .white.opacity(0.9))
                 .shadow(
@@ -93,7 +93,10 @@ struct ClubListCard: View {
         }
         .buttonStyle(.plain)
         .disabled(onFavoriteTap == nil)
-        .padding(8)
+        .padding(.top, m.space8)
+        .padding(.bottom, m.space8)
+        .padding(.leading, m.space8)
+        .padding(.trailing, m.space20)
     }
 
     // MARK: - Status Badge

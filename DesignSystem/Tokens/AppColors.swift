@@ -20,8 +20,9 @@ public enum AppColors {
     public static let grey000 = Color(hex: 0xFFFFFF)
 
     // MARK: - Brand
-    public static let brand      = Color(hex: 0xFF5900)
-    public static let brandLight = Color(hex: 0xFF7600)
+    public static let brand          = Color(hex: 0xFF5900)
+    public static let brandLight     = Color(hex: 0xFF7600)
+    public static let brandCardFill  = Color(hex: 0xFF9230)
     public static let error      = Color(hex: 0xF30000)
     public static let pink       = Color(hex: 0xFFBFC8)
 
