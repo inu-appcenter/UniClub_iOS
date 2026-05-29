@@ -79,6 +79,7 @@ public struct ScreenContainer<Content: View>: View {
                     ScrollView(showsIndicators: showsIndicators) {
                         inner(metrics)
                     }
+                    .scrollClipDisabled()
                 } else {
                     inner(metrics)
                 }

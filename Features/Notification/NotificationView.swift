@@ -12,6 +12,8 @@ struct NotificationView: View {
     @Environment(\.appMetrics) private var m
 
     let onBack: () -> Void
+    let onNavigateToClub: (Int) -> Void
+    let onNavigateToQnA: (Int) -> Void
 
     @StateObject private var vm = NotificationViewModel()
     @State private var selectedTab: NotificationTab = .unread
@@ -117,20 +119,22 @@ struct NotificationView: View {
                     ForEach(current) { item in
                         NotificationRowView(
                             item: item,
-                            onAction: { handleAction(item) }
-                        )
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                Task { await vm.delete(item: item) }
-                            } label: {
-                                Label("삭제", systemImage: "trash")
+                            actionLabel: actionLabel(for: item),
+                            swipeLabel: selectedTab == .unread ? "읽음" : "삭제",
+                            onAction: { handleAction(item) },
+                            onSwipeAction: {
+                                if selectedTab == .unread {
+                                    Task { await vm.markRead(item: item) }
+                                } else {
+                                    Task { await vm.delete(item: item) }
+                                }
                             }
-                            .tint(AppColors.brand)
-                        }
+                        )
                     }
                 }
                 .padding(.vertical, m.space8)
             }
+            .scrollClipDisabled()
         }
     }
 
@@ -144,19 +148,22 @@ struct NotificationView: View {
         }
     }
 
+    private func actionLabel(for item: NotificationItem) -> String? {
+        switch item.type {
+        case .club:       return "지원하기"
+        case .qna:        return "이동하기"
+        default:          return nil
+        }
+    }
+
     private func handleAction(_ item: NotificationItem) {
         Task { await vm.markRead(item: item) }
+        guard let targetId = item.targetId else { return }
+        switch item.type {
+        case .club:       onNavigateToClub(targetId)
+        case .qna:        onNavigateToQnA(targetId)
+        default:          break
+        }
     }
 }
 
-#Preview("알림 - 안읽은 목록") {
-    NotificationView(onBack: {})
-        .environment(\.appMetrics, .make(for: CGSize(width: 390, height: 844)))
-}
-
-#Preview("알림 - 빈 화면") {
-    var view = NotificationView(onBack: {})
-    return view
-        .environment(\.appMetrics, .make(for: CGSize(width: 390, height: 844)))
-        .onAppear { }
-}

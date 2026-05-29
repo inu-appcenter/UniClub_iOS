@@ -223,6 +223,7 @@ struct QnAListView: View {
                 .padding(.top, m.space4)
                 .padding(.bottom, m.space8)
             }
+            .scrollClipDisabled()
             .refreshable {
                 async let load: () = viewModel.loadQuestions()
                 async let delay: () = Task.sleep(nanoseconds: 500_000_000)

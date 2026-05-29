@@ -73,6 +73,7 @@ struct PromotionEditView: View {
                 }
             }
         }
+        .scrollClipDisabled()
     }
 
     // MARK: - Top Background Section

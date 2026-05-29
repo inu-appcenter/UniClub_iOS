@@ -54,6 +54,7 @@ struct HomeView: View {
                 VStack(alignment: .leading, spacing: 0) {
 
                     header
+                        .padding(.trailing, m.space4)
                         .padding(.top, m.space14)
 
                     bannerCarousel
@@ -71,6 +72,7 @@ struct HomeView: View {
                 }
                 .padding(.bottom, tabBarHeight)
             }
+            .scrollClipDisabled()
         }
         .task { await initialLoadIfNeeded() }
         .task { await loadUnreadNotificationStatus() }

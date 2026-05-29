@@ -7,6 +7,7 @@ enum HomeRoute: Hashable {
     case search
     case promotionDetail(Int)
     case notification
+    case qnaDetail(Int)
 }
 
 enum ClubListMode: Hashable {

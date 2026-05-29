@@ -32,8 +32,25 @@ struct HomeRootView: View {
                     PromotionDetailView(clubId: clubId)
 
                 case .notification:
-                    NotificationView(onBack: { path.removeLast() })
-                        .tabBarPresent(false)
+                    NotificationView(
+                        onBack: { path.removeLast() },
+                        onNavigateToClub: { clubId in
+                            path.append(HomeRoute.promotionDetail(clubId))
+                        },
+                        onNavigateToQnA: { questionId in
+                            path.append(HomeRoute.qnaDetail(questionId))
+                        }
+                    )
+                    .tabBarPresent(false)
+
+                case .qnaDetail(let questionId):
+                    QnADetailView(
+                        questionId: questionId,
+                        onBack: { path.removeLast() },
+                        onCloseToHome: { path.removeLast(path.count) },
+                        onEdit: { qId, club, content in }
+                    )
+                    .tabBarPresent(false)
 
                 case .search:
                     EmptyView()
