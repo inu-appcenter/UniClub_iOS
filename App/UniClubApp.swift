@@ -11,7 +11,7 @@ import SwiftUI
 struct UniClubApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var auth = MyAuthStore.shared
-
+    
     var body: some Scene {
         WindowGroup {
             GeometryReader { geo in
